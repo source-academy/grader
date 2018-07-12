@@ -1,0 +1,16 @@
+{
+  "name": "grader",
+  "version": "0.1.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc && zip -r --exclude=*terraform* terraform/grader.zip ."
+  },
+  "dependencies": {
+    "js-slang": "0.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^10.5.2",
+    "typescript": "^2.9.2"
+  }
+}
