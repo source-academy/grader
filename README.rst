@@ -2,6 +2,12 @@
 Grader
 ======
 
+.. image:: https://travis-ci.org/source-academy/grader.svg?branch=master
+    :target: https://travis-ci.org/source-academy/grader
+.. image:: https://coveralls.io/repos/github/source-academy/grader/badge.svg?branch=master
+    :target: https://coveralls.io/github/source-academy/grader?branch=master
+
+
 **The grader is still in development, API specficiations may change!**
 
 The grader is a component of the `Cadet backend`_. The grader:
