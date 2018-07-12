@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "build": "rm -rf node_modules && yarn install --production=true && tsc && zip -r --exclude=*terraform* terraform/grader.zip index.js node_modules/ && yarn install --production=false",
-    "test": "jest"
+    "test": "jest",
+    "test-coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls"
   },
   "dependencies": {
     "js-slang": "0.1.2",
@@ -13,6 +14,7 @@
   },
   "devDependencies": {
     "@types/node": "^10.5.2",
+    "coveralls": "^3.0.2",
     "jest": "^23.4.0",
     "ts-jest": "^23.0.0"
   },
