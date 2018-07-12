@@ -11,7 +11,7 @@ type AwsContext = {}
 
 type AwsCallback = (e: Error | null, output: GraderOutput) => void
 
-export type GraderOutput = GraderPass | GraderError
+type GraderOutput = GraderPass | GraderError
 
 type GraderPass = {
   resultType: 'pass'
@@ -46,7 +46,18 @@ export function myHandler(event: AwsEvent, c: AwsContext, callback: AwsCallback)
   })
 }
 
-const parseError = (sourceErrors: Array<SourceError>, stdProg: string, grdProg: string): GraderError => {
+/**
+ * Transforms the given SourceErrors and student, grader programs into an output
+ * of @type {GraderError}.
+ * @param sourceErrors Non-empty array of SourceErrors.
+ * @param stdProg Student program.
+ * @param grdProg Grader program.
+ */
+export const parseError = (
+  sourceErrors: Array<SourceError>,
+  stdProg: string,
+  grdProg: string
+): GraderError => {
   const stdProgLines = numLines(stdProg)
   const errors =  sourceErrors.map((err: SourceError) => {
     const line = err.location.end.line
@@ -63,4 +74,8 @@ const parseError = (sourceErrors: Array<SourceError>, stdProg: string, grdProg: 
   }
 }
 
+/**
+ * Count the number of lines in a given string.
+ * @param lines String to count number of lines of.
+ */
 export const numLines = (lines: string) => lines.split("\n").length
