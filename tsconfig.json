@@ -24,7 +24,7 @@
   },
   "exclude": [
     "node_modules",
-    "__tests__"
+    "src/__tests__"
   ],
   "types": [
     "typePatches"
