@@ -1,3 +1,7 @@
+variable "env" {
+  default = "stg"
+}
+
 provider "aws" {
   region = "ap-southeast-1"
 }
@@ -22,9 +26,9 @@ resource  "aws_iam_role" "iam_for_lambda" {
 EOF
 }
 
-resource "aws_lambda_function" "test_lambda" {
+resource "aws_lambda_function" "grader" {
   filename      = "grader.zip"
-  function_name = "grader"
+  function_name = "${var.env}-cadet-grader"
   handler       = "index.runAll"
   role          = "${aws_iam_role.iam_for_lambda.arn}"
   runtime       = "nodejs8.10"
