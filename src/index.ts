@@ -3,13 +3,9 @@ import { ErrorType, SourceError } from 'js-slang/dist/types'
 
 type AwsEvent = {
   chapter: number
-  graderProgram: string
+  graderPrograms: string[]
   studentProgram: string
 }
-
-type AwsContext = {}
-
-type AwsCallback = (e: Error | null, output: GraderOutput) => void
 
 type GraderOutput = GraderPass | GraderError
 
@@ -27,23 +23,24 @@ type GraderError = {
   }>
 }
 
-export function myHandler(event: AwsEvent, c: AwsContext, callback: AwsCallback) {
-  const context = createContext<{}>(event.chapter)
-  const program = event.studentProgram + '\n' + event.graderProgram
-  const promise = runInContext(program, context, { scheduler: 'preemptive' })
-  promise.then(obj => {
-    if (obj.status == 'finished') {
-      callback(
-        null,
-        {
-          "resultType": "pass",
-          "marks": obj.value
-        }
-      )
-    } else {
-      callback(null, parseError(context.errors, event.studentProgram, event.graderProgram))
-    }
-  })
+export const run = async (chap: number, stdPrg: string, gdrPrg: string): Promise<GraderOutput> => {
+  const context = createContext<{}>(chap)
+  const program = stdPrg + '\n' + gdrPrg
+  const result = await runInContext(program, context, { scheduler: 'preemptive' })
+  if (result.status == 'finished') {
+    return { "resultType": "pass", "marks": result.value } as GraderPass
+  } else {
+    return parseError(context.errors, stdPrg, gdrPrg)
+  }
+}
+
+export const runAll = async (event: AwsEvent): Promise<GraderOutput[]> => {
+  const stdPrg = event.studentProgram
+  const promises = event.graderPrograms.map(
+    gdrPrg => run(event.chapter, stdPrg, gdrPrg)
+  )
+  const results = await Promise.all(promises)
+  return results
 }
 
 /**
