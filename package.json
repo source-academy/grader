@@ -9,7 +9,7 @@
     "test-coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls"
   },
   "dependencies": {
-    "js-slang": "0.1.2",
+    "js-slang": "0.1.4",
     "typescript": "^2.9.2"
   },
   "devDependencies": {
