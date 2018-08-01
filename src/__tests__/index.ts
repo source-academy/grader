@@ -1,4 +1,4 @@
-import { myHandler, numLines, parseError } from '../index'
+import { myHandler, numLines, parseError, runAll } from '../index'
 import { TypeError } from 'js-slang/dist/utils/rttc'
 
 const validStudent =
@@ -9,7 +9,7 @@ const validGrader =
      const sum_marks = sum(1, 9) === 10 ? 2 : 0;
      const mul_marks = mul(9, 9) === 81 ? 3 : 0;
      return sum_marks + mul_marks;
-   })()`
+   })();`
 const invalidStudentSyntax =
   `const sum = (a, b) => a + b;
    const mul = (a, b) => a * b  // missing semicolon`
@@ -31,9 +31,25 @@ const invalidGraderRuntime =
 
 describe('Test function numLines', () => {
   test('Test case 1', () => {
-    expect(numLines(validStudent)).toBe(2)
+    expect(numLines(invalidStudentSyntax)).toBe(2)
   })
   test('Test case 2', () => {
-    expect(numLines(validGrader)).toBe(5)
+    expect(numLines(invalidGraderSyntax)).toBe(5)
+  })
+})
+
+describe('Test function runAll', () => {
+  test('Test case 1', async () => {
+    const result = await runAll({
+      chapter: 2,
+      graderPrograms: [validGrader],
+      studentProgram: validStudent
+    })
+    expect(result).toEqual(
+      [{
+        marks: 5,
+        resultType: 'pass'
+      }]
+    )
   })
 })
