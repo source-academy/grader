@@ -40,7 +40,7 @@ test('grader OK, student runtimeError', async () => {
       location: 'student'
     }))
   })
-})
+}, 30000)
 
 test('grader OK, student syntaxError', async () => {
   const results = await runAll(makeAwsEvent(grader.valid, student.invalid.syntax))
