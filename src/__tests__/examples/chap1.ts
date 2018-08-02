@@ -11,13 +11,13 @@ const validStudentCorrect =
   `const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2);`
 
 const validStudentWrong =
-  `const f = i => i < 3 ? 0 : f(i-1) + f(i-2);`
+  `const f = i => i < 3 ? 2 : f(i-2) + f(i-3);`
 
 const validStudentPartial =
   `const f = i => i < 3 ? 1 : f(i-1) + f(i-2);`
 
 const invalidStudentRuntime =
-  `const f = i => i === 0 ? 0 : i === 1 || i === 2 ? 1 : f(i-1) + f(i-2);`
+  `const f = i => f(i+1);`
 
 const invalidStudentSyntax =
   `const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2)`
@@ -34,19 +34,21 @@ export const student: Student = {
   }
 }
 
-const invalidGraderRuntime =
+const invalidGraderRuntime = [
   `function ek0chei0y1() {
     return g(0) === 0 ? 1 : 0;
   }
 
   ek0chei0y1();`
+]
 
-const invalidGraderSyntax =
+const invalidGraderSyntax = [
   `function ek0chei0y1() {
     return f(0) === 0 ? 1 : 0;
   }
 
-  ek0chei0y1();`
+  ek0chei0y1()`
+]
 
 const validGrader = [
   `function ek0chei0y1() {

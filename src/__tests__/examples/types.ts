@@ -1,16 +1,16 @@
 export type Grader = {
-  invalid: InvalidPrograms
+  invalid: InvalidPrograms<string[]>
   valid: string[]
 }
 
 export type Student = {
-  invalid: InvalidPrograms
+  invalid: InvalidPrograms<string>
   valid: ValidPrograms
 }
 
-type InvalidPrograms = {
-  runtime: string
-  syntax: string
+type InvalidPrograms<Program> = {
+  runtime: Program
+  syntax: Program
 }
 
 type ValidPrograms = {
