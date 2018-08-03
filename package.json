@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "rm -rf node_modules && yarn install --production=true && tsc && zip -r --exclude=*terraform* ./grader.zip index.js node_modules/ && yarn install --production=false",
+    "build": "rm -rf node_modules && rm -rf build && yarn install --production=true && tsc && cd build && zip -r --exclude=*terraform* ../dist/grader.zip index.js node_modules/ && cd .. && yarn install --production=false",
     "typecheck": "tsc --noEmit",
     "test": "TIMEOUT=1000 jest",
     "test-coveralls": "TIMEOUT=1000 jest --coverage --coverageReporters=text-lcov | coveralls"
