@@ -1872,9 +1872,9 @@ jest@^23.4.0:
     import-local "^1.0.0"
     jest-cli "^23.4.0"
 
-js-slang@0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-0.1.2.tgz#e24e562d8b6e5c240b2004a4667d37a032cf10d4"
+js-slang@0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-0.1.4.tgz#53eeaf5b22e919e0db99bf29bf449d645bd2d79a"
   dependencies:
     "@types/acorn" "^4.0.3"
     "@types/estree" "0.0.39"
