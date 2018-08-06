@@ -1,5 +1,7 @@
-export function awsEventFactory(chapter: number) {
+import { Library } from '../index'
+
+export function awsEventFactory(library: Library) {
   return (graderPrograms: string[], studentProgram: string) => ({
-    chapter, graderPrograms, studentProgram
+    library, graderPrograms, studentProgram
   })
 }

@@ -2,29 +2,36 @@ import { grader, student } from './examples/chap1'
 import { awsEventFactory } from './helpers'
 import { runAll } from '../index'
 
-const makeAwsEvent = awsEventFactory(1)
+const makeAwsEvent = awsEventFactory({
+  chapter: 1,
+  external: {
+    name: 'NONE',
+    symbols: []
+  },
+  globals: [[]]
+})
 
 test('grader OK, student OK, correct', async () => {
   const results = await runAll(makeAwsEvent(grader.valid, student.valid.correct))
   expect(results).toEqual([
-      {'marks': 1, 'resultType': 'pass'},
-      {'marks': 4, 'resultType': 'pass'}
+      {'grade': 1, 'resultType': 'pass'},
+      {'grade': 4, 'resultType': 'pass'}
   ])
 })
 
 test('grader OK, student OK, partial', async () => {
   const results = await runAll(makeAwsEvent(grader.valid, student.valid.partial))
   expect(results).toEqual([
-      {'marks': 0, 'resultType': 'pass'},
-      {'marks': 4, 'resultType': 'pass'}
+      {'grade': 0, 'resultType': 'pass'},
+      {'grade': 4, 'resultType': 'pass'}
   ])
 })
 
 test('grader OK, student OK, wrong', async () => {
   const results = await runAll(makeAwsEvent(grader.valid, student.valid.wrong))
   expect(results).toEqual([
-      {'marks': 0, 'resultType': 'pass'},
-      {'marks': 0, 'resultType': 'pass'}
+      {'grade': 0, 'resultType': 'pass'},
+      {'grade': 0, 'resultType': 'pass'}
   ])
 })
 
@@ -33,9 +40,9 @@ test('grader OK, student runtimeError', async () => {
   results.map(result => {
     // One result per student program, each result is a GraderError
     expect(result.resultType).toBe('error')
-    // each GraderError is a RuntimeError at the correct line
+    // each GraderError is a runtimeError at the correct line
     result.errors.map(error => expect(error).toEqual({
-      errorType: 'Runtime',
+      errorType: 'runtime',
       line: 1,
       location: 'student'
     }))
@@ -47,9 +54,9 @@ test('grader OK, student syntaxError', async () => {
   results.map(result => {
     // One result per student program, each result is a GraderError
     expect(result.resultType).toBe('error')
-    // each GraderError is a SyntaxError at the correct line
+    // each GraderError is a syntaxError at the correct line
     result.errors.map(error => expect(error).toEqual({
-      errorType: 'Syntax',
+      errorType: 'syntax',
       line: 1,
       location: 'student'
     }))
@@ -61,9 +68,9 @@ test('grader runtimeError, student OK', async () => {
   results.map(result => {
     // One result per student program, each result is a GraderError
     expect(result.resultType).toBe('error')
-    // each GraderError is a RuntimeError at the correct line
+    // each GraderError is a runtimeError at the correct line
     result.errors.map(error => expect(error).toEqual({
-      errorType: 'Runtime',
+      errorType: 'runtime',
       line: 2,
       location: 'grader'
     }))
@@ -75,9 +82,9 @@ test('grader syntaxError, student OK', async () => {
   results.map(result => {
     // One result per student program, each result is a GraderError
     expect(result.resultType).toBe('error')
-    // each GraderError is a RuntimeError at the correct line
+    // each GraderError is a runtimeError at the correct line
     result.errors.map(error => expect(error).toEqual({
-      errorType: 'Syntax',
+      errorType: 'syntax',
       line: 5,
       location: 'grader'
     }))
