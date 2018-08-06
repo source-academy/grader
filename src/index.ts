@@ -1,5 +1,5 @@
 import { createContext, runInContext } from 'js-slang'
-import { ErrorType, SourceError } from 'js-slang/dist/types'
+import { SourceError } from 'js-slang/dist/types'
 
 type AwsEvent = {
   graderPrograms: string[]
@@ -42,13 +42,13 @@ export const run = async (chap: number, stdPrg: string, gdrPrg: string): Promise
   const program = stdPrg + '\n' + gdrPrg
   const result = await runInContext(program, context, { scheduler: 'preemptive' })
   if (result.status == 'finished') {
-    return { resultType: "pass", grade: result.value } as GraderPass
+    return { resultType: "pass", grade: result.value } as OutputPass
   } else {
     return parseError(context.errors, stdPrg, gdrPrg)
   }
 }
 
-export const runAll = async (event: AwsEvent): Promise<GraderOutput[]> => {
+export const runAll = async (event: AwsEvent): Promise<Output[]> => {
   const stdPrg = event.studentProgram
   const promises = event.graderPrograms.map(
     gdrPrg => run(event.library.chapter, stdPrg, gdrPrg)
@@ -68,13 +68,13 @@ export const parseError = (
   sourceErrors: Array<SourceError>,
   stdProg: string,
   grdProg: string
-): GraderError => {
+): OutputError => {
   const stdProgLines = numLines(stdProg)
   const errors =  sourceErrors.map((err: SourceError) => {
     const line = err.location.end.line
     const location = line <= stdProgLines ? 'student' : 'grader'
     return {
-      errorType: err.type.toLowerCase(),
+      errorType: err.type.toLowerCase() as 'syntax' | 'runtime',
       line: location == 'student' ? line : line - stdProgLines,
       location: location
     }

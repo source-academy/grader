@@ -8,4 +8,4 @@ branches:
 script:
   - yarn test
   - yarn test-coveralls
-  - yarn build
+  - yarn typecheck
