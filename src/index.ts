@@ -29,24 +29,26 @@ export type Library = {
  *   OutputPass - program raises no errors
  *   OutputTimeout - program has run pass the TIMEOUT_DURATION
  */
-type Output = OutputError | OutputPass | OutputTimeout
-
-type OutputError = {
-  errors: Array<{
-    errorType: 'runtime' | 'syntax'
-    line?: number
-    location?: string
-  }>
-  resultType: 'error'
-}
+type Output = OutputPass | OutputError
 
 type OutputPass = {
   grade: number
   resultType: 'pass'
 }
 
-type OutputTimeout = {
-  resultType: 'timeout'
+type OutputError = {
+  errors: Array<ErrorFromSource | ErrorFromTimeout>
+  resultType: 'error'
+}
+
+type ErrorFromSource = {
+  errorType: 'runtime' | 'syntax'
+  line: number
+  location: string
+}
+
+type ErrorFromTimeout = {
+  errorType: 'timeout'
 }
 
 /**
@@ -80,7 +82,10 @@ const run = async (chap: number, stdPrg: string, gdrPrg: string): Promise<Output
   } else if (result.status === 'error') {
     return parseError(context.errors, stdPrg, gdrPrg)
   } else {
-    return { resultType: 'timeout' } // from timeout/1 in catchTimeouts/1
+    return {
+      errors: [ { errorType: 'timeout' } ],
+      resultType: 'error'
+    }
   }
 }
 
