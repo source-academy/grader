@@ -24,7 +24,7 @@ export type Library = {
 }
 
 /**
- * Output is the 'refined' version of a Result.
+ * Output is the 'refined' version of a @type {Result}.
  *   OutputError - program raises a js-slang SourceError
  *   OutputPass - program raises no errors
  *   OutputTimeout - program has run pass the TIMEOUT_DURATION
@@ -53,8 +53,8 @@ type ErrorFromTimeout = {
 
 /**
  * Result is the 'raw' result of the js-slang interpreter running a
- * student/grader program. It will be transformed into a more 'refined' Output
- * to be returned to a backend.
+ * student/grader program. It will be transformed into a more 'refined'
+ * @type {Output} to be returned to a backend.
  */
 type Result = SourceResult | TimeoutResult
 
