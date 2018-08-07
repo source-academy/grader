@@ -18,7 +18,7 @@ The grader is a component of the `Cadet backend`_. The grader,
     1. Concatenate the student program and grader program into a single combined program
     2. Evaluates the single combined program in the `js-slang`_ interpreter
     
-3. Returns a ``GraderOutput[]`` containing the result of the evaluation
+3. Returns a ``Output[]`` containing the result of the evaluation
 
 .. _Cadet backend: https://github.com/source-academy/cadet
 .. _js-slang: https://github.com/source-academy/js-slang
@@ -63,8 +63,8 @@ The grader's corresponding output for this function is then,
 .. code-block:: json
 
     {
+      "grade": 4
       "resultType": "pass",
-      "marks": 4
     }
 
 Note that the `resultType` pass represents any successful evaluation, i.e. no errors raised. It is independent of the `marks` property. 
@@ -91,7 +91,7 @@ Of course, this is an infinite loop. The source interpreter raises a runtime err
       "resultType":  "error",
       "errors": [
         {
-          "errorType": "Runtime",
+          "errorType": "runtime",
           "line": 1,
           "location": "student"
         }
@@ -157,16 +157,16 @@ The grader then receives a two-element array of strings, each corresponding to t
 
     [
       {
+        "grade": 4
         "resultType": "pass",
-        "marks": 4
       },
       {
+        "grade": 0
         "resultType": "pass",
-        "marks": 0
       }
     ]
 
-Recall that a ``resultType`` of ``"pass"`` only means that no SourceErrors were raised in the evaluation. The order of ``GraderOutput`` elements in the array are preserved according to the order of ``GRADER`` nodes in the assessment XML files.
+Recall that a ``resultType`` of ``"pass"`` only means that no SourceErrors were raised in the evaluation. The order of ``Output`` elements in the array are preserved according to the order of ``GRADER`` nodes in the assessment XML files.
 
 Note that the ``SOLUTION`` node is not related to the Grader, but a node used by a previous iteration of the source academy.
 
