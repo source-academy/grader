@@ -1,7 +1,7 @@
 import { createContext, runInContext, Result as SourceResult } from 'js-slang'
 import { SourceError } from 'js-slang/dist/types'
 
-const TIMEOUT_DURATION = 20000
+const TIMEOUT_DURATION = process.env.NODE_ENV !== 'test' ? 20000 : 1000
 
 type AwsEvent = {
   graderPrograms: string[]
@@ -90,10 +90,7 @@ const run = async (chap: number, stdPrg: string, gdrPrg: string): Promise<Output
 }
 
 const catchTimeouts = (slangPromise: Promise<Result>): Promise<Result> => {
-  const timeoutDuration = process.env.NODE_ENV !== 'test'
-    ? TIMEOUT_DURATION
-    : 1000 // facilitate testing
-  return Promise.race([slangPromise, timeout(timeoutDuration)])
+  return Promise.race([slangPromise, timeout(TIMEOUT_DURATION)])
 }
 
 const timeout = (msDuration: number): Promise<TimeoutResult> => (
