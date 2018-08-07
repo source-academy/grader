@@ -11,6 +11,7 @@ export type Student = {
 type InvalidPrograms<Program> = {
   runtime: Program
   syntax: Program
+  timeout?: Program
 }
 
 type ValidPrograms = {
