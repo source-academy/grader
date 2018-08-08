@@ -1,7 +1,7 @@
 import { createContext, runInContext, Result as SourceResult } from 'js-slang'
 import { SourceError } from 'js-slang/dist/types'
 
-const TIMEOUT_DURATION = process.env.NODE_ENV !== 'test' ? 20000 : 1000
+const TIMEOUT_DURATION = parseInt(process.env.TIMEOUT!, 10) // in milliseconds
 
 type AwsEvent = {
   graderPrograms: string[]
