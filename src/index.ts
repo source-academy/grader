@@ -1,5 +1,7 @@
-import { createContext, runInContext } from 'js-slang'
+import { createContext, runInContext, Result as SourceResult } from 'js-slang'
 import { SourceError } from 'js-slang/dist/types'
+
+const TIMEOUT_DURATION = parseInt(process.env.TIMEOUT!, 10) // in milliseconds
 
 type AwsEvent = {
   graderPrograms: string[]
@@ -21,6 +23,11 @@ export type Library = {
   globals: Array<string[]>
 }
 
+/**
+ * Output is the 'refined' version of a @type {Result}.
+ *   OutputError - program raises an error
+ *   OutputPass - program raises no errors
+ */
 type Output = OutputPass | OutputError
 
 type OutputPass = {
@@ -29,33 +36,84 @@ type OutputPass = {
 }
 
 type OutputError = {
-  errors: Array<{
-    errorType: 'syntax' | 'runtime'
-    line: number
-    location: string
-  }>
+  errors: Array<ErrorFromSource | ErrorFromTimeout>
   resultType: 'error'
 }
 
-export const run = async (chap: number, stdPrg: string, gdrPrg: string): Promise<Output> => {
-  const context = createContext<{}>(chap)
-  const program = stdPrg + '\n' + gdrPrg
-  const result = await runInContext(program, context, { scheduler: 'preemptive' })
-  if (result.status == 'finished') {
-    return { resultType: "pass", grade: result.value } as OutputPass
-  } else {
-    return parseError(context.errors, stdPrg, gdrPrg)
-  }
+type ErrorFromSource = {
+  errorType: 'runtime' | 'syntax'
+  line: number
+  location: string
+}
+
+type ErrorFromTimeout = {
+  errorType: 'timeout'
+}
+
+/**
+ * Result is the 'raw' result of the js-slang interpreter running a
+ * student/grader program. It will be transformed into a more 'refined'
+ * @type {Output} to be returned to a backend.
+ */
+type Result = SourceResult | TimeoutResult
+
+type TimeoutResult = {
+  status: 'timeout'
 }
 
 export const runAll = async (event: AwsEvent): Promise<Output[]> => {
+  evaluateGlobals(event.library.globals)
   const stdPrg = event.studentProgram
   const promises = event.graderPrograms.map(
-    gdrPrg => run(event.library.chapter, stdPrg, gdrPrg)
+    gdrPrg => run(event.library, stdPrg, gdrPrg)
   )
   const results = await Promise.all(promises)
   return results
 }
+
+const run = async (library: Library, stdPrg: string, gdrPrg: string): Promise<Output> => {
+  const context = createContext<{}>(library.chapter, library.external.symbols)
+  const program = stdPrg + '\n' + gdrPrg
+  const result = await catchTimeouts(runInContext(
+    program, context, { scheduler: 'preemptive' }
+  ))
+  if (result.status === 'finished') {
+    return { resultType: "pass", grade: result.value } as OutputPass
+  } else if (result.status === 'error') {
+    return parseError(context.errors, stdPrg, gdrPrg)
+  } else {
+    return {
+      errors: [ { errorType: 'timeout' } ],
+      resultType: 'error'
+    }
+  }
+}
+
+/**
+ * Given an array of pairs, where the first element is an identifier, and the
+ * second is a string representation of a javascript value, evaluate the value
+ * and bind it to the identifier, in the global frame. Used for Library.globals
+ */
+const evaluateGlobals = (nameValuePairs: Array<string[]>) => {
+  nameValuePairs.map(nameValuePair => {
+    const name = nameValuePair[0]
+    const value = nameValuePair[1]
+    global[name] = eval(value)
+  })
+}
+
+/**
+ * Takes in the promise that js-slang's runInContext returns. Races it against a
+ * timeout. Returns a @type{SourceResult} if the former resolves first,
+ * otherwise a @type{TimeoutResult}.
+ */
+const catchTimeouts = (slangPromise: Promise<Result>): Promise<Result> => {
+  return Promise.race([slangPromise, timeout(TIMEOUT_DURATION)])
+}
+
+const timeout = (msDuration: number): Promise<TimeoutResult> => (
+  new Promise(resolve => setTimeout(resolve, msDuration, { status: 'timeout' }))
+)
 
 /**
  * Transforms the given SourceErrors and student, grader programs into an output
@@ -64,7 +122,7 @@ export const runAll = async (event: AwsEvent): Promise<Output[]> => {
  * @param stdProg Student program.
  * @param grdProg Grader program.
  */
-export const parseError = (
+const parseError = (
   sourceErrors: Array<SourceError>,
   stdProg: string,
   grdProg: string
@@ -87,6 +145,5 @@ export const parseError = (
 
 /**
  * Count the number of lines in a given string.
- * @param lines String to count number of lines of.
  */
-export const numLines = (lines: string) => lines.split("\n").length
+const numLines = (str: string) => str.split("\n").length

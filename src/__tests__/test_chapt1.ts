@@ -8,7 +8,7 @@ const makeAwsEvent = awsEventFactory({
     name: 'NONE',
     symbols: []
   },
-  globals: [[]]
+  globals: []
 })
 
 test('grader OK, student OK, correct', async () => {
@@ -47,7 +47,18 @@ test('grader OK, student runtimeError', async () => {
       location: 'student'
     }))
   })
-}, 30000)
+})
+
+test('grader OK, student timeoutError', async () => {
+  const results = await runAll(makeAwsEvent(grader.valid, student.invalid.timeout))
+  results.map(result => {
+    expect(result.resultType).toBe('error')
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0]).toEqual({
+      errorType: 'timeout'
+    })
+  })
+}, 10000)
 
 test('grader OK, student syntaxError', async () => {
   const results = await runAll(makeAwsEvent(grader.valid, student.invalid.syntax))
