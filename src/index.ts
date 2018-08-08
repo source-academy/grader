@@ -25,9 +25,8 @@ export type Library = {
 
 /**
  * Output is the 'refined' version of a @type {Result}.
- *   OutputError - program raises a js-slang SourceError
+ *   OutputError - program raises an error
  *   OutputPass - program raises no errors
- *   OutputTimeout - program has run pass the TIMEOUT_DURATION
  */
 type Output = OutputPass | OutputError
 
