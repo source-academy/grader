@@ -8,7 +8,7 @@ const makeAwsEvent = awsEventFactory({
     name: 'NONE',
     symbols: []
   },
-  globals: [[]]
+  globals: []
 })
 
 test('grader OK, student OK, correct', async () => {

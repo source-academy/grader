@@ -62,16 +62,17 @@ type TimeoutResult = {
 }
 
 export const runAll = async (event: AwsEvent): Promise<Output[]> => {
+  evaluateGlobals(event.library.globals)
   const stdPrg = event.studentProgram
   const promises = event.graderPrograms.map(
-    gdrPrg => run(event.library.chapter, stdPrg, gdrPrg)
+    gdrPrg => run(event.library, stdPrg, gdrPrg)
   )
   const results = await Promise.all(promises)
   return results
 }
 
-const run = async (chap: number, stdPrg: string, gdrPrg: string): Promise<Output> => {
-  const context = createContext<{}>(chap)
+const run = async (library: Library, stdPrg: string, gdrPrg: string): Promise<Output> => {
+  const context = createContext<{}>(library.chapter, library.external.symbols)
   const program = stdPrg + '\n' + gdrPrg
   const result = await catchTimeouts(runInContext(
     program, context, { scheduler: 'preemptive' }
@@ -88,6 +89,24 @@ const run = async (chap: number, stdPrg: string, gdrPrg: string): Promise<Output
   }
 }
 
+/**
+ * Given an array of pairs, where the first element is an identifier, and the
+ * second is a string representation of a javascript value, evaluate the value
+ * and bind it to the identifier, in the global frame. Used for Library.globals
+ */
+const evaluateGlobals = (nameValuePairs: Array<string[]>) => {
+  nameValuePairs.map(nameValuePair => {
+    const name = nameValuePair[0]
+    const value = nameValuePair[1]
+    global[name] = eval(value)
+  })
+}
+
+/**
+ * Takes in the promise that js-slang's runInContext returns. Races it against a
+ * timeout. Returns a @type{SourceResult} if the former resolves first,
+ * otherwise a @type{TimeoutResult}.
+ */
 const catchTimeouts = (slangPromise: Promise<Result>): Promise<Result> => {
   return Promise.race([slangPromise, timeout(TIMEOUT_DURATION)])
 }
@@ -126,6 +145,5 @@ const parseError = (
 
 /**
  * Count the number of lines in a given string.
- * @param lines String to count number of lines of.
  */
-const numLines = (lines: string) => lines.split("\n").length
+const numLines = (str: string) => str.split("\n").length
