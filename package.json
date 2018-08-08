@@ -12,6 +12,7 @@
   "dependencies": {
     "@types/node": "^10.5.2",
     "js-slang": "0.1.4",
+    "lodash": "4.17.10",
     "typescript": "^2.9.2"
   },
   "devDependencies": {
