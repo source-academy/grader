@@ -10,11 +10,11 @@
     "test-coveralls": "TIMEOUT=1000 jest --coverage --coverageReporters=text-lcov | coveralls"
   },
   "dependencies": {
+    "@types/node": "^10.5.2",
     "js-slang": "0.1.4",
     "typescript": "^2.9.2"
   },
   "devDependencies": {
-    "@types/node": "^10.5.2",
     "coveralls": "^3.0.2",
     "jest": "^23.4.0",
     "ts-jest": "^23.0.0"
