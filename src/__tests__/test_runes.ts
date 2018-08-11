@@ -49,7 +49,7 @@ const makeAwsEvent = awsEventFactory({
       '__are_pictures_equal',
     ]
   },
-  globals: [[]]
+  globals: []
 })
 
 test('rune grader OK, student OK, correct', async () => {
