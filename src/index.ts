@@ -2,6 +2,7 @@ import { createContext, runInContext, Result as SourceResult } from 'js-slang'
 import { SourceError } from 'js-slang/dist/types'
 
 const TIMEOUT_DURATION = parseInt(process.env.TIMEOUT!, 10) // in milliseconds
+require('./graphics/rune_library')
 
 type AwsEvent = {
   graderPrograms: string[]
