@@ -3,7 +3,6 @@ import { Grader, Student } from './types';
 const validStudentCorrect =
     `
     const a = () => blue(quarter_turn_left(quarter_turn_left(quarter_turn_left(nova_bb))));
-    //const b = () => quarter_turn_right(quarter_turn_right(stack(quarter_turn_left(nova_bb), quarter_turn_left(nova_bb))));
     const b = () => stack(quarter_turn_right(nova_bb), quarter_turn_right(nova_bb));
     const c = (p1, p2, p3, p4) => beside(stack(p1, p2), stack(p3, p4));
     function d(rune, n) {
