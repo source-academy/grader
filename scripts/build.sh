@@ -10,12 +10,13 @@ if [ -d build ]
         rm -rf build
 fi
 
-if [ ! -d dist ]
+if [ -f grader.zip ]
     then
-        mkdir dist
+        rm grader.zip
 fi
 
 yarn install --production=true
 tsc
-cd build && zip -r --exclude=*terraform* ../dist/grader.zip index.js node_modules/ && cd ..
+cd build && zip -r --exclude=*terraform* ../grader.zip index.js graphics/ && cd ..
+zip -ur grader.zip node_modules/
 yarn install --production=false
