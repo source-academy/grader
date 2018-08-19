@@ -1,4 +1,4 @@
-import { grader, student } from './examples/runes'
+import { grader, student } from './examples/runes2d'
 import { awsEventFactory } from './helpers'
 import { runAll } from '../index'
 
