@@ -4886,6 +4886,12 @@ global.repeat_pattern = repeat_pattern;
 global.overlay_frac = overlay_frac;
 global.overlay = overlay;
 
+// visualisations (overriden as they are not used in the node environment)
+global.show = (x) => {};
+global.anaglyph = (x) => {};
+global.hollusion = (x) => {};
+global.animate = (x) => {};
+global.stereogram = (x) => {};
 
 // internal utilities
 global.__compile = __compile;
