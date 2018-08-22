@@ -1,6 +1,7 @@
 import { createContext, runInContext, Result as SourceResult } from 'js-slang'
 import { SourceError } from 'js-slang/dist/types'
 
+
 const TIMEOUT_DURATION = parseInt(process.env.TIMEOUT!, 10) // in milliseconds
 
 type AwsEvent = {
@@ -62,6 +63,7 @@ type TimeoutResult = {
 }
 
 export const runAll = async (event: AwsEvent): Promise<Output[]> => {
+  require('./graphics/rune_library.js')
   evaluateGlobals(event.library.globals)
   const stdPrg = event.studentProgram
   const promises = event.graderPrograms.map(
