@@ -23,6 +23,14 @@ The grader is a component of the `Cadet backend`_. The grader,
 .. _Cadet backend: https://github.com/source-academy/cadet
 .. _js-slang: https://github.com/source-academy/js-slang
 
+========================
+External Library Support
+========================
+
+Only support for the "runes" library is available. These include the functions:
+- `__compile`
+- `__are_pictures_equal`
+
 Grader Program
 ==============
 
