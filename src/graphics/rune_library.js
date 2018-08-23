@@ -4854,6 +4854,7 @@ global.orange = orange;
 global.brown = brown;
 global.black = black;
 global.white = white;
+global.random_color = random_color;
 
 // runes
 global.black_bb = black_bb;
@@ -4870,6 +4871,7 @@ global.ribbon_bb = ribbon_bb;
 // transforms
 global.quarter_turn_left = quarter_turn_left;
 global.quarter_turn_right = quarter_turn_right;
+global.turn_upside_down = turn_upside_down;
 global.scale_independent = scale_independent;
 global.scale = scale;
 global.translate = translate;
