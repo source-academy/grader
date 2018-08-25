@@ -1,4 +1,5 @@
-const { padImageData, createBitmapFile } = require('bitmap-js');
+// import bitmap library https://github.com/ericandrewlewis/bitmap-js
+const { padImageData, createBitmapFile } = require('@ericandrewlewis/bitmap');
 
 // Modified from lib/public/WebGLCurve
 
