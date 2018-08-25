@@ -1,4 +1,12 @@
+const { padImageData, createBitmapFile } = require('bitmap-js');
+
+// Modified from lib/public/WebGLCurve
+
 const viewport_size = 600;
+
+// Variables that proxy browser state (the canvas)
+var stashed_draw_mode;
+var stashed_point_array;
 
 function generateCurve(scaleMode, drawMode, numPoints, func, isFullView){
     var curvePosArray = [];
@@ -56,7 +64,23 @@ function generateCurve(scaleMode, drawMode, numPoints, func, isFullView){
     }
     clear();
     gl.uniformMatrix4fv(u_transformMatrix, false, transMat);
-    drawCurve(drawMode, curvePosArray);
+    // drawCurve(drawMode, curvePosArray);
+    stashCurve(drawMode, curvePosArray);
+}
+
+function stashCurve(drawMode, curvePosArray) {
+  stashed_draw_mode = drawMode;
+  stashed_point_array = curvePosArray;
+}
+
+/* We stub in our own drawCurve to:
+    improve performance
+    Reduce dependencies on node implementations of webgl and canvas
+    Let us do fuzzy matching based on the vertices alone
+ */
+//
+function drawCurve(drawMode, curvePosArray) {
+
 }
 
 function draw_connected(num){
@@ -105,4 +129,14 @@ function x_of(pt){
 
 function y_of(pt){
     return pt[1];
+}
+
+// Checks the solution curve against the "drawn" curve and returns true/false
+// Resolution: pixel height/width of bitmap
+// Accuracy: fraction of pixels that need to match to be considered as passing
+function __check_canvas(solution_mode, solution_curve, resolution=600, accuracy=0.99) {
+    if(solution_mode != stashed_draw_mode) {
+      return false;
+    }
+    return false;
 }
