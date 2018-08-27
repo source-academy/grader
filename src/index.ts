@@ -64,6 +64,7 @@ type TimeoutResult = {
 
 export const runAll = async (event: AwsEvent): Promise<Output[]> => {
   require('./graphics/rune_library.js')
+  require('./util.js')
   evaluateGlobals(event.library.globals)
   const stdPrg = event.studentProgram
   const promises = event.graderPrograms.map(
