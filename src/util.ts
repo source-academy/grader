@@ -4,27 +4,27 @@
   Type: (fn) -> fn
 **/
 var table = {};
-function track_function(name) {
-  if(table[name] !== undefined) {
+const track_function = (name: String) => {
+  if (table[name] !== undefined) {
     reset_count(name);
     return;
   }
   reset_count(name);
   var fn = global[name];
-  function wrapped_function(...args) {
+  function wrapped_function(...args: any[]): any {
     table[name]++;
     return fn(...args);
-  };
+  }
   global[name] = wrapped_function;
-}
+};
 
-function reset_count(name) {
+const reset_count = (name: String) => {
   table[name] = 0;
-}
+};
 
-function get_count(name) {
+const get_count = (name: String) => {
   return table[name];
-}
+};
 
 global.__track_function = track_function;
 global.__reset_function_count = reset_count;

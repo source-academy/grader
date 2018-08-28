@@ -14,6 +14,7 @@ const makeAwsEvent = awsEventFactory({
     ]
   },
   globals: [
+    ['make_funny', 'str => str + ", haha!";'],
     ['__tracking_function', 'global.__track_function("make_funny");'],
   ]
 })
