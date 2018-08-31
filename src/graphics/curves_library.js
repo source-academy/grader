@@ -1,29 +1,23 @@
-// import bitmap library https://github.com/ericandrewlewis/bitmap-js
-const { padImageData, createBitmapFile } = require('@ericandrewlewis/bitmap');
-
 // Modified from lib/public/WebGLCurve
 
-const viewport_size = 600;
+const VIEWPORT_SIZE = 600;
 
-// Variables that proxy browser state (the canvas)
-var stashed_draw_mode;
-var stashed_point_array;
+var min_x = Infinity;
+var max_x = -Infinity;
+var min_y = Infinity;
+var max_y = -Infinity;
 
 function generateCurve(scaleMode, drawMode, numPoints, func, isFullView){
     var curvePosArray = [];
-    var transMat = mat4.create();
+    // var transMat = mat4.create();
     // initialize the min/max to extreme values
-    var min_x = Infinity;
-    var max_x = -Infinity;
-    var min_y = Infinity;
-    var max_y = -Infinity;
+    
 
     function evaluator(num, func){
         // func should take input of [0, 1] and output pair(x, y)
         // where x,y is in [0, 1]
         // evaluator has a side effect of recording the max/min
         // x and y value for adjusting the position
-        curvePosArray = [];
         for(var i = 0; i <= num; i += 1){
             var value = func(i / num);
             if ((typeof value !== "object") || (value.length !== 2)
@@ -38,41 +32,10 @@ function generateCurve(scaleMode, drawMode, numPoints, func, isFullView){
             min_y = Math.min(min_y, y);
             max_y = Math.max(max_y, y);
         }
+        return curvePosArray;
     }
 
-    evaluator(numPoints, func);
-
-    if (isFullView) {
-        var vert_padding = 0.05 * (max_y - min_y);
-        min_y -= vert_padding;
-        max_y += vert_padding;
-        var horiz_padding = 0.05 * (max_x - min_x);
-        min_x -= horiz_padding;
-        max_x += horiz_padding;
-    }
-
-    if(scaleMode == "fit"){
-        var center = [(min_x + max_x) / 2, (min_y + max_y) / 2];
-        var scale = Math.max(max_x - min_x, max_y - min_y);
-        mat4.scale(transMat, transMat, vec3.fromValues(2/scale, 2/scale, 0)); // use 2 because the value is in [-1, 1]
-        mat4.translate(transMat, transMat, vec3.fromValues(-center[0], -center[1], 0));
-    }else if(scaleMode == "stretch"){
-        var center = [(min_x + max_x) / 2, (min_y + max_y) / 2];
-        mat4.scale(transMat, transMat, vec3.fromValues(2/(max_x - min_x), 2/(max_y - min_y), 0)); // use 2 because the value is in [-1, 1]
-        mat4.translate(transMat, transMat, vec3.fromValues(-center[0], -center[1], 0));
-    }else{
-        // do nothing for normal situations
-    }
-    clear();
-    gl.uniformMatrix4fv(u_transformMatrix, false, transMat);
-    // drawCurve(drawMode, curvePosArray);
-    stashCurve(drawMode, curvePosArray);
-}
-
-function stashCurve(drawMode, curvePosArray) {
-  stashed_draw_mode = drawMode;
-  stashed_point_array = curvePosArray;
-}
+    return evaluator(numPoints, func);
 
 /* We stub in our own drawCurve to:
     improve performance
@@ -80,8 +43,62 @@ function stashCurve(drawMode, curvePosArray) {
     Let us do fuzzy matching based on the vertices alone
  */
 //
-function drawCurve(drawMode, curvePosArray) {
+function drawCurve(curvePosArray, resolution) {
+  var curveBitmap = [];
+  
+  // Initialize curveBitMap to 2D array of 0's
+  for (var x = 0; x < resolution; x++) {
+    if (!curveBitmap[x]) {
+      curveBitmap[x] = [];
+    }
+    for (var y = 0; y < resolution; y++) {
+      curveBitmap[x][y] = 0;
+    }
+  }
 
+  // Scale the (x, y) to fit the bitmap resolution
+  const range_x = max_x - min_x;
+  const range_y = max_y - min_y;
+  console.log("range_x: " + range_x);
+  console.log("range_y: " + range_y);
+
+  // Scale the actual points to fit the bitmap resolution
+  function approximate_point(x, y) {
+    // These 2 if-else are for cases where unit_lines are being compared
+    // Since there is no range of x or y to let us scale
+    // As such, I am simply setting all negative points to 0 and 
+    // and points above 600 to 600.
+    if (range_x === 0) {
+      return x < 0
+        ? 0
+        : x > 600
+          ? 600
+          : Math.round(x);
+    }
+    if (range_y === 0) {
+      return y < 0
+        ? 0
+        : y > 600
+          ? 600
+          : Math.round(y);
+    }
+
+    // Scales the points according to the range_x/y
+    return {
+      x: Math.round(((x - min_x) / (range_x)) * (resolution - 1)),
+      y: Math.round(((y - min_y) / (range_y)) * (resolution - 1))
+    }
+  }
+
+  // For every point in curvePosArray, fill in corresponding pixel in curveBitmap with 1
+  for (var i = 0; i < curvePosArray.length; i+=2) {
+    var approx_point = approximate_point(curvePosArray[i], curvePosArray[i+1]);
+    var approx_x = approx_point.x;
+    var approx_y = approx_point.y;   
+    console.log(approx_point);
+    curveBitmap[approx_x][approx_y] = 1;
+  }
+  return curveBitmap;
 }
 
 function draw_connected(num){
@@ -135,9 +152,91 @@ function y_of(pt){
 // Checks the solution curve against the "drawn" curve and returns true/false
 // Resolution: pixel height/width of bitmap
 // Accuracy: fraction of pixels that need to match to be considered as passing
-function __check_canvas(solution_mode, solution_curve, resolution=600, accuracy=0.99) {
-    if(solution_mode != stashed_draw_mode) {
+function __check_canvas(draw_mode, num_points, student_curve, solution_curve, 
+  resolution=600, accuracy=0.99) {
+    // if(solution_mode != stashed_draw_mode) {
+    //   return false;
+    // }
+    
+    // Load student's curve and solution's curve into respective bitmaps
+    // Suggestion: Let generate_curve return the point_array of the input curve so we 
+    // don't have to play with states as seen below.
+
+    // Generate student_curve's bitmap and solution_curve's bitmap first
+    // to get the same min/max_x/y for scaling points in point_array to the bitmap
+    var student_point_array = draw_mode(num_points)(student_curve);
+    var solution_point_array = draw_mode(num_points)(solution_curve);
+    
+    var studentBitmap = drawCurve(student_point_array, resolution);
+    var solutionBitmap = drawCurve(solution_point_array, resolution);
+
+    // Initialize a counter for number of pixels that match between student and solution
+    // Step through all pixels in the bitmap and increment the number of matching pixels
+    // accordingly
+    const TOTAL_PIXELS = resolution * resolution;
+    var correct_pixels = 0;
+    for (var i = 0; i < resolution; i++) {
+      for (var j = 0; j < resolution; j++) {
+        if (studentBitmap[i][j] === solutionBitmap[i][j]) {
+          correct_pixels++;
+        }
+      }
+    }
+    
+    const test_accuracy = correct_pixels / TOTAL_PIXELS;
+    console.log(test_accuracy);
+
+    // Check fraction of correct pixels against accuracy tolerance
+    if (test_accuracy >= accuracy) {
+      return true;
+    } else {
       return false;
     }
-    return false;
 }
+
+function unit_circle(t) {
+  return make_point(Math.sin(2 * Math.PI * t),
+                    Math.cos(2 * Math.PI * t));
+}
+
+function unit_line_at(y) {
+  return t => make_point(t, y);
+}
+
+function some_shape(t) {
+  if (t < 0.5) {
+    return make_point(Math.sin(2 * Math.PI * t),
+        Math.cos(2 * Math.PI * t));
+  } else {
+    return make_point(t, t * 2);
+  }
+}
+
+function up_line(t) {
+  return make_point(0.5, t);
+}
+function down_line(t) {
+  return make_point(0.5, 1-t);
+}
+(draw_connected(200))(up_line);
+(draw_connected(200))(down_line);
+
+function forward_sine(t) {
+  return make_point(t, Math.sin(t * Math.PI));
+}
+function backwards_sine(t) {
+  return make_point(-t, Math.sin(t * Math.PI));
+}
+// (draw_connected_squeezed_to_window(200))(forward_sine);
+// (draw_connected_squeezed_to_window(200))(backwards_sine);
+
+const TEST_DRAW_MODE = draw_connected;
+const TEST_NUM_POINTS = 200;
+const TEST_STUDENT_CURVE = forward_sine;
+const TEST_SOLUTION_CURVE = backwards_sine;
+
+console.log(__check_canvas(
+  TEST_DRAW_MODE, 
+  TEST_NUM_POINTS, 
+  TEST_STUDENT_CURVE, 
+  TEST_SOLUTION_CURVE));
