@@ -1,7 +1,4 @@
-// Modified from lib/public/WebGLCurve
-
-const VIEWPORT_SIZE = 600;
-
+// initialize the min/max to extreme values
 var min_x = Infinity;
 var max_x = -Infinity;
 var min_y = Infinity;
@@ -9,9 +6,6 @@ var max_y = -Infinity;
 
 function generateCurve(scaleMode, drawMode, numPoints, func, isFullView){
     var curvePosArray = [];
-    // var transMat = mat4.create();
-    // initialize the min/max to extreme values
-    
 
     function evaluator(num, func){
         // func should take input of [0, 1] and output pair(x, y)
@@ -57,51 +51,39 @@ function drawCurve(curvePosArray, resolution) {
     }
   }
 
-  // Scale the (x, y) to fit the bitmap resolution
+  // Determine the range in x & y axes of the curve
   const range_x = max_x - min_x;
   const range_y = max_y - min_y;
-  console.log("range_x: " + range_x);
-  console.log("range_y: " + range_y);
+
+  // console.log(`range_x: ${range_x}`);
+  // console.log(`range_y: ${range_y}`);
 
   // Scale the actual points to fit the bitmap resolution
-  function approximate_point(x, y) {
-    // The 2 if-else are for cases where there is no range of x or y to let us scale
-    // e.g. unit_line_at(t)
-    // As such, I am simply setting all negative points to 0 and points above 600 to 600.
-    // Otherwise, scale the points based on the range_x and range_y
-    var approx_x;
-    var approx_y;
-    if (range_x === 0) {
-      approx_x = x < 0
+  /*
+  Note edge case where range_x === 0 || range_y === 0 (e.g. unit_line_at(t)). This will
+  result in a Divide-By-Zero operation, and thus needs to be handled separately.
+  For now, I am simply setting all negative points to 0 and points above `resolution`
+  to `resolution`. 
+  Otherwise if range !== 0, scale the points based on the range.
+  ** Suggest to break bitmap abstraction and compare the x or y values directly for edge
+  ** cases.
+  */
+  function scale_and_approximate(val, min_val, max_val, range_val) {
+    return range_val === 0
+      ? x < 0
         ? 0
-        : x > 600
-          ? 600
-          : Math.round(x);
-    } else {
-      approx_x = Math.round(((x - min_x) / (range_x)) * (resolution - 1));
-    }
-    if (range_y === 0) {
-      approx_y = y < 0
-        ? 0
-        : y > 600
-          ? 600
-          : Math.round(y);
-    } else {
-      approx_y = Math.round(((y - min_y) / (range_y)) * (resolution - 1));
-    }
-    return {
-      x: approx_x,
-      y: approx_y
-    }
+        : x > resolution
+          ? resolution
+          : Math.round(val)
+      : Math.round(((val - min_val) / (range_val)) * (resolution - 1));
   }
 
   // For every point in curvePosArray, fill in corresponding pixel in curveBitmap with 1
   for (var i = 0; i < curvePosArray.length; i+=2) {
-    var approx_point = approximate_point(curvePosArray[i], curvePosArray[i+1]);
-    var approx_x = approx_point.x;
-    var approx_y = approx_point.y;   
-    console.log("approx_point: " + JSON.stringify(approx_point));
+    var approx_x = scale_and_approximate(curvePosArray[i], min_x, max_x, range_x);
+    var approx_y = scale_and_approximate(curvePosArray[i+1], min_y, max_y, range_y);  
     curveBitmap[approx_x][approx_y] = 1;
+    // console.log(`Point on bitmap: (${approx_x}, ${approx_y})`);
   }
   return curveBitmap;
 }
@@ -159,14 +141,6 @@ function y_of(pt){
 // Accuracy: fraction of pixels that need to match to be considered as passing
 function __check_canvas(draw_mode, num_points, student_curve, solution_curve, 
   resolution=600, accuracy=0.99) {
-    // if(solution_mode != stashed_draw_mode) {
-    //   return false;
-    // }
-    
-    // Load student's curve and solution's curve into respective bitmaps
-    // Suggestion: Let generate_curve return the point_array of the input curve so we 
-    // don't have to play with states as seen below.
-
     // Generate student_curve's bitmap and solution_curve's bitmap first
     // to get the same min/max_x/y for scaling points in point_array to the bitmap
     var student_point_array = draw_mode(num_points)(student_curve);
@@ -175,26 +149,25 @@ function __check_canvas(draw_mode, num_points, student_curve, solution_curve,
     var studentBitmap = drawCurve(student_point_array, resolution);
     var solutionBitmap = drawCurve(solution_point_array, resolution);
 
-    // Initialize a counter for number of pixels that match between student and solution
-    // Step through all pixels in the bitmap and increment the number of matching pixels
+    // Initialize a counter for number of points that match between student and solution
+    // Step through all pixels in the bitmap and increment the number of matching points
     // accordingly
-    // const TOTAL_PIXELS = resolution * resolution;
     const TOTAL_POINTS = num_points + 1;
-    var matched_pixels = 0;
+    var matched_points = 0;
     for (var i = 0; i < resolution; i++) {
       for (var j = 0; j < resolution; j++) {
         if (studentBitmap[i][j] === 1 && studentBitmap[i][j] === solutionBitmap[i][j]) {
-          matched_pixels++;
+          matched_points++;
         }
       }
     }
 
-    console.log("TOTAL_POINTS: " + TOTAL_POINTS);
-    console.log("matched_pixels: " + matched_pixels);
-    const test_accuracy = matched_pixels / TOTAL_POINTS;
-    console.log("test_accuracy: " + test_accuracy);
+    const test_accuracy = matched_points / TOTAL_POINTS;
+    console.log(`Total points: ${TOTAL_POINTS}`);
+    console.log(`Matched points: ${matched_points}`);
+    console.log(`Test accuracy: ${test_accuracy}`);
 
-    // Check fraction of correct pixels against accuracy tolerance
+    // Check fraction of correct points against accuracy tolerance
     if (test_accuracy >= accuracy) {
       return true;
     } else {
@@ -241,10 +214,10 @@ function backward_sine(t) {
 /* Tests */
 
 // Pass. Expected.
-// const TEST_DRAW_MODE = draw_connected;
-// const TEST_NUM_POINTS = 200;
-// const TEST_STUDENT_CURVE = up_line;
-// const TEST_SOLUTION_CURVE = down_line;
+const TEST_DRAW_MODE = draw_connected;
+const TEST_NUM_POINTS = 200;
+const TEST_STUDENT_CURVE = up_line;
+const TEST_SOLUTION_CURVE = down_line;
 
 // Pass. Expected.
 // const TEST_DRAW_MODE = draw_connected;
@@ -265,10 +238,10 @@ function backward_sine(t) {
 // const TEST_SOLUTION_CURVE = unit_line_at(3);
 
 // Fail. Expected.
-const TEST_DRAW_MODE = draw_connected;
-const TEST_NUM_POINTS = 200;
-const TEST_STUDENT_CURVE = unit_line_at(10);
-const TEST_SOLUTION_CURVE = unit_line_at(50);
+// const TEST_DRAW_MODE = draw_connected;
+// const TEST_NUM_POINTS = 200;
+// const TEST_STUDENT_CURVE = unit_line_at(10);
+// const TEST_SOLUTION_CURVE = unit_line_at(50);
 
 console.log(__check_canvas(
   TEST_DRAW_MODE, 
