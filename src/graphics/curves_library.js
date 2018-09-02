@@ -36,6 +36,8 @@ function generateCurve(scaleMode, drawMode, numPoints, func, isFullView){
 
     var raw_points = evaluator(numPoints, func);
 
+    canvas.connected = drawMode == "lines";
+
     if(scaleMode == "none") {
         canvas = raw_points;
         return raw_points;
@@ -78,6 +80,7 @@ function drawCurve(curvePosArray, resolution) {
     }
   }
 
+  var prevPoint = undefined;
   // For every point in curvePosArray, fill in corresponding pixel in curveBitmap with 1
   for (point of curvePosArray) {
     // skip pixels that are out of bounds
@@ -87,6 +90,22 @@ function drawCurve(curvePosArray, resolution) {
     var approx_x = Math.floor(point[0] * resolution);
     var approx_y = Math.floor(point[1] * resolution);
     curveBitmap[approx_x][approx_y] = 1;
+    if(curvePosArray.connected == false) {
+      continue;
+    }
+
+    // Otherwise we have to interpolate between this and the last point
+    if(prevPoint) {
+      const x_diff = approx_x - prevPoint[0];
+      const y_diff = approx_y - prevPoint[1];
+      const dist = Math.sqrt(x_diff * x_diff + y_diff * y_diff);
+      for(var i = 0; i < dist; i++) {
+        const new_x = Math.floor(prevPoint[0] + x_diff * i / dist);
+        const new_y = Math.floor(prevPoint[1] + y_diff * i / dist);
+        curveBitmap[new_x][new_y] = 1;
+      }
+    }
+    prevPoint = [approx_x, approx_y];
   }
   return curveBitmap;
 }
@@ -143,7 +162,7 @@ function y_of(pt){
 // Resolution: pixel height/width of bitmap
 // Accuracy: fraction of pixels that need to match to be considered as passing
 function __check_canvas(draw_mode, num_points, solution_curve,
-  resolution=600, accuracy=0.99) {
+  resolution=600, accuracy=0.90) {
     // Generate student_curve's bitmap first
     var studentBitmap = drawCurve(canvas, resolution);
     var solution_point_array = (draw_mode(num_points))(solution_curve);
@@ -168,9 +187,9 @@ function __check_canvas(draw_mode, num_points, solution_curve,
     if (test_accuracy >= accuracy) {
       return true;
     } else {
-      console.log(`Total points: ${base}`);
-      console.log(`Matched points: ${matched_points}`);
-      console.log(`Test accuracy: ${test_accuracy}`);
+      // console.log(`Total points: ${base}`);
+      // console.log(`Matched points: ${matched_points}`);
+      // console.log(`Test accuracy: ${test_accuracy}`);
       return false;
     }
 }
