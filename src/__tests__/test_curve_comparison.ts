@@ -101,7 +101,7 @@ test("test squeezed sines", async () => {
     TEST_DRAW_MODE,
     TEST_NUM_POINTS,
     TEST_SOLUTION_CURVE,
-    30
+    300
   );
   expect(results).toEqual(true);
 });
