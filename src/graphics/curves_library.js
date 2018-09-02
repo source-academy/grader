@@ -1,13 +1,15 @@
 // for the side effects, populating the global namespace;
 require('./hi_graph.js');
 
-// initialize the min/max to extreme values
-var min_x = Infinity;
-var max_x = -Infinity;
-var min_y = Infinity;
-var max_y = -Infinity;
+
+var canvas = [];
 
 function generateCurve(scaleMode, drawMode, numPoints, func, isFullView){
+    // initialize the min/max to extreme values
+    var min_x = Infinity;
+    var max_x = -Infinity;
+    var min_y = Infinity;
+    var max_y = -Infinity;
     var curvePosArray = [];
 
     function evaluator(num, func){
@@ -23,7 +25,7 @@ function generateCurve(scaleMode, drawMode, numPoints, func, isFullView){
             }
             var x = value[0] * 2 - 1;
             var y = value[1] * 2 - 1;
-            curvePosArray.push(x, y);
+            curvePosArray.push([x, y]);
             min_x = Math.min(min_x, x);
             max_x = Math.max(max_x, x);
             min_y = Math.min(min_y, y);
@@ -32,7 +34,29 @@ function generateCurve(scaleMode, drawMode, numPoints, func, isFullView){
         return curvePosArray;
     }
 
-    return evaluator(numPoints, func);
+    var raw_points = evaluator(numPoints, func);
+
+    if(scaleMode == "none") {
+        canvas = raw_points;
+        return raw_points;
+    }
+    var range_x = (max_x - min_x);
+    var range_y = (max_y - min_y);
+    var x_scale = 1 / (range_x == 0 ? 1 : range_x);
+    var y_scale = 1 / (range_y == 0 ? 1 : range_y);
+    if(scaleMode == "fit") {
+      var scale_factor = Math.min(x_scale, y_scale);
+      x_scale = scale_factor;
+      y_scale = scale_factor;
+    }
+    curvePosArray = raw_points.map(([x, y]) => {
+      var new_x = (x - min_x) * x_scale;
+      var new_y = (y - min_y) * y_scale;
+      return [new_x, new_y];
+    });
+
+    canvas = curvePosArray;
+    return curvePosArray;
   }
 
 /* We stub in our own drawCurve to:
@@ -54,39 +78,15 @@ function drawCurve(curvePosArray, resolution) {
     }
   }
 
-  // Determine the range in x & y axes of the curve
-  const range_x = max_x - min_x;
-  const range_y = max_y - min_y;
-
-  // console.log(`range_x: ${range_x}`);
-  // console.log(`range_y: ${range_y}`);
-
-  // Scale the actual points to fit the bitmap resolution
-  /*
-  Note edge case where range_x === 0 || range_y === 0 (e.g. unit_line_at(t)). This will
-  result in a Divide-By-Zero operation, and thus needs to be handled separately.
-  For now, I am simply setting all negative points to 0 and points above `resolution`
-  to `resolution`.
-  Otherwise if range !== 0, scale the points based on the range.
-  ** Suggest to break bitmap abstraction and compare the x or y values directly for edge
-  ** cases.
-  */
-  function scale_and_approximate(val, min_val, max_val, range_val) {
-    return range_val === 0
-      ? x < 0
-        ? 0
-        : x > resolution
-          ? resolution
-          : Math.round(val)
-      : Math.round(((val - min_val) / (range_val)) * (resolution - 1));
-  }
-
   // For every point in curvePosArray, fill in corresponding pixel in curveBitmap with 1
-  for (var i = 0; i < curvePosArray.length; i+=2) {
-    var approx_x = scale_and_approximate(curvePosArray[i], min_x, max_x, range_x);
-    var approx_y = scale_and_approximate(curvePosArray[i+1], min_y, max_y, range_y);
+  for (point of curvePosArray) {
+    // skip pixels that are out of bounds
+    if(point[0] >= 1 || point[0] < 0 || point[1] >= 1 || point[1] < 0) {
+      continue;
+    }
+    var approx_x = Math.floor(point[0] * resolution);
+    var approx_y = Math.floor(point[1] * resolution);
     curveBitmap[approx_x][approx_y] = 1;
-    // console.log(`Point on bitmap: (${approx_x}, ${approx_y})`);
   }
   return curveBitmap;
 }
@@ -142,38 +142,35 @@ function y_of(pt){
 // Checks the solution curve against the "drawn" curve and returns true/false
 // Resolution: pixel height/width of bitmap
 // Accuracy: fraction of pixels that need to match to be considered as passing
-function __check_canvas(draw_mode, num_points, student_curve, solution_curve,
+function __check_canvas(draw_mode, num_points, solution_curve,
   resolution=600, accuracy=0.99) {
-    // Generate student_curve's bitmap and solution_curve's bitmap first
-    // to get the same min/max_x/y for scaling points in point_array to the bitmap
-    var student_point_array = draw_mode(num_points)(student_curve);
-    var solution_point_array = draw_mode(num_points)(solution_curve);
-
-    var studentBitmap = drawCurve(student_point_array, resolution);
+    // Generate student_curve's bitmap first
+    var studentBitmap = drawCurve(canvas, resolution);
+    var solution_point_array = (draw_mode(num_points))(solution_curve);
     var solutionBitmap = drawCurve(solution_point_array, resolution);
-
-    // Initialize a counter for number of points that match between student and solution
-    // Step through all pixels in the bitmap and increment the number of matching points
-    // accordingly
-    const TOTAL_POINTS = num_points + 1;
+    const TOTAL_POINTS = resolution * resolution;
+    var base = 0;
     var matched_points = 0;
     for (var i = 0; i < resolution; i++) {
       for (var j = 0; j < resolution; j++) {
-        if (studentBitmap[i][j] === 1 && studentBitmap[i][j] === solutionBitmap[i][j]) {
+        if (studentBitmap[i][j] === 0 && solutionBitmap[i][j] === 0) {
+          continue;
+        }
+        base++;
+        if( studentBitmap[i][j] === solutionBitmap[i][j]) {
           matched_points++;
         }
       }
     }
 
-    const test_accuracy = matched_points / TOTAL_POINTS;
-    console.log(`Total points: ${TOTAL_POINTS}`);
-    console.log(`Matched points: ${matched_points}`);
-    console.log(`Test accuracy: ${test_accuracy}`);
-
+    const test_accuracy = matched_points / base;
     // Check fraction of correct points against accuracy tolerance
     if (test_accuracy >= accuracy) {
       return true;
     } else {
+      console.log(`Total points: ${base}`);
+      console.log(`Matched points: ${matched_points}`);
+      console.log(`Test accuracy: ${test_accuracy}`);
       return false;
     }
 }

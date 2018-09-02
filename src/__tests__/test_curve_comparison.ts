@@ -28,23 +28,27 @@ function forward_sine(t) {
 function backward_sine(t) {
   return make_point(-t, Math.sin(t * Math.PI));
 }
-// (draw_connected_squeezed_to_window(200))(forward_sine);
-// (draw_connected_squeezed_to_window(200))(backwards_sine);
+// (draw_connected_squeezed_to_window(1000))(forward_sine);
+// (draw_connected_squeezed_to_window(1000))(backwards_sine);
 
 /* Tests */
+
+const TEST_RESOLUTION = 300;
 
 test("similar curves", async () => {
   // Pass. Expected.
   const TEST_DRAW_MODE = draw_connected;
-  const TEST_NUM_POINTS = 200;
+  const TEST_NUM_POINTS = 1000;
   const TEST_STUDENT_CURVE = up_line;
   const TEST_SOLUTION_CURVE = down_line;
 
+  // Draw student's curve first
+  TEST_DRAW_MODE(TEST_NUM_POINTS)(TEST_STUDENT_CURVE);
   const results = __check_canvas(
     TEST_DRAW_MODE,
     TEST_NUM_POINTS,
-    TEST_STUDENT_CURVE,
-    TEST_SOLUTION_CURVE
+    TEST_SOLUTION_CURVE,
+    TEST_RESOLUTION
   );
   expect(results).toEqual(true);
 });
@@ -52,15 +56,17 @@ test("similar curves", async () => {
 test("test same circle", async () => {
   // Pass. Expected.
   const TEST_DRAW_MODE = draw_connected;
-  const TEST_NUM_POINTS = 200;
+  const TEST_NUM_POINTS = 1000;
   const TEST_STUDENT_CURVE = unit_circle;
   const TEST_SOLUTION_CURVE = unit_circle;
 
+  // Draw student's curve first
+  TEST_DRAW_MODE(TEST_NUM_POINTS)(TEST_STUDENT_CURVE);
   const results = __check_canvas(
     TEST_DRAW_MODE,
     TEST_NUM_POINTS,
-    TEST_STUDENT_CURVE,
-    TEST_SOLUTION_CURVE
+    TEST_SOLUTION_CURVE,
+    TEST_RESOLUTION
   );
   expect(results).toEqual(true);
 });
@@ -68,30 +74,34 @@ test("test same circle", async () => {
 test("test similar sines", async () => {
   // Fail. Expected.
   const TEST_DRAW_MODE = draw_connected;
-  const TEST_NUM_POINTS = 200;
+  const TEST_NUM_POINTS = 1000;
   const TEST_STUDENT_CURVE = forward_sine;
   const TEST_SOLUTION_CURVE = backward_sine;
 
+  // Draw student's curve first
+  TEST_DRAW_MODE(TEST_NUM_POINTS)(TEST_STUDENT_CURVE);
   const results = __check_canvas(
     TEST_DRAW_MODE,
     TEST_NUM_POINTS,
-    TEST_STUDENT_CURVE,
-    TEST_SOLUTION_CURVE
+    TEST_SOLUTION_CURVE,
+    TEST_RESOLUTION
   );
   expect(results).toEqual(false);
 });
 
 test("test squeezed sines", async () => {
   const TEST_DRAW_MODE = draw_connected_squeezed_to_window;
-  const TEST_NUM_POINTS = 200;
+  const TEST_NUM_POINTS = 1000;
   const TEST_STUDENT_CURVE = forward_sine;
   const TEST_SOLUTION_CURVE = backward_sine;
 
+  // Draw student's curve first
+  TEST_DRAW_MODE(TEST_NUM_POINTS)(TEST_STUDENT_CURVE);
   const results = __check_canvas(
     TEST_DRAW_MODE,
     TEST_NUM_POINTS,
-    TEST_STUDENT_CURVE,
-    TEST_SOLUTION_CURVE
+    TEST_SOLUTION_CURVE,
+    TEST_RESOLUTION
   );
   expect(results).toEqual(true);
 });
@@ -99,15 +109,17 @@ test("test squeezed sines", async () => {
 test("", async () => {
   // Pass. Expected.
   const TEST_DRAW_MODE = draw_connected;
-  const TEST_NUM_POINTS = 200;
+  const TEST_NUM_POINTS = 1000;
   const TEST_STUDENT_CURVE = unit_line_at(3);
   const TEST_SOLUTION_CURVE = unit_line_at(3);
 
+  // Draw student's curve first
+  TEST_DRAW_MODE(TEST_NUM_POINTS)(TEST_STUDENT_CURVE);
   const results = __check_canvas(
     TEST_DRAW_MODE,
     TEST_NUM_POINTS,
-    TEST_STUDENT_CURVE,
-    TEST_SOLUTION_CURVE
+    TEST_SOLUTION_CURVE,
+    TEST_RESOLUTION
   );
   expect(results).toEqual(true);
 });
@@ -115,15 +127,17 @@ test("", async () => {
 test("", async () => {
   // Fail. Expected.
   const TEST_DRAW_MODE = draw_connected;
-  const TEST_NUM_POINTS = 200;
+  const TEST_NUM_POINTS = 1000;
   const TEST_STUDENT_CURVE = unit_line_at(10);
   const TEST_SOLUTION_CURVE = unit_line_at(50);
 
+  // Draw student's curve first
+  TEST_DRAW_MODE(TEST_NUM_POINTS)(TEST_STUDENT_CURVE);
   const results = __check_canvas(
     TEST_DRAW_MODE,
     TEST_NUM_POINTS,
-    TEST_STUDENT_CURVE,
-    TEST_SOLUTION_CURVE
+    TEST_SOLUTION_CURVE,
+    TEST_RESOLUTION
   );
   expect(results).toEqual(false);
 });
