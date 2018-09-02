@@ -16,10 +16,6 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
-"@ericandrewlewis/bitmap@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@ericandrewlewis/bitmap/-/bitmap-1.0.0.tgz#f7586422489b603f304d3292720bb7a02ae33b96"
-
 "@types/acorn@^4.0.3":
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/@types/acorn/-/acorn-4.0.3.tgz#d1f3e738dde52536f9aad3d3380d14e448820afd"
