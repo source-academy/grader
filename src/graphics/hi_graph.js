@@ -301,3 +301,4 @@ global.squeeze_full_view = squeeze_full_view;
 global.squeeze_rectangular_portion = squeeze_rectangular_portion;
 global.translate = translate;
 global.scale = scale;
+global.scale_x_y = scale_x_y;
