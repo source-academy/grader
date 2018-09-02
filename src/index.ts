@@ -71,7 +71,7 @@ export const runAll = async (event: AwsEvent): Promise<Output[]> => {
         break
       }
       case 'CURVES': {
-        require('./graphics/curves_library')
+        require('./graphics/curves_library.js')
       }
     }
   }
