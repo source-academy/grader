@@ -1,3 +1,6 @@
+// for the side effects, populating the global namespace;
+require('./hi_graph.js');
+
 // initialize the min/max to extreme values
 var min_x = Infinity;
 var max_x = -Infinity;
@@ -40,7 +43,7 @@ function generateCurve(scaleMode, drawMode, numPoints, func, isFullView){
 //
 function drawCurve(curvePosArray, resolution) {
   var curveBitmap = [];
-  
+
   // Initialize curveBitMap to 2D array of 0's
   for (var x = 0; x < resolution; x++) {
     if (!curveBitmap[x]) {
@@ -63,7 +66,7 @@ function drawCurve(curvePosArray, resolution) {
   Note edge case where range_x === 0 || range_y === 0 (e.g. unit_line_at(t)). This will
   result in a Divide-By-Zero operation, and thus needs to be handled separately.
   For now, I am simply setting all negative points to 0 and points above `resolution`
-  to `resolution`. 
+  to `resolution`.
   Otherwise if range !== 0, scale the points based on the range.
   ** Suggest to break bitmap abstraction and compare the x or y values directly for edge
   ** cases.
@@ -81,7 +84,7 @@ function drawCurve(curvePosArray, resolution) {
   // For every point in curvePosArray, fill in corresponding pixel in curveBitmap with 1
   for (var i = 0; i < curvePosArray.length; i+=2) {
     var approx_x = scale_and_approximate(curvePosArray[i], min_x, max_x, range_x);
-    var approx_y = scale_and_approximate(curvePosArray[i+1], min_y, max_y, range_y);  
+    var approx_y = scale_and_approximate(curvePosArray[i+1], min_y, max_y, range_y);
     curveBitmap[approx_x][approx_y] = 1;
     // console.log(`Point on bitmap: (${approx_x}, ${approx_y})`);
   }
@@ -139,13 +142,13 @@ function y_of(pt){
 // Checks the solution curve against the "drawn" curve and returns true/false
 // Resolution: pixel height/width of bitmap
 // Accuracy: fraction of pixels that need to match to be considered as passing
-function __check_canvas(draw_mode, num_points, student_curve, solution_curve, 
+function __check_canvas(draw_mode, num_points, student_curve, solution_curve,
   resolution=600, accuracy=0.99) {
     // Generate student_curve's bitmap and solution_curve's bitmap first
     // to get the same min/max_x/y for scaling points in point_array to the bitmap
     var student_point_array = draw_mode(num_points)(student_curve);
     var solution_point_array = draw_mode(num_points)(solution_curve);
-    
+
     var studentBitmap = drawCurve(student_point_array, resolution);
     var solutionBitmap = drawCurve(solution_point_array, resolution);
 
@@ -175,76 +178,13 @@ function __check_canvas(draw_mode, num_points, student_curve, solution_curve,
     }
 }
 
-function unit_circle(t) {
-  return make_point(Math.sin(2 * Math.PI * t),
-                    Math.cos(2 * Math.PI * t));
-}
-
-function unit_line_at(y) {
-  return t => make_point(t, y);
-}
-
-function some_shape(t) {
-  if (t < 0.5) {
-    return make_point(Math.sin(2 * Math.PI * t),
-        Math.cos(2 * Math.PI * t));
-  } else {
-    return make_point(t, t * 2);
-  }
-}
-
-function up_line(t) {
-  return make_point(0.5, t);
-}
-function down_line(t) {
-  return make_point(0.5, 1-t);
-}
-(draw_connected(200))(up_line);
-(draw_connected(200))(down_line);
-
-function forward_sine(t) {
-  return make_point(t, Math.sin(t * Math.PI));
-}
-function backward_sine(t) {
-  return make_point(-t, Math.sin(t * Math.PI));
-}
-// (draw_connected_squeezed_to_window(200))(forward_sine);
-// (draw_connected_squeezed_to_window(200))(backwards_sine);
-
-/* Tests */
-
-// Pass. Expected.
-const TEST_DRAW_MODE = draw_connected;
-const TEST_NUM_POINTS = 200;
-const TEST_STUDENT_CURVE = up_line;
-const TEST_SOLUTION_CURVE = down_line;
-
-// Pass. Expected.
-// const TEST_DRAW_MODE = draw_connected;
-// const TEST_NUM_POINTS = 200;
-// const TEST_STUDENT_CURVE = unit_circle;
-// const TEST_SOLUTION_CURVE = unit_circle;
-
-// Fail. Expected.
-// const TEST_DRAW_MODE = draw_connected;
-// const TEST_NUM_POINTS = 200;
-// const TEST_STUDENT_CURVE = forward_sine;
-// const TEST_SOLUTION_CURVE = backward_sine;
-
-// Pass. Expected.
-// const TEST_DRAW_MODE = draw_connected;
-// const TEST_NUM_POINTS = 200;
-// const TEST_STUDENT_CURVE = unit_line_at(3);
-// const TEST_SOLUTION_CURVE = unit_line_at(3);
-
-// Fail. Expected.
-// const TEST_DRAW_MODE = draw_connected;
-// const TEST_NUM_POINTS = 200;
-// const TEST_STUDENT_CURVE = unit_line_at(10);
-// const TEST_SOLUTION_CURVE = unit_line_at(50);
-
-console.log(__check_canvas(
-  TEST_DRAW_MODE, 
-  TEST_NUM_POINTS, 
-  TEST_STUDENT_CURVE, 
-  TEST_SOLUTION_CURVE));
+global.make_point = make_point;
+global.draw_points_on = draw_points_on;
+global.draw_connected = draw_connected;
+global.draw_points_squeezed_to_window = draw_points_squeezed_to_window;
+global.draw_connected_squeezed_to_window = draw_connected_squeezed_to_window;
+global.draw_connected_full_view = draw_connected_full_view;
+global.draw_connected_full_view_proportional = draw_connected_full_view_proportional;
+global.x_of = x_of;
+global.y_of = y_of;
+global.__check_canvas = __check_canvas;
