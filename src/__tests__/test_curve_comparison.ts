@@ -81,6 +81,21 @@ test("test similar sines", async () => {
   expect(results).toEqual(false);
 });
 
+test("test squeezed sines", async () => {
+  const TEST_DRAW_MODE = draw_connected_squeezed_to_window;
+  const TEST_NUM_POINTS = 200;
+  const TEST_STUDENT_CURVE = forward_sine;
+  const TEST_SOLUTION_CURVE = backward_sine;
+
+  const results = __check_canvas(
+    TEST_DRAW_MODE,
+    TEST_NUM_POINTS,
+    TEST_STUDENT_CURVE,
+    TEST_SOLUTION_CURVE
+  );
+  expect(results).toEqual(true);
+});
+
 test("", async () => {
   // Pass. Expected.
   const TEST_DRAW_MODE = draw_connected;
