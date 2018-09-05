@@ -63,7 +63,18 @@ type TimeoutResult = {
 }
 
 export const runAll = async (event: AwsEvent): Promise<Output[]> => {
-  require('./graphics/rune_library.js')
+  if (event.library && event.library.external) {
+    switch(event.library.external.name) {
+      case 'TWO_DIM_RUNES': {}
+      case 'THREE_DIM_RUNES': {
+        require('./graphics/rune_library.js')
+        break
+      }
+      case 'CURVES': {
+        require('./graphics/curves_library.js')
+      }
+    }
+  }
   require('./util')
   evaluateGlobals(event.library.globals)
   const stdPrg = event.studentProgram
