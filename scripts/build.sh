@@ -17,6 +17,6 @@ fi
 
 yarn install --production=true
 tsc
-cd build && zip -r --exclude=*terraform* ../grader.zip index.js graphics/ && cd ..
+cd build && zip -r --exclude=*terraform* ../grader.zip index.js util.js graphics/ && cd ..
 zip -ur grader.zip node_modules/
 yarn install --production=false

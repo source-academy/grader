@@ -75,7 +75,7 @@ export const runAll = async (event: AwsEvent): Promise<Output[]> => {
       }
     }
   }
-  require('./util')
+  require('./util.js')
   evaluateGlobals(event.library.globals)
   const stdPrg = event.studentProgram
   const promises = event.graderPrograms.map(
