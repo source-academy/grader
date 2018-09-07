@@ -47,3 +47,17 @@ test('wrong answer', async () => {
   ])
 })
 
+test('scan grader correct', async () => {
+  const results = await runAll(makeAwsEvent(grader.scan, student.valid.correct))
+  expect(results).toEqual([
+      {'grade': 1, 'resultType': 'pass'}
+  ])
+})
+
+test('scan grader wrong', async () => {
+  const results = await runAll(makeAwsEvent(grader.scan, student.valid.wrong))
+  expect(results).toEqual([
+      {'grade': 0, 'resultType': 'pass'}
+  ])
+})
+

@@ -201,34 +201,23 @@ function __scan_canvas(draw_mode, num_points, solution_curve, resolution=300, ho
   var studentBitmap = drawCurve(canvas, resolution);
   var solution_point_array = (draw_mode(num_points))(solution_curve);
   var solutionBitmap = drawCurve(solution_point_array, resolution);
-  const TOTAL_POINTS = resolution * resolution;
-  var base = 0;
-  var matched_points = 0;
-  for (var i = 0; i < resolution; i++) {
-    for (var j = 0; j < resolution; j++) {
-      if (studentBitmap[i][j] === 0 && solutionBitmap[i][j] === 0) {
-        continue;
-      }
-      base++;
-      if( studentBitmap[i][j] === solutionBitmap[i][j]) {
-        matched_points++;
-      }
-    }
+  var result = true;
+  if(horizontal_lines) {
+    result = result && (
+      build_compressed_horizontal(studentBitmap)
+        === build_compressed_horizontal(solutionBitmap)
+    );
   }
-
-  const test_accuracy = matched_points / base;
-  // Check fraction of correct points against accuracy tolerance
-  if (test_accuracy >= accuracy) {
-    return true;
-  } else {
-    // console.log(`Total points: ${base}`);
-    // console.log(`Matched points: ${matched_points}`);
-    // console.log(`Test accuracy: ${test_accuracy}`);
-    return false;
+  if(vertical_lines) {
+    result = result && (
+      build_compressed_vertical(studentBitmap)
+        === build_compressed_horizontal(solutionBitmap)
+    );
   }
+  return result;
 }
 
-function build_compressed_horizontal(bitmap, resolution) {
+function build_compressed_horizontal(bitmap) {
   var intermediate = bitmap.map((_, index) => {
     var row = bitmap.map(col => col[index]);
     return compress_array(row, '');
@@ -236,7 +225,7 @@ function build_compressed_horizontal(bitmap, resolution) {
   return compress_array(intermediate, '\n');
 }
 
-function build_compressed_vertical(bitmap, resolution) {
+function build_compressed_vertical(bitmap) {
   return compress_array(bitmap.map(arr => compress_array(arr, '')),'\n');
 }
 

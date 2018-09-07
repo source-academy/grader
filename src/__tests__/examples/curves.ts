@@ -40,6 +40,15 @@ const validGrader = [
       ) ? 1 : 0;
 `]
 
+const scanGrader = [
+ `__scan_canvas(
+        draw_connected_squeezed_to_window,
+        300,
+        backward_sine,
+        50,
+      ) ? 1 : 0;
+`]
+
 export const grader: Grader = {
     pixel: validGrader,
     scan: validGrader
