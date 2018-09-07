@@ -34,14 +34,14 @@ const makeAwsEvent = awsEventFactory({
 })
 
 test('curve grader correct', async () => {
-  const results = await runAll(makeAwsEvent(grader.valid, student.valid.correct))
+  const results = await runAll(makeAwsEvent(grader.pixel, student.valid.correct))
   expect(results).toEqual([
       {'grade': 1, 'resultType': 'pass'}
   ])
 })
 
 test('wrong answer', async () => {
-  const results = await runAll(makeAwsEvent(grader.valid, student.valid.wrong))
+  const results = await runAll(makeAwsEvent(grader.pixel, student.valid.wrong))
   expect(results).toEqual([
       {'grade': 0, 'resultType': 'pass'}
   ])

@@ -23,8 +23,8 @@ function generateCurve(scaleMode, drawMode, numPoints, func, isFullView){
                 || (typeof value[0] !== "number") || (typeof value[1] !== "number")) {
                 throw "Expected a point, encountered " + value;
             }
-            var x = value[0] * 2 - 1;
-            var y = value[1] * 2 - 1;
+            var x = value[0];
+            var y = value[1];
             curvePosArray.push([x, y]);
             min_x = Math.min(min_x, x);
             max_x = Math.max(max_x, x);
@@ -194,6 +194,64 @@ function __check_canvas(draw_mode, num_points, solution_curve,
     }
 }
 
+// Checks the solution curve against the "drawn" curve, and returns true/false
+// instead of using pixel comparisons, builds a compressed representation of the curve and compares with that.
+function __scan_canvas(draw_mode, num_points, solution_curve, resolution=300, horizontal_lines=true, vertical_lines=true) {
+  // Generate student_curve's bitmap first
+  var studentBitmap = drawCurve(canvas, resolution);
+  var solution_point_array = (draw_mode(num_points))(solution_curve);
+  var solutionBitmap = drawCurve(solution_point_array, resolution);
+  const TOTAL_POINTS = resolution * resolution;
+  var base = 0;
+  var matched_points = 0;
+  for (var i = 0; i < resolution; i++) {
+    for (var j = 0; j < resolution; j++) {
+      if (studentBitmap[i][j] === 0 && solutionBitmap[i][j] === 0) {
+        continue;
+      }
+      base++;
+      if( studentBitmap[i][j] === solutionBitmap[i][j]) {
+        matched_points++;
+      }
+    }
+  }
+
+  const test_accuracy = matched_points / base;
+  // Check fraction of correct points against accuracy tolerance
+  if (test_accuracy >= accuracy) {
+    return true;
+  } else {
+    // console.log(`Total points: ${base}`);
+    // console.log(`Matched points: ${matched_points}`);
+    // console.log(`Test accuracy: ${test_accuracy}`);
+    return false;
+  }
+}
+
+function build_compressed_horizontal(bitmap, resolution) {
+  var intermediate = bitmap.map((_, index) => {
+    var row = bitmap.map(col => col[index]);
+    return compress_array(row, '');
+  });
+  return compress_array(intermediate, '\n');
+}
+
+function build_compressed_vertical(bitmap, resolution) {
+  return compress_array(bitmap.map(arr => compress_array(arr, '')),'\n');
+}
+
+// Removes sequential duplicate elements
+// compress_array([0,0,0,0,1,1,0,1,1,1,0,1]) -> [0,1,0,1,0,1]
+function compress_array(array, separator='') {
+  return array.reduce((accumulator, val) => {
+    var [prev, result] = accumulator;
+    if(val !== prev) {
+      result.push(val);
+    }
+    return [val, result];
+  }, [false, []])[1].join(separator);
+}
+
 global.make_point = make_point;
 global.draw_points_on = draw_points_on;
 global.draw_connected = draw_connected;
@@ -204,3 +262,7 @@ global.draw_connected_full_view_proportional = draw_connected_full_view_proporti
 global.x_of = x_of;
 global.y_of = y_of;
 global.__check_canvas = __check_canvas;
+global.__scan_canvas = __scan_canvas;
+global.__build_compressed_vertical = build_compressed_vertical;
+global.__build_compressed_horizontal = build_compressed_horizontal;
+global.__drawCurve = drawCurve;
