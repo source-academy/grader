@@ -211,7 +211,7 @@ function __scan_canvas(draw_mode, num_points, solution_curve, resolution=300, ho
   if(vertical_lines) {
     result = result && (
       build_compressed_vertical(studentBitmap)
-        === build_compressed_horizontal(solutionBitmap)
+        === build_compressed_vertical(solutionBitmap)
     );
   }
   return result;
