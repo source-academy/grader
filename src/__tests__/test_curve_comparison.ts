@@ -141,3 +141,40 @@ test("", async () => {
   );
   expect(results).toEqual(false);
 });
+
+test("build compressed vertical test", async () => {
+  var solution_point_array = draw_connected_full_view(3000)(unit_circle);
+  var solutionBitmap = __drawCurve(solution_point_array, 300);
+  var results = __build_compressed_vertical(solutionBitmap);
+  expect(results).toEqual(["010", "01010", "101", "01010", "010"].join("\n"));
+});
+
+test("build compressed horizontal test", async () => {
+  var solution_point_array = draw_connected_full_view(3000)(unit_circle);
+  var solutionBitmap = __drawCurve(solution_point_array, 300);
+  var results = __build_compressed_horizontal(solutionBitmap);
+  expect(results).toEqual(["010", "01010", "101", "01010", "010"].join("\n"));
+});
+
+
+
+/*
+[ [ 1, 1, 1, 0, 0 ],
+  [ 0, 0, 1, 1, 1 ],
+  [ 0, 0, 0, 0, 1 ],
+  [ 0, 0, 1, 1, 1 ],
+  [ 1, 1, 1, 0, 0 ] ]
+*/
+test("build compressed vertical sin test", async () => {
+  var solution_point_array = draw_connected(3000)(forward_sine);
+  var solutionBitmap = __drawCurve(solution_point_array, 300);
+  var results = __build_compressed_vertical(solutionBitmap);
+  expect(results).toEqual(["10", "010", "01","010", "10"].join("\n"));
+});
+
+test("build compressed horizontal sin test", async () => {
+  var solution_point_array = draw_connected(3000)(forward_sine);
+  var solutionBitmap = __drawCurve(solution_point_array, 20);
+  var results = __build_compressed_horizontal(solutionBitmap);
+  expect(results).toEqual(["101", "01010","010"].join("\n"));
+});

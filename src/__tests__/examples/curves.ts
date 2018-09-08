@@ -20,7 +20,7 @@ const validStudentWrong =
       return make_point(-t, math_sin(t * math_PI));
     }
 
-    (draw_connected(200))(forward_sine);
+    (draw_connected(200))(backward_sine);
     `
 
 export const student: Student = {
@@ -40,6 +40,17 @@ const validGrader = [
       ) ? 1 : 0;
 `]
 
+const scanGrader = [
+ `__scan_canvas(
+        draw_connected_squeezed_to_window,
+        300,
+        backward_sine,
+        50,
+      ) ? 1 : 0;
+`]
+
 export const grader: Grader = {
-    valid: validGrader
+    pixel: validGrader,
+    scan: validGrader
+
 }
