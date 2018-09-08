@@ -302,3 +302,5 @@ global.squeeze_rectangular_portion = squeeze_rectangular_portion;
 global.translate = translate;
 global.scale = scale;
 global.scale_x_y = scale_x_y;
+global.pixel_dragonize = pixel_dragonize;
+global.pixel_rotate = pixel_rotate;
