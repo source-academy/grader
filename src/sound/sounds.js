@@ -111,7 +111,7 @@ function simultaneously(list_of_sounds) {
                 const current_amplitude = accumulate(function(sourcesound, total_amplitude) {
                     return total_amplitude + (get_wave(sourcesound))(t);
                 }, 0, list_of_sourcesounds);
-                return total_amplitude / number_of_sounds;
+                return current_amplitude / number_of_sounds;
             }
         }, max_duration));
     }
@@ -345,5 +345,19 @@ global.make_sourcesound = make_sourcesound;
 global.get_wave = get_wave;
 global.get_duration = get_duration;
 global.play = play;
+global.consecutively = consecutively;
+global.simultaneously = simultaneously;
 global.sourcesound_to_sound = sourcesound_to_sound;
 global.sound_to_sourcesound = sound_to_sourcesound;
+
+global.noise = noise;
+global.silence = silence;
+global.sine_sound = sine_sound;
+global.square_sound = square_sound;
+global.triangle_sound = triangle_sound;
+global.sawtooth_sound = sawtooth_sound;
+
+
+
+
+
