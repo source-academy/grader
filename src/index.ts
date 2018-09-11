@@ -73,6 +73,9 @@ export const runAll = async (event: AwsEvent): Promise<Output[]> => {
       case 'CURVES': {
         require('./graphics/curves_library.js')
       }
+      case 'SOUND': {
+        require('./sound/sounds.js')
+      }
     }
   }
   require('./util.js')
