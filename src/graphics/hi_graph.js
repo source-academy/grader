@@ -288,19 +288,36 @@ function pixel_rotate(theta) { // rotates around origin, but less efficiently
                    };
            };
 }
+global.compose = compose;
+global.thrice = thrice;
+global.identity = identity;
+global.repeated = repeated;
 
-
-global.unit_line = unit_line;
-global.unit_line_at = unit_line_at;
+global.square = square;
 global.unit_circle = unit_circle;
+global.unit_line = unit_line;
+
+global.unit_line_at = unit_line_at;
+global.alternative_unit_circle = alternative_unit_circle;
+global.arc = arc;
+global.invert = invert;
+
+global.rotate_pi_over_2 = rotate_pi_over_2;
+global.translate = translate;
+global.rotate_around_origin = rotate_around_origin;
+global.deriv_t = deriv_t;
+global.scale_x_y = scale_x_y;
+global.scale = scale;
+global.squeeze_rectangular_portion = squeeze_rectangular_portion;
+global.squeeze_full_view = squeeze_full_view;
+global.full_view_proportional = full_view_proportional;
+global.put_in_standard_position = put_in_standard_position;
 global.connect_rigidly = connect_rigidly;
 global.connect_ends = connect_ends;
-global.put_in_standard_position = put_in_standard_position;
-global.full_view_proportional = full_view_proportional;
-global.squeeze_full_view = squeeze_full_view;
-global.squeeze_rectangular_portion = squeeze_rectangular_portion;
-global.translate = translate;
-global.scale = scale;
-global.scale_x_y = scale_x_y;
+global.gosperize = gosperize;
+global.gosper_curve = gosper_curve;
+global.show_connected_gosper = show_connected_gosper;
+global.param_gosper = param_gosper;
+global.param_gosperize = param_gosperize;
 global.pixel_dragonize = pixel_dragonize;
 global.pixel_rotate = pixel_rotate;
