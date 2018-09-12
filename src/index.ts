@@ -63,9 +63,8 @@ type TimeoutResult = {
 }
 
 export const runAll = async (event: AwsEvent): Promise<Output[]> => {
-  if (event.library && event.library.chapter >= 2) {
-    require('./list.js')
-  }
+  require('./util.js')
+  require('./list.js')
   if (event.library && event.library.external) {
     switch(event.library.external.name) {
       case 'TWO_DIM_RUNES': {}
@@ -81,7 +80,6 @@ export const runAll = async (event: AwsEvent): Promise<Output[]> => {
       }
     }
   }
-  require('./util.js')
   evaluateGlobals(event.library.globals)
   const stdPrg = event.studentProgram
   const promises = event.graderPrograms.map(
