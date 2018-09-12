@@ -1,5 +1,3 @@
-require('./list');
-
 // Constants
 var FS = 32000; // Standard sampling rate for all problems
 
@@ -339,6 +337,117 @@ function play_concurrently(sound) {
     }
 }
 
+function exponential_decay(decay_period) {
+  return function (t) {
+    if ((t > decay_period) || (t < 0)) {
+      return undefined;
+    } else {
+      var halflife = decay_period / 8;
+      var lambda = Math.log(2) / halflife;
+      return Math.pow(Math.E, -lambda * t);
+    }
+  }
+}
+
+function adsr(attack_time, decay_time, sustain_level, release_time) {
+  return function (sound) {
+    var sourcesound = sound_to_sourcesound(sound);
+    var wave = get_wave(sourcesound);
+    var duration = get_duration(sourcesound);
+    return sourcesound_to_sound(make_sourcesound(function (t) {
+      if (t < attack_time) {
+        return wave(t) * (t / attack_time);
+      } else if (t < attack_time + decay_time) {
+        return ((exponential_decay(1 - sustain_level, decay_time))(t - attack_time) + sustain_level) * wave(t);
+      } else if (t < duration - release_time) {
+        return wave(t) * sustain_level;
+      } else if (t <= duration) {
+        return wave(t) * sustain_level * (exponential_decay(release_time))(t - (duration - release_time));
+      } else {
+        return 0;
+      }
+    }, duration));
+  };
+}
+
+function stacking_adsr(waveform, base_frequency, duration, list_of_envelope) {
+  function zip(xs, ys) {
+    if (is_empty_list(xs) || is_empty_list(ys)) {
+      return [];
+    } else {
+      const new_pair = pair(head(xs), head(ys));
+      return pair(new_pair, zip(tail(xs), tail(ys)));
+    }
+  }
+
+  const range = build_list(length(list_of_envelope), i => i + 1);
+  const multiplier_to_envelopes = zip(list_of_envelope, range);
+
+  const adsr_sounds = map(function(multiplier_to_envelope) {
+    const multiplier = head(multiplier_to_envelope);
+    const envelope = tail(multiplier_to_envelope);
+    const base_sound = waveform(base_frequency * multiplier, duration);
+    const adsr_sound = envelope(base_sound);
+    return adsr_sound;
+  }, multiplier_to_envelopes);
+
+  return simultaneously(adsr_sounds);
+}
+
+// instruments for students
+function trombone(note, duration) {
+  return stacking_adsr(square_sound, midi_note_to_frequency(note), duration,
+    list(adsr(0.4, 0, 1, 0),
+      adsr(0.6472, 1.2, 0, 0)));
+}
+
+function piano(note, duration) {
+  return stacking_adsr(triangle_sound, midi_note_to_frequency(note), duration,
+    list(adsr(0, 1.03, 0, 0),
+      adsr(0, 0.64, 0, 0),
+      adsr(0, 0.4, 0, 0)));
+}
+
+function bell(note, duration) {
+  return stacking_adsr(square_sound, midi_note_to_frequency(note), duration,
+    list(adsr(0, 1.2, 0, 0),
+      adsr(0, 1.3236, 0, 0),
+      adsr(0, 1.5236, 0, 0),
+      adsr(0, 1.8142, 0, 0)));
+}
+
+function violin(note, duration) {
+  return stacking_adsr(sawtooth_sound, midi_note_to_frequency(note), duration,
+    list(adsr(0.7, 0, 1, 0.3),
+      adsr(0.7, 0, 1, 0.3),
+      adsr(0.9, 0, 1, 0.3),
+      adsr(0.9, 0, 1, 0.3)));
+}
+
+function cello(note, duration) {
+  return stacking_adsr(square_sound, midi_note_to_frequency(note), duration,
+    list(adsr(0.1, 0, 1, 0.2),
+      adsr(0.1, 0, 1, 0.3),
+      adsr(0, 0, 0.2, 0.3)));
+}
+
+/*
+// Tone Matrix
+global.timeout_ids = [];
+
+function set_timeout(f, t) {
+  const timeout_id = global.setTimeout(f, t);
+  global.timeout_ids.push(timeout_id);
+}
+
+function clear_all_timeout() {
+  for (let i = 0; i < global.timeout_ids.length; i++) {
+    const timeout_id = global.timeout_ids.pop();
+    global.clearTimeout(timeout_id);
+  }
+}
+*/
+
 // Sound API
 global.is_sound = is_sound;
 global.make_sourcesound = make_sourcesound;
@@ -357,7 +466,19 @@ global.square_sound = square_sound;
 global.triangle_sound = triangle_sound;
 global.sawtooth_sound = sawtooth_sound;
 
+global.letter_name_to_midi_note = letter_name_to_midi_note;
+global.midi_note_to_frequency = midi_note_to_frequency;
 
+global.adsr = adsr;
+global.stacking_adsr = stacking_adsr;
+global.trombone = trombone;
+global.piano = piano;
+global.bell = bell;
+global.violin = violin;
+global.cello = cello;
+
+//global.set_timeout = set_timeout;
+//global.clear_all_timeout = clear_all_timeout;
 
 
 

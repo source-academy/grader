@@ -63,6 +63,9 @@ type TimeoutResult = {
 }
 
 export const runAll = async (event: AwsEvent): Promise<Output[]> => {
+  if (event.library && event.library.chapter >= 2) {
+    require('./list.js')
+  }
   if (event.library && event.library.external) {
     switch(event.library.external.name) {
       case 'TWO_DIM_RUNES': {}
