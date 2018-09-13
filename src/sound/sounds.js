@@ -431,23 +431,6 @@ function cello(note, duration) {
       adsr(0, 0, 0.2, 0.3)));
 }
 
-/*
-// Tone Matrix
-global.timeout_ids = [];
-
-function set_timeout(f, t) {
-  const timeout_id = global.setTimeout(f, t);
-  global.timeout_ids.push(timeout_id);
-}
-
-function clear_all_timeout() {
-  for (let i = 0; i < global.timeout_ids.length; i++) {
-    const timeout_id = global.timeout_ids.pop();
-    global.clearTimeout(timeout_id);
-  }
-}
-*/
-
 // Sound API
 global.is_sound = is_sound;
 global.make_sourcesound = make_sourcesound;
@@ -476,9 +459,5 @@ global.piano = piano;
 global.bell = bell;
 global.violin = violin;
 global.cello = cello;
-
-//global.set_timeout = set_timeout;
-//global.clear_all_timeout = clear_all_timeout;
-
 
 
