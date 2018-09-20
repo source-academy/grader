@@ -46,4 +46,11 @@ function value_of(t) {
 function right_subtree_of(t) {
     return list_ref(t, 2);
 }
-    
+
+global.make_empty_binary_tree = make_empty_binary_tree;
+global.is_binary_tree = is_binary_tree;
+global.make_binary_tree_node = make_binary_tree_node;
+global.is_empty_binary_tree = is_empty_binary_tree;
+global.left_subtree_of = left_subtree_of;
+global.value_of = value_of;
+global.right_subtree_of = right_subtree_of;
