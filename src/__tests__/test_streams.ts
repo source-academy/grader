@@ -11,8 +11,12 @@ const makeAwsEvent = awsEventFactory({
       'stream_to_list',
       'stream_take_max',
       'stream_tail',
+      'stream_ref',
+      'is_stream',
       'integers_from',
       'enum_stream',
+      'list_to_stream',
+      'stream_append',
       'equal',
       'list',
     ]
@@ -25,6 +29,8 @@ test('stream grader OK, student OK, correct', async () => {
   expect(results).toEqual([
     {'grade': 1, 'resultType': 'pass'},
     {'grade': 2, 'resultType': 'pass'},
+    {'grade': 1, 'resultType': 'pass'},
+    {'grade': 1, 'resultType': 'pass'},
   ])
 })
 
@@ -33,6 +39,8 @@ test('stream grader OK, student OK, wrong', async () => {
   expect(results).toEqual([
     {'grade': 0, 'resultType': 'pass'},
     {'grade': 0, 'resultType': 'pass'},
+    {'grade': 1, 'resultType': 'pass'},
+    {'grade': 1, 'resultType': 'pass'},
   ])
 })
 
@@ -41,6 +49,17 @@ test('stream grader OK, student OK, partial', async () => {
   expect(results).toEqual([
     {'grade': 1, 'resultType': 'pass'},
     {'grade': 0, 'resultType': 'pass'},
+    {'grade': 1, 'resultType': 'pass'},
+    {'grade': 1, 'resultType': 'pass'},
   ])
 })
 
+test('stream grader OK, student runtimeError', async () => {
+  const results = await runAll(makeAwsEvent(grader.valid, student.invalid.runtime))
+  expect(results).toEqual([
+    {'grade': 1, 'resultType': 'pass'},
+    {'grade': 2, 'resultType': 'pass'},
+    {'grade': 1, 'resultType': 'pass'},
+    {'errors': [{'errorType': 'runtime', 'line': 3, 'location': 'grader'}], 'resultType': 'error'},
+  ])
+})
