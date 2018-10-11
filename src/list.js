@@ -373,6 +373,24 @@ function set_tail(xs,x) {
     }
 }
 
+// take(xs, n) puts the first n elements of xs into a list.
+function take(xs, n) {
+    if (n < 0) {
+        throw new Error("take(xs, n) expects a positive integer as " +
+            "argument n, but encountered " + n);
+    }
+    return (n === 0) ? [] : pair(head(xs), take(tail(xs), n - 1));
+}
+
+// drop(xs, n) removes the first n elements from xs and returns the rest (as a list)
+function drop(xs, n) {
+    if (n < 0) {
+        throw new Error("drop(xs, n) expects a positive integer as " +
+            "argument n, but encountered " + n);
+    }
+    return (n === 0) ? xs : drop(tail(xs), n - 1);
+}
+
 global.array_test = array_test;
 global.pair = pair;
 global.is_pair = is_pair;
@@ -399,3 +417,5 @@ global.list_ref = list_ref;
 global.accumulate = accumulate;
 global.set_head = set_head;
 global.set_tail = set_tail;
+global.take = take;
+global.drop = drop;
