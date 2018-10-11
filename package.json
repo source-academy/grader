@@ -7,7 +7,7 @@
     "build": "./scripts/build.sh",
     "typecheck": "tsc --noEmit",
     "test": "TIMEOUT=2000 jest --env=node",
-    "test-coveralls": "TIMEOUT=2000 jest --env=node --coverage --coverageReporters=text-lcov | coveralls"
+    "test-coveralls": "TIMEOUT=2000 jest --env=node --coverage --coverageReporters=text-lcov --forceExit | coveralls"
   },
   "dependencies": {
     "@ericandrewlewis/bitmap": "^1.0.0",
