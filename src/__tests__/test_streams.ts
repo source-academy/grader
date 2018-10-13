@@ -12,6 +12,7 @@ const makeAwsEvent = awsEventFactory({
       'stream_take_max',
       'stream_tail',
       'stream_ref',
+      'stream_member',
       'is_stream',
       'integers_from',
       'enum_stream',
