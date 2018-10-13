@@ -5,7 +5,7 @@ import { runAll } from '../index'
 const makeAwsEvent = awsEventFactory({
   chapter: 3,
   external: {
-    name: 'NONE',
+    name: 'STREAMS',
     symbols: [
       'stream_filter',
       'stream_to_list',
