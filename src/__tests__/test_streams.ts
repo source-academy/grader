@@ -5,13 +5,14 @@ import { runAll } from '../index'
 const makeAwsEvent = awsEventFactory({
   chapter: 3,
   external: {
-    name: 'NONE',
+    name: 'STREAMS',
     symbols: [
       'stream_filter',
       'stream_to_list',
       'stream_take_max',
       'stream_tail',
       'stream_ref',
+      'stream_member',
       'is_stream',
       'integers_from',
       'enum_stream',

@@ -18,7 +18,7 @@ type AwsEvent = {
 export type Library = {
   chapter: number
   external: {
-    name: 'NONE' | 'TWO_DIM_RUNES' | 'THREE_DIM_RUNES' | 'CURVES' | 'SOUND'
+    name: 'NONE' | 'TWO_DIM_RUNES' | 'THREE_DIM_RUNES' | 'CURVES' | 'SOUND' | 'STREAMS'
     symbols: string[]
   }
   globals: Array<string[]>
@@ -66,7 +66,6 @@ export const runAll = async (event: AwsEvent): Promise<Output[]> => {
   require('./util.js')
   require('./list.js')
   require('./tree.js')
-  require('./streams/streams.js')
   if (event.library && event.library.external) {
     switch(event.library.external.name) {
       case 'TWO_DIM_RUNES': {}
@@ -76,9 +75,15 @@ export const runAll = async (event: AwsEvent): Promise<Output[]> => {
       }
       case 'CURVES': {
         require('./graphics/curves_library.js')
+        break
       }
       case 'SOUND': {
         require('./sound/sounds.js')
+        break
+      }
+      case 'STREAMS': {
+        require('./streams/streams.js')
+        break
       }
     }
   }
