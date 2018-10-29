@@ -90,10 +90,12 @@ const validGrader = [
             return 0;
         } else {}
 
-        const discipline = accumulate(function(t, final_marks) {
+        function accumulate_discipline(t, final_marks) {
             const has_discipline = (get_wave(some_sourcesound))(t) === 0;
             return has_discipline ? final_marks : 0;
-        }, 2, list(0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18));
+        }
+
+        const discipline = accumulate(accumulate_discipline, 2, list(0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18));
 
         return 1 + discipline;
     }
@@ -116,10 +118,13 @@ const validGrader = [
         } else {}
 
         const disciplined_sourcesound = sound_to_sourcesound(disciplined_sound);
-        const deductions = accumulate(function(t, final_marks) {
+
+        function accumulate_deductions(t, final_marks) {
             const has_discipline = (get_wave(disciplined_sourcesound))(t) === 0;
             return has_discipline ? final_marks : -1;
-        }, 0, list(0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18));
+        }
+
+        const deductions = accumulate(accumulate_deductions, 0, list(0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18));
 
         return 2 + deductions;
     }
