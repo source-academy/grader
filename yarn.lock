@@ -2171,10 +2171,10 @@ jest@^23.4.0:
     import-local "^1.0.0"
     jest-cli "^23.4.0"
 
-js-slang@0.1.14:
-  version "0.1.14"
-  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-0.1.14.tgz#7df10d980bbd0f65e4ee6813d26db5b544d64ce2"
-  integrity sha512-j2zLfhRrDN0uSJrR9N1nFMQ4nOqiFrSLOa+hqbuPbcUsMlSV9hDYy9tZ/ZyW1oB2gpRyzCFvJRvkEkde7ooBlQ==
+js-slang@0.1.19:
+  version "0.1.19"
+  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-0.1.19.tgz#7ef2b9616763c3d8f3144288d357130025ebdfda"
+  integrity sha512-X4JgpeDxUSEzn+ssnzXoO7lo6RfDD70V06ecVcRUt5QkV70s+HfcORiO5Cf+SgqUV4LC+2R5cBv0Yk5YSXvqHw==
   dependencies:
     "@types/acorn" "^4.0.3"
     "@types/estree" "0.0.39"
