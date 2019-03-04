@@ -2,7 +2,7 @@ import { createContext, runInContext, Result as SourceResult } from 'js-slang'
 import { SourceError } from 'js-slang/dist/types'
 
 
-const TIMEOUT_DURATION = 2000 // in milliseconds
+const TIMEOUT_DURATION = parseInt(process.env.TIMEOUT!, 10) // in milliseconds
 
 /**
  * @property globals - an array of two element string arrays. The first element
@@ -18,6 +18,12 @@ export type Library = {
   globals: Array<string[]>
 }
 
+export type TestCase = {
+  program: string
+  answer: string
+  score: number
+}
+
 /**
  * Set of properties of an event from the backend
  */
@@ -26,8 +32,7 @@ export type AwsEvent = {
   prependProgram: string
   studentProgram: string
   postpendProgram: string
-  testPrograms: string[]
-  answers: string[]
+  testCases: TestCase[]
 }
 
 /**
@@ -38,8 +43,7 @@ export type UnitTest = {
   prependProgram: string
   studentProgram: string
   postpendProgram: string
-  testProgram: string
-  answer: string
+  testCase: TestCase
 }
 
 /**
@@ -129,15 +133,13 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
     }
   }
   evaluateGlobals(event.library.globals)
-  const _ = require('lodash/array')
-  const promises: Promise<Output>[] = _.zipWith(event.testPrograms, event.answers, 
-    (testPrg: string, answer: string) => run({
+  const promises: Promise<Output>[] = event.testCases.map( 
+    (testCase: TestCase) => run({
       library: event.library,
       prependProgram: event.prependProgram,
       studentProgram: event.studentProgram,
       postpendProgram: event.postpendProgram,
-      testProgram: testPrg,
-      answer: answer
+      testCase: testCase
     }))
   const results = await Promise.all(promises)
   const totalScore = results.reduce<number>( 
@@ -160,24 +162,24 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
   const program = unitTest.prependProgram + '\n' 
     + unitTest.studentProgram + '\n' 
     + unitTest.postpendProgram + '\n' 
-    + unitTest.testProgram
+    + unitTest.testCase.program
   const result = await catchTimeouts(runInContext(
     program, context, { scheduler: 'preemptive' }
   ))
   if (result.status === 'finished') {
     const resultValue = JSON.stringify(result.value)
-    return resultValue === unitTest.answer
+    return resultValue === unitTest.testCase.answer
       ? { resultType: 'pass',
-          score: 1 } as OutputPass
+          score: unitTest.testCase.score } as OutputPass
       : { resultType: 'fail',
-          expected: unitTest.answer,
+          expected: unitTest.testCase.answer,
           actual: resultValue } as OutputFail
   } else if (result.status === 'error') {
     return parseError(context.errors, 
       unitTest.prependProgram, 
       unitTest.studentProgram, 
       unitTest.postpendProgram,
-      unitTest.testProgram)
+      unitTest.testCase.program)
   } else {
     return {
       resultType: 'error',

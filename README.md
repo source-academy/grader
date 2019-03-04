@@ -51,9 +51,10 @@ The grader's corresponding `Summary` JSON output for this program is then,
     "totalScore": 1,
     "results": [
         {
-            "resultType": "pass"
+            "resultType": "pass",
             "score": 1
-        }]
+        }
+    ]
 }
 ```
 
@@ -190,7 +191,7 @@ The grader will receive a set of strings, consisting of the prepend, student, po
 
 Note that the `SOLUTION` node is not related to the Autograder program, but it will be displayed for the manual graders to see.
 
-<a name="#1"></a>[1] Prepend programs should be created in assessments that require students to make use of abstracted functions / variables that are declared but hidden away.
+<a name="1"></a>[1] Prepend programs should be created in assessments that require students to make use of abstracted functions / variables that are declared but hidden away.
 
-<a name="#2"></a>[2] Postpend programs should be created in assessments that require students to do deep comparison/copies rather than shallow comparisons/copies. (For example, in the missions involving `set_head` and `set_tail`) 
+<a name="2"></a>[2] Postpend programs should be created in assessments that require students to do deep comparison/copies rather than shallow comparisons/copies. (For example, in the missions involving `set_head` and `set_tail`) 
 
