@@ -2,6 +2,11 @@ import { createContext, runInContext, Result as SourceResult } from 'js-slang'
 import { SourceError } from 'js-slang/dist/types'
 
 
+exports.handler = function(event: AwsEvent, context:any, callback:Function)
+{
+    this.runAll(event).then((result:any) => callback(null, result))
+};
+
 const TIMEOUT_DURATION = parseInt(process.env.TIMEOUT!, 10) // in milliseconds
 
 /**
@@ -248,10 +253,10 @@ const parseError = (
       errorType: err.type.toLowerCase() as 'syntax' | 'runtime',
       line: locationLine,
       location: location,
-      errorLine: location == 'prepend' ? preProgLines[locationLine - 1]
+      errorLine: (location == 'prepend' ? preProgLines[locationLine - 1]
         : location == 'student' ? stdProgLines[locationLine - 1]
         : location == 'postpend' ? postProgLines[locationLine - 1]
-        : testProgLines[locationLine - 1],
+        : testProgLines[locationLine - 1]).trim(),
       errorExplanation: err.explain()
     }
   })
