@@ -4,10 +4,11 @@ import { SourceError } from 'js-slang/dist/types'
 
 exports.handler = function(event: AwsEvent, context:any, callback:Function)
 {
-    this.runAll(event).then((result:any) => callback(null, result))
+  const _ = require("./index.js")  
+  _.runAll(event).then((result:any) => callback(null, result))
 };
 
-const TIMEOUT_DURATION = parseInt(process.env.TIMEOUT!, 10) // in milliseconds
+const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT!, 10) : 500 // in milliseconds
 
 /**
  * @property globals - an array of two element string arrays. The first element

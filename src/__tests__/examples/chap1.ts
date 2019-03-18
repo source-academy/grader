@@ -6,6 +6,7 @@
  */
 
 import { Grader, Student } from './types'
+import { TestCase } from '../../index'
 
 const validStudentCorrect =
   `const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2);`
@@ -27,54 +28,48 @@ const invalidStudentTimeout =
    `const f = i => i < -3 ? 0 : f(i+1) + f(i+2);`
 
 export const student: Student = {
-  invalid: {
-    runtime: invalidStudentRuntime,
-    syntax: invalidStudentSyntax,
-    timeout: invalidStudentTimeout
-  },
   valid: {
     correct: validStudentCorrect,
     wrong: validStudentWrong,
     partial: validStudentPartial
+  },
+  invalid: {
+    runtime: invalidStudentRuntime,
+    syntax: invalidStudentSyntax,
+    timeout: invalidStudentTimeout
   }
 }
 
-const invalidGraderRuntime = [
-  `function ek0chei0y1() {
-    return g(0) === 0 ? 1 : 0;
-  }
-
-  ek0chei0y1();`
+const invalidTestcaseRuntime = [
+  {  program: `g(1);`,
+  answer: "1",
+  score: 1 }
 ]
 
-const invalidGraderSyntax = [
-  `function ek0chei0y1() {
-    return f(0) === 0 ? 1 : 0;
-  }
-
-  ek0chei0y1()`
+const invalidTestcaseSyntax = [
+  {  program: `f(1)`,
+  answer: "1",
+  score: 1 }
 ]
 
-const validGrader = [
-  `function ek0chei0y1() {
-    return f(0) === 0 ? 1 : 0;
-  }
-
-  ek0chei0y1();`,
-  `function ek0chei0y1() {
-    const test1 = f(7) === 13;
-    const test2 = f(10) === 55;
-    const test3 = f(12) === 144;
-    return test1 && test2 && test3 ? 4 : 0;
-  }
-
-  ek0chei0y1();`
+const validTestcases: TestCase[] = [
+  {  program: `f(1);`,
+  answer: "1",
+  score: 1 },
+  {  program: `f(3);`,
+  answer: "2",
+  score: 1 },
+  {  program: `f(5);`,
+  answer: "5",
+  score: 1 }
 ]
 
 export const grader: Grader = {
-  invalid: {
-    runtime: invalidGraderRuntime,
-    syntax: invalidGraderSyntax
-  },
-  valid: validGrader
+  validPrepend: ``,
+  validPostpend: ``,
+  validTestcases: validTestcases,
+  invalidTestcases: {
+    runtime: invalidTestcaseRuntime,
+    syntax: invalidTestcaseSyntax
+  }
 }

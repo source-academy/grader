@@ -44,31 +44,39 @@ export const student: Student = {
 }
 
 const validGrader = [
-`
+{ program: `
     function rune_testcase_a() {
         const expected_result = overlay(heart_bb, nova_bb);
         const actual_result = a();
-        return __are_pictures_equal(actual_result, expected_result) ? 2 : 0;
+        return __are_pictures_equal(actual_result, expected_result);
     }
     rune_testcase_a();
 `,
-`
+answer: "true",
+score: 1
+},
+{ program: `
     function rune_testcase_b() {
         const expected_result = overlay_frac(0.25, quarter_turn_right(nova_bb), scale(0.4, heart_bb));
         const actual_result = b();
-        return __are_pictures_equal(actual_result, expected_result) ? 2 : 0;
+        return __are_pictures_equal(actual_result, expected_result);
     }
     rune_testcase_b();
-`,
-`
+`,    answer: "true",
+score: 1
+},
+{ program: `
     function rune_testcase_c() {
         const expected_result = overlay(stack(beside(nova_bb, heart_bb), beside(blank_bb, blank_bb)), stack(beside(blank_bb, blank_bb), beside(rcross_bb, circle_bb)));
         const actual_result = c(nova_bb, heart_bb, rcross_bb, circle_bb);
-        return __are_pictures_equal(actual_result, expected_result) ? 2 : 0;
+        return __are_pictures_equal(actual_result, expected_result);
     }
     rune_testcase_c();
 `,
-`
+answer: "true",
+score: 1
+},
+{ program: `
     function rune_testcase_d() {
         function tree(rune, n) {
             if (n === 1) {
@@ -80,16 +88,17 @@ const validGrader = [
         }
         const expected_result = tree(nova_bb, 7);
         const actual_result = d(nova_bb, 7);
-        return __are_pictures_equal(actual_result, expected_result) ? 2 : 0;
+        return __are_pictures_equal(actual_result, expected_result);
     }
     rune_testcase_d();
 `,
+answer: "true",
+score: 1
+}
 ]
 
 export const grader: Grader = {
-    invalid: {
-        runtime: null,
-        syntax: null
-    },
-    valid: validGrader
+    validPrepend: "",
+    validPostpend: "",
+    validTestcases: validGrader
 }
