@@ -1,4 +1,4 @@
-import { AwsEvent, Library, TestCase} from '../index'
+import { AwsEvent, Library, TestCase } from '../index'
 
 
 type PartialAwsEvent = {
@@ -11,10 +11,10 @@ type PartialAwsEvent = {
 export function awsEventFactory(library: Library) {
   return (awsEvent: PartialAwsEvent): AwsEvent => (
     {
-    library: library,
-    prependProgram: awsEvent.prependProgram,
-    studentProgram: awsEvent.studentProgram,
-    postpendProgram: awsEvent.postpendProgram,
-    testCases: awsEvent.testCases,
+      library: library,
+      prependProgram: awsEvent.prependProgram,
+      studentProgram: awsEvent.studentProgram,
+      postpendProgram: awsEvent.postpendProgram,
+      testCases: awsEvent.testCases,
     })
 }

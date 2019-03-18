@@ -2,13 +2,12 @@ import { createContext, runInContext, Result as SourceResult } from 'js-slang'
 import { SourceError } from 'js-slang/dist/types'
 
 
-exports.handler = function(event: AwsEvent, context:any, callback:Function)
-{
-  const _ = require("./index.js")  
-  _.runAll(event).then((result:any) => callback(null, result))
+exports.handler = function (event: AwsEvent, context: any, callback: Function) {
+  const _ = require("./index.js")
+  _.runAll(event).then((result: any) => callback(null, result))
 };
 
-const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT!, 10) : 500 // in milliseconds
+const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT!, 10) : 1000 // in milliseconds
 
 /**
  * @property globals - an array of two element string arrays. The first element
@@ -118,8 +117,8 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
   require('./list.js')
   require('./tree.js')
   if (event.library && event.library.external) {
-    switch(event.library.external.name) {
-      case 'TWO_DIM_RUNES': {}
+    switch (event.library.external.name) {
+      case 'TWO_DIM_RUNES': { }
       case 'THREE_DIM_RUNES': {
         require('./graphics/rune_library.js')
         break
@@ -139,7 +138,7 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
     }
   }
   evaluateGlobals(event.library.globals)
-  const promises: Promise<Output>[] = event.testCases.map( 
+  const promises: Promise<Output>[] = event.testCases.map(
     (testCase: TestCase) => run({
       library: event.library,
       prependProgram: event.prependProgram,
@@ -148,10 +147,10 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
       testCase: testCase
     }))
   const results = await Promise.all(promises)
-  const totalScore = results.reduce<number>( 
+  const totalScore = results.reduce<number>(
     (total: number, result) => result.resultType === 'pass'
       ? total + result.score
-      : total, 
+      : total,
     0)
   return {
     totalScore: totalScore,
@@ -165,9 +164,9 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
  */
 export const run = async (unitTest: UnitTest): Promise<Output> => {
   const context = createContext<{}>(unitTest.library.chapter, unitTest.library.external.symbols)
-  const program = unitTest.prependProgram + '\n' 
-    + unitTest.studentProgram + '\n' 
-    + unitTest.postpendProgram + '\n' 
+  const program = unitTest.prependProgram + '\n'
+    + unitTest.studentProgram + '\n'
+    + unitTest.postpendProgram + '\n'
     + unitTest.testCase.program
   const result = await catchTimeouts(runInContext(
     program, context, { scheduler: 'preemptive' }
@@ -175,21 +174,25 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
   if (result.status === 'finished') {
     const resultValue = JSON.stringify(result.value)
     return resultValue === unitTest.testCase.answer
-      ? { resultType: 'pass',
-          score: unitTest.testCase.score } as OutputPass
-      : { resultType: 'fail',
-          expected: unitTest.testCase.answer,
-          actual: resultValue } as OutputFail
+      ? {
+        resultType: 'pass',
+        score: unitTest.testCase.score
+      } as OutputPass
+      : {
+        resultType: 'fail',
+        expected: unitTest.testCase.answer,
+        actual: resultValue
+      } as OutputFail
   } else if (result.status === 'error') {
-    return parseError(context.errors, 
-      unitTest.prependProgram, 
-      unitTest.studentProgram, 
+    return parseError(context.errors,
+      unitTest.prependProgram,
+      unitTest.studentProgram,
       unitTest.postpendProgram,
       unitTest.testCase.program)
   } else {
     return {
       resultType: 'error',
-      errors: [ { errorType: 'timeout' } ]
+      errors: [{ errorType: 'timeout' }]
     }
   }
 }
@@ -240,24 +243,24 @@ const parseError = (
   const stdProgLines = getLines(stdProg)
   const postProgLines = getLines(postProg)
   const testProgLines = getLines(testProg)
-  const errors =  sourceErrors.map((err: SourceError) => {
+  const errors = sourceErrors.map((err: SourceError) => {
     const line = err.location.end.line
     const location = line <= preProgLines.length ? 'prepend'
-      : line <= preProgLines.length + stdProgLines.length ? 'student' 
-      : line <= preProgLines.length + stdProgLines.length + postProgLines.length ? 'postpend'
-      : 'testcase'
-    const locationLine = location == 'prepend' ? line 
+      : line <= preProgLines.length + stdProgLines.length ? 'student'
+        : line <= preProgLines.length + stdProgLines.length + postProgLines.length ? 'postpend'
+          : 'testcase'
+    const locationLine = location == 'prepend' ? line
       : location == 'student' ? line - preProgLines.length
-      : location == 'postpend' ? line - preProgLines.length - stdProgLines.length
-      : line - preProgLines.length - stdProgLines.length - postProgLines.length
+        : location == 'postpend' ? line - preProgLines.length - stdProgLines.length
+          : line - preProgLines.length - stdProgLines.length - postProgLines.length
     return {
       errorType: err.type.toLowerCase() as 'syntax' | 'runtime',
       line: locationLine,
       location: location,
       errorLine: (location == 'prepend' ? preProgLines[locationLine - 1]
         : location == 'student' ? stdProgLines[locationLine - 1]
-        : location == 'postpend' ? postProgLines[locationLine - 1]
-        : testProgLines[locationLine - 1]).trim(),
+          : location == 'postpend' ? postProgLines[locationLine - 1]
+            : testProgLines[locationLine - 1]).trim(),
       errorExplanation: err.explain()
     }
   })

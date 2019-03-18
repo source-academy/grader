@@ -169,12 +169,12 @@ test("build compressed vertical sin test", async () => {
   var solution_point_array = draw_connected(3000)(forward_sine);
   var solutionBitmap = __drawCurve(solution_point_array, 300);
   var results = __build_compressed_vertical(solutionBitmap);
-  expect(results).toEqual(["10", "010", "01","010", "10"].join("\n"));
+  expect(results).toEqual(["10", "010", "01", "010", "10"].join("\n"));
 });
 
 test("build compressed horizontal sin test", async () => {
   var solution_point_array = draw_connected(3000)(forward_sine);
   var solutionBitmap = __drawCurve(solution_point_array, 20);
   var results = __build_compressed_horizontal(solutionBitmap);
-  expect(results).toEqual(["101", "01010","010"].join("\n"));
+  expect(results).toEqual(["101", "01010", "010"].join("\n"));
 });

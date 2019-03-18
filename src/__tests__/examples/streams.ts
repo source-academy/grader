@@ -46,44 +46,48 @@ export const student: Student = {
 }
 
 const validGrader = [
-{program :  `
+  {
+    program: `
   function stream_testcase_a() {
     const lst = stream_to_list(stream_take_max(odd_stream, 3));
     return equal(lst, list(1, 3, 5));
   }
   stream_testcase_a();
   `,
-  answer: "true",
-  score: 1
-},
-{program :  `
+    answer: "true",
+    score: 1
+  },
+  {
+    program: `
   function stream_testcase_b() {
     const lst = stream_to_list(stream_take_max(odd_stream, 5));
     return equal(lst, list(1, 3, 5, 7, 9));
   }
   stream_testcase_b();
   `,
-  answer: "true",
-  score: 1
-},
-{program :  `
+    answer: "true",
+    score: 1
+  },
+  {
+    program: `
   function stream_testcase_c() {
     return !is_empty_list(stream_member(3, odd_stream)) &&
       stream_ref(odd_stream, 1) === 3;
   }
   stream_testcase_c();
   `,
-  answer: "true",
-  score: 1
-},
-{program :  `
+    answer: "true",
+    score: 1
+  },
+  {
+    program: `
   function stream_testcase_d() {
     return is_stream(odd_stream, 1);
   }
   stream_testcase_d();
-  `,    answer: "true",
-  score: 1
-}
+  `, answer: "true",
+    score: 1
+  }
 ]
 
 export const grader: Grader = {

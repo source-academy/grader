@@ -133,47 +133,57 @@ const validPostpend = `
   function check_obj(f, obj) {
     return f(obj);
   }`
-  
+
 const invalidTestcaseRuntime = [
-  {  program: `check();`,
-  answer: "true",
-  score: 1 }
+  {
+    program: `check();`,
+    answer: "true",
+    score: 1
+  }
 ]
 
 const invalidTestcaseSyntax = [
-  {  program: `check_x(x, 1)`,
-  answer: "true",
-  score: 1 },
+  {
+    program: `check_x(x, 1)`,
+    answer: "true",
+    score: 1
+  },
 ]
 
 const validTestcases = [
-  {  program: 
-    `const a1 = check_x(x, 1);
+  {
+    program:
+      `const a1 = check_x(x, 1);
     reassign_x();
     const a2 = check_x(x, 2);
     
     a1 === a2;`,
-  answer: "true",
-  score: 1 },
-  {  program: 
-    `const a1 = check_arr(is_empty_list, arr);
+    answer: "true",
+    score: 1
+  },
+  {
+    program:
+      `const a1 = check_arr(is_empty_list, arr);
     assign_array();
     const f = (arr) => arr[0] === 'a' && arr[1] === 'b';
     const a2 = check_arr(f, arr);
     
     a1 === a2;`,
-  answer: "true",
-  score: 1 },
-  {  program: 
-    `const f = (obj) => obj.a === undefined && obj.b === undefined;
+    answer: "true",
+    score: 1
+  },
+  {
+    program:
+      `const f = (obj) => obj.a === undefined && obj.b === undefined;
     const a1 = check_obj(f, obj);
     assign_object();
     const g = (obj) => obj.a === 1 && obj.b === 2;
     const a2 = check_obj(g, obj);
     
     a1 === a2;`,
-  answer: "true",
-  score: 1 }
+    answer: "true",
+    score: 1
+  }
 ]
 
 export const grader: Grader = {

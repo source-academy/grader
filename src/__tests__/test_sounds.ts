@@ -44,24 +44,25 @@ test('sound grader OK, student OK, correct', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.correct,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases}))
+    testCases: grader.validTestcases
+  }))
   expect(results).toEqual({
     "totalScore": 3,
     "results": [
-     {
-      "resultType": "pass",
-      "score": 1
-     },
-     {
-      "resultType": "pass",
-      "score": 1
-     },
-     {
-      "resultType": "pass",
-      "score": 1
-     }
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      }
     ]
-   })
+  })
 })
 
 test('sound grader OK, student OK, wrong', async () => {
@@ -69,27 +70,28 @@ test('sound grader OK, student OK, wrong', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.wrong,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases}))
+    testCases: grader.validTestcases
+  }))
   expect(results).toEqual({
     "totalScore": 0,
     "results": [
-     {
-      "resultType": "fail",
-      "expected": "true",
-      "actual": "false"
-     },
-     {
-      "resultType": "fail",
-      "expected": "3",
-      "actual": "0"
-     },
-     {
-      "resultType": "fail",
-      "expected": "2",
-      "actual": "0"
-     }
+      {
+        "resultType": "fail",
+        "expected": "true",
+        "actual": "false"
+      },
+      {
+        "resultType": "fail",
+        "expected": "3",
+        "actual": "0"
+      },
+      {
+        "resultType": "fail",
+        "expected": "2",
+        "actual": "0"
+      }
     ]
-   })
+  })
 })
 
 test('sound grader OK, student OK, partial', async () => {
@@ -97,24 +99,25 @@ test('sound grader OK, student OK, partial', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.partial!,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases}))
+    testCases: grader.validTestcases
+  }))
   expect(results).toEqual({
     "totalScore": 1,
     "results": [
-     {
-      "resultType": "pass",
-      "score": 1
-     },
-     {
-      "resultType": "fail",
-      "expected": "3",
-      "actual": "1"
-     },
-     {
-      "resultType": "fail",
-      "expected": "2",
-      "actual": "1"
-     }
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "fail",
+        "expected": "3",
+        "actual": "1"
+      },
+      {
+        "resultType": "fail",
+        "expected": "2",
+        "actual": "1"
+      }
     ]
-   })
+  })
 }, 10000)

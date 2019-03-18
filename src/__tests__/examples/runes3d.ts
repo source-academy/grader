@@ -44,7 +44,8 @@ export const student: Student = {
 }
 
 const validGrader = [
-{ program: `
+    {
+        program: `
     function rune_testcase_a() {
         const expected_result = overlay(heart_bb, nova_bb);
         const actual_result = a();
@@ -52,20 +53,22 @@ const validGrader = [
     }
     rune_testcase_a();
 `,
-answer: "true",
-score: 1
-},
-{ program: `
+        answer: "true",
+        score: 1
+    },
+    {
+        program: `
     function rune_testcase_b() {
         const expected_result = overlay_frac(0.25, quarter_turn_right(nova_bb), scale(0.4, heart_bb));
         const actual_result = b();
         return __are_pictures_equal(actual_result, expected_result);
     }
     rune_testcase_b();
-`,    answer: "true",
-score: 1
-},
-{ program: `
+`, answer: "true",
+        score: 1
+    },
+    {
+        program: `
     function rune_testcase_c() {
         const expected_result = overlay(stack(beside(nova_bb, heart_bb), beside(blank_bb, blank_bb)), stack(beside(blank_bb, blank_bb), beside(rcross_bb, circle_bb)));
         const actual_result = c(nova_bb, heart_bb, rcross_bb, circle_bb);
@@ -73,10 +76,11 @@ score: 1
     }
     rune_testcase_c();
 `,
-answer: "true",
-score: 1
-},
-{ program: `
+        answer: "true",
+        score: 1
+    },
+    {
+        program: `
     function rune_testcase_d() {
         function tree(rune, n) {
             if (n === 1) {
@@ -92,9 +96,9 @@ score: 1
     }
     rune_testcase_d();
 `,
-answer: "true",
-score: 1
-}
+        answer: "true",
+        score: 1
+    }
 ]
 
 export const grader: Grader = {

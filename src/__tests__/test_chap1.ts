@@ -17,24 +17,25 @@ test('prepend OK, postpend OK, testCases OK, student OK, correct', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.correct,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases}))
+    testCases: grader.validTestcases
+  }))
   expect(results).toEqual({
     "totalScore": 3,
     "results": [
-     {
-      "resultType": "pass",
-      "score": 1
-     },
-     {
-      "resultType": "pass",
-      "score": 1
-     },
-     {
-      "resultType": "pass",
-      "score": 1
-     }
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      }
     ]
-   })
+  })
 })
 
 test('prepend OK, postpend OK, testCases OK, student OK, partial', async () => {
@@ -42,24 +43,25 @@ test('prepend OK, postpend OK, testCases OK, student OK, partial', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.partial!,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases}))
+    testCases: grader.validTestcases
+  }))
   expect(results).toEqual({
     "totalScore": 3,
     "results": [
-     {
-      "resultType": "pass",
-      "score": 1
-     },
-     {
-      "resultType": "pass",
-      "score": 1
-     },
-     {
-      "resultType": "pass",
-      "score": 1
-     }
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      }
     ]
-   })
+  })
 })
 
 test('prepend OK, postpend OK, testCases OK, student OK, wrong', async () => {
@@ -67,27 +69,28 @@ test('prepend OK, postpend OK, testCases OK, student OK, wrong', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.wrong,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases}))
+    testCases: grader.validTestcases
+  }))
   expect(results).toEqual({
     "totalScore": 0,
     "results": [
-     {
-      "resultType": "fail",
-      "expected": "1",
-      "actual": "2"
-     },
-     {
-      "resultType": "fail",
-      "expected": "2",
-      "actual": "4"
-     },
-     {
-      "resultType": "fail",
-      "expected": "5",
-      "actual": "6"
-     }
+      {
+        "resultType": "fail",
+        "expected": "1",
+        "actual": "2"
+      },
+      {
+        "resultType": "fail",
+        "expected": "2",
+        "actual": "4"
+      },
+      {
+        "resultType": "fail",
+        "expected": "5",
+        "actual": "6"
+      }
     ]
-   })
+  })
 })
 
 test('prepend OK, postpend OK, testCases OK, student runtimeError', async () => {
@@ -95,48 +98,49 @@ test('prepend OK, postpend OK, testCases OK, student runtimeError', async () => 
     prependProgram: grader.validPrepend,
     studentProgram: student.invalid.runtime,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases}))
+    testCases: grader.validTestcases
+  }))
   expect(results).toEqual({
     "totalScore": 0,
     "results": [
-     {
-      "resultType": "error",
-      "errors": [
-       {
-        "errorType": "runtime",
-        "line": 1,
-        "location": "student",
-        "errorLine": "const f = i => f(j+1);",
-        "errorExplanation": "Name j not declared"
-       }
-      ]
-     },
-     {
-      "resultType": "error",
-      "errors": [
-       {
-        "errorType": "runtime",
-        "line": 1,
-        "location": "student",
-        "errorLine": "const f = i => f(j+1);",
-        "errorExplanation": "Name j not declared"
-       }
-      ]
-     },
-     {
-      "resultType": "error",
-      "errors": [
-       {
-        "errorType": "runtime",
-        "line": 1,
-        "location": "student",
-        "errorLine": "const f = i => f(j+1);",
-        "errorExplanation": "Name j not declared"
-       }
-      ]
-     }
+      {
+        "resultType": "error",
+        "errors": [
+          {
+            "errorType": "runtime",
+            "line": 1,
+            "location": "student",
+            "errorLine": "const f = i => f(j+1);",
+            "errorExplanation": "Name j not declared"
+          }
+        ]
+      },
+      {
+        "resultType": "error",
+        "errors": [
+          {
+            "errorType": "runtime",
+            "line": 1,
+            "location": "student",
+            "errorLine": "const f = i => f(j+1);",
+            "errorExplanation": "Name j not declared"
+          }
+        ]
+      },
+      {
+        "resultType": "error",
+        "errors": [
+          {
+            "errorType": "runtime",
+            "line": 1,
+            "location": "student",
+            "errorLine": "const f = i => f(j+1);",
+            "errorExplanation": "Name j not declared"
+          }
+        ]
+      }
     ]
-   })
+  })
 })
 
 test('prepend OK, postpend OK, testCases OK, student syntaxError', async () => {
@@ -144,46 +148,47 @@ test('prepend OK, postpend OK, testCases OK, student syntaxError', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.invalid.syntax,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases}))
+    testCases: grader.validTestcases
+  }))
   expect(results).toEqual({
     "totalScore": 0,
     "results": [
-     {
-      "resultType": "error",
-      "errors": [
-       {
-        "errorType": "syntax",
-        "line": 1,
-        "location": "student",
-        "errorLine": "const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2)",
-        "errorExplanation": "Missing semicolon at the end of statement"
-       }
-      ]
-     },
-     {
-      "resultType": "error",
-      "errors": [
-       {
-        "errorType": "syntax",
-        "line": 1,
-        "location": "student",
-        "errorLine": "const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2)",
-        "errorExplanation": "Missing semicolon at the end of statement"
-       }
-      ]
-     },
-     {
-      "resultType": "error",
-      "errors": [
-       {
-        "errorType": "syntax",
-        "line": 1,
-        "location": "student",
-        "errorLine": "const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2)",
-        "errorExplanation": "Missing semicolon at the end of statement"
-       }
-      ]
-     }
+      {
+        "resultType": "error",
+        "errors": [
+          {
+            "errorType": "syntax",
+            "line": 1,
+            "location": "student",
+            "errorLine": "const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2)",
+            "errorExplanation": "Missing semicolon at the end of statement"
+          }
+        ]
+      },
+      {
+        "resultType": "error",
+        "errors": [
+          {
+            "errorType": "syntax",
+            "line": 1,
+            "location": "student",
+            "errorLine": "const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2)",
+            "errorExplanation": "Missing semicolon at the end of statement"
+          }
+        ]
+      },
+      {
+        "resultType": "error",
+        "errors": [
+          {
+            "errorType": "syntax",
+            "line": 1,
+            "location": "student",
+            "errorLine": "const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2)",
+            "errorExplanation": "Missing semicolon at the end of statement"
+          }
+        ]
+      }
     ]
   })
 })
@@ -193,34 +198,35 @@ test('prepend OK, postpend OK, testCases OK, student timeoutError', async () => 
     prependProgram: grader.validPrepend,
     studentProgram: student.invalid.timeout!,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases}))
+    testCases: grader.validTestcases
+  }))
   expect(results).toEqual({
     "totalScore": 0,
     "results": [
-     {
-      "resultType": "error",
-      "errors": [
-       {
-        "errorType": "timeout"
-       }
-      ]
-     },
-     {
-      "resultType": "error",
-      "errors": [
-       {
-        "errorType": "timeout"
-       }
-      ]
-     },
-     {
-      "resultType": "error",
-      "errors": [
-       {
-        "errorType": "timeout"
-       }
-      ]
-     }
+      {
+        "resultType": "error",
+        "errors": [
+          {
+            "errorType": "timeout"
+          }
+        ]
+      },
+      {
+        "resultType": "error",
+        "errors": [
+          {
+            "errorType": "timeout"
+          }
+        ]
+      },
+      {
+        "resultType": "error",
+        "errors": [
+          {
+            "errorType": "timeout"
+          }
+        ]
+      }
     ]
   })
 })
@@ -230,24 +236,25 @@ test('prepend OK, postpend OK, testCases runtimeError, student OK', async () => 
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.correct,
     postpendProgram: grader.validPostpend,
-    testCases: grader.invalidTestcases!.runtime}))
+    testCases: grader.invalidTestcases!.runtime
+  }))
   expect(results).toEqual({
     "totalScore": 0,
     "results": [
-     {
-      "resultType": "error",
-      "errors": [
-       {
-        "errorType": "runtime",
-        "line": 1,
-        "location": "testcase",
-        "errorLine": "g(1);",
-        "errorExplanation": "Name g not declared"
-       }
-      ]
-     }
+      {
+        "resultType": "error",
+        "errors": [
+          {
+            "errorType": "runtime",
+            "line": 1,
+            "location": "testcase",
+            "errorLine": "g(1);",
+            "errorExplanation": "Name g not declared"
+          }
+        ]
+      }
     ]
-   })
+  })
 })
 
 test('prepend OK, postpend OK, testCases syntaxError, student OK', async () => {
@@ -255,22 +262,23 @@ test('prepend OK, postpend OK, testCases syntaxError, student OK', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.correct,
     postpendProgram: grader.validPostpend,
-    testCases: grader.invalidTestcases!.syntax}))
+    testCases: grader.invalidTestcases!.syntax
+  }))
   expect(results).toEqual({
     "totalScore": 0,
     "results": [
-     {
-      "resultType": "error",
-      "errors": [
-       {
-        "errorType": "syntax",
-        "line": 1,
-        "location": "testcase",
-        "errorLine": "f(1)",
-        "errorExplanation": "Missing semicolon at the end of statement"
-       }
-      ]
-     }
+      {
+        "resultType": "error",
+        "errors": [
+          {
+            "errorType": "syntax",
+            "line": 1,
+            "location": "testcase",
+            "errorLine": "f(1)",
+            "errorExplanation": "Missing semicolon at the end of statement"
+          }
+        ]
+      }
     ]
-   })
+  })
 })
