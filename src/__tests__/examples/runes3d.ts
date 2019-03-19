@@ -33,8 +33,8 @@ const validStudentPartial =
 
 export const student: Student = {
     invalid: {
-        runtime: null,
-        syntax: null
+        runtime: "a;",
+        syntax: "a"
     },
     valid: {
         correct: validStudentCorrect,

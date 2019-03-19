@@ -36,7 +36,7 @@ const invalidStudentRuntime =
 export const student: Student = {
   invalid: {
     runtime: invalidStudentRuntime,
-    syntax: null,
+    syntax: "a",
   },
   valid: {
     correct: validStudentCorrect,

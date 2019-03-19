@@ -7,7 +7,7 @@ exports.handler = function (event: AwsEvent, context: any, callback: Function) {
   _.runAll(event).then((result: any) => callback(null, result))
 };
 
-const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT!, 10) : 1000 // in milliseconds
+const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT!, 10) : 3000 // in milliseconds
 
 /**
  * @property globals - an array of two element string arrays. The first element
