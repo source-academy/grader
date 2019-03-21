@@ -7,12 +7,12 @@
     "build": "./scripts/build.sh",
     "typecheck": "tsc --noEmit",
     "test": "jest --env=node",
-    "test-coveralls": "jest --env=node --coverage --coverageReporters=text-lcov --forceExit | coveralls"
+    "test-coveralls": "jest --env=node --coverage --collectCoverageFrom=src/index.ts --coverageReporters=text-lcov --forceExit | coveralls"
   },
   "dependencies": {
     "@types/node": "^10.14.1",
     "js-slang": "0.1.14",
-    "typescript": "^2.9.2"
+    "typescript": "^3.3.3333"
   },
   "devDependencies": {
     "@types/jest": "^24.0.9",

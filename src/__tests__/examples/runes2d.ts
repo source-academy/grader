@@ -32,8 +32,8 @@ const validStudentPartial =
 
 export const student: Student = {
     invalid: {
-        runtime: null,
-        syntax: null
+        runtime: "a;",
+        syntax: "a"
     },
     valid: {
         correct: validStudentCorrect,
@@ -43,31 +43,46 @@ export const student: Student = {
 }
 
 const validGrader = [
-`
+    {
+        program: `
     function rune_testcase_a() {
         const expected_result = quarter_turn_right(blue(nova_bb));
         const actual_result = a();
-        return __are_pictures_equal(actual_result, expected_result) ? 2 : 0;
+        return __are_pictures_equal(actual_result, expected_result);
     }
     rune_testcase_a();
 `,
-`
+        answer: "true",
+        score: 1
+    }
+    ,
+    {
+        program: `
     function rune_testcase_b() {
         const expected_result = stack(quarter_turn_right(nova_bb), quarter_turn_right(nova_bb));
         const actual_result = b();
-        return __are_pictures_equal(actual_result, expected_result) ? 2 : 0;
+        return __are_pictures_equal(actual_result, expected_result);
     }
     rune_testcase_b();
 `,
-`
+        answer: "true",
+        score: 1
+    },
+    {
+        program:
+            `
     function rune_testcase_c() {
         const expected_result = beside(stack(nova_bb, heart_bb), stack(rcross_bb, circle_bb));
         const actual_result = c(nova_bb, heart_bb, rcross_bb, circle_bb);
-        return __are_pictures_equal(actual_result, expected_result) ? 2 : 0;
+        return __are_pictures_equal(actual_result, expected_result);
     }
     rune_testcase_c();
 `,
-`
+        answer: "true",
+        score: 1
+    },
+    {
+        program: `
     function rune_testcase_d() {
         function fractal(rune, n) {
             if (n === 1) {
@@ -79,16 +94,17 @@ const validGrader = [
         }
         const expected_result = fractal(nova_bb, 7);
         const actual_result = d(nova_bb, 7);
-        return __are_pictures_equal(actual_result, expected_result) ? 2 : 0;
+        return __are_pictures_equal(actual_result, expected_result);
     }
     rune_testcase_d();
 `,
+        answer: "true",
+        score: 1
+    }
 ]
 
 export const grader: Grader = {
-    invalid: {
-        runtime: null,
-        syntax: null
-    },
-    valid: validGrader
+    validPrepend: "",
+    validPostpend: "",
+    validTestcases: validGrader
 }

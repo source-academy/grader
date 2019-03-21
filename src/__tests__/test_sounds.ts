@@ -1,6 +1,7 @@
 import { grader, student } from './examples/sounds'
 import { awsEventFactory } from './helpers'
-import { runAll } from '..'
+import { runAll } from '../index'
+import 'jest'
 
 const makeAwsEvent = awsEventFactory({
   chapter: 2,
@@ -39,28 +40,84 @@ const makeAwsEvent = awsEventFactory({
 })
 
 test('sound grader OK, student OK, correct', async () => {
-  const results = await runAll(makeAwsEvent(grader.valid, student.valid.correct))
-  expect(results).toEqual([
-      {'grade': 1, 'resultType': 'pass'},
-      {'grade': 3, 'resultType': 'pass'},
-      {'grade': 2, 'resultType': 'pass'},
-  ])
+  const results = await runAll(makeAwsEvent({
+    prependProgram: grader.validPrepend,
+    studentProgram: student.valid.correct,
+    postpendProgram: grader.validPostpend,
+    testcases: grader.validTestcases
+  }))
+  expect(results).toEqual({
+    "totalScore": 3,
+    "results": [
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      }
+    ]
+  })
 })
 
 test('sound grader OK, student OK, wrong', async () => {
-  const results = await runAll(makeAwsEvent(grader.valid, student.valid.wrong))
-  expect(results).toEqual([
-      {'grade': 0, 'resultType': 'pass'},
-      {'grade': 0, 'resultType': 'pass'},
-      {'grade': 0, 'resultType': 'pass'},
-  ])
+  const results = await runAll(makeAwsEvent({
+    prependProgram: grader.validPrepend,
+    studentProgram: student.valid.wrong,
+    postpendProgram: grader.validPostpend,
+    testcases: grader.validTestcases
+  }))
+  expect(results).toEqual({
+    "totalScore": 0,
+    "results": [
+      {
+        "resultType": "fail",
+        "expected": "true",
+        "actual": "false"
+      },
+      {
+        "resultType": "fail",
+        "expected": "3",
+        "actual": "0"
+      },
+      {
+        "resultType": "fail",
+        "expected": "2",
+        "actual": "0"
+      }
+    ]
+  })
 })
 
 test('sound grader OK, student OK, partial', async () => {
-  const results = await runAll(makeAwsEvent(grader.valid, student.valid.partial))
-  expect(results).toEqual([
-      {'grade': 1, 'resultType': 'pass'},
-      {'grade': 1, 'resultType': 'pass'},
-      {'grade': 1, 'resultType': 'pass'},
-  ])
+  const results = await runAll(makeAwsEvent({
+    prependProgram: grader.validPrepend,
+    studentProgram: student.valid.partial!,
+    postpendProgram: grader.validPostpend,
+    testcases: grader.validTestcases
+  }))
+  expect(results).toEqual({
+    "totalScore": 1,
+    "results": [
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "fail",
+        "expected": "3",
+        "actual": "1"
+      },
+      {
+        "resultType": "fail",
+        "expected": "2",
+        "actual": "1"
+      }
+    ]
+  })
 }, 10000)

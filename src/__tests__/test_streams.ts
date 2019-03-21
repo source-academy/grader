@@ -1,6 +1,7 @@
 import { grader, student } from './examples/streams'
 import { awsEventFactory } from './helpers'
 import { runAll } from '../index'
+import 'jest'
 
 const makeAwsEvent = awsEventFactory({
   chapter: 3,
@@ -26,41 +27,132 @@ const makeAwsEvent = awsEventFactory({
 })
 
 test('stream grader OK, student OK, correct', async () => {
-  const results = await runAll(makeAwsEvent(grader.valid, student.valid.correct))
-  expect(results).toEqual([
-    {'grade': 1, 'resultType': 'pass'},
-    {'grade': 2, 'resultType': 'pass'},
-    {'grade': 1, 'resultType': 'pass'},
-    {'grade': 1, 'resultType': 'pass'},
-  ])
+  const results = await runAll(makeAwsEvent({
+    prependProgram: grader.validPrepend,
+    studentProgram: student.valid.correct,
+    postpendProgram: grader.validPostpend,
+    testcases: grader.validTestcases
+  }))
+  expect(results).toEqual({
+    "totalScore": 4,
+    "results": [
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      }
+    ]
+  })
 })
 
 test('stream grader OK, student OK, wrong', async () => {
-  const results = await runAll(makeAwsEvent(grader.valid, student.valid.wrong))
-  expect(results).toEqual([
-    {'grade': 0, 'resultType': 'pass'},
-    {'grade': 0, 'resultType': 'pass'},
-    {'grade': 1, 'resultType': 'pass'},
-    {'grade': 1, 'resultType': 'pass'},
-  ])
+  const results = await runAll(makeAwsEvent({
+    prependProgram: grader.validPrepend,
+    studentProgram: student.valid.wrong,
+    postpendProgram: grader.validPostpend,
+    testcases: grader.validTestcases
+  }))
+  expect(results).toEqual({
+    "totalScore": 2,
+    "results": [
+      {
+        "resultType": "fail",
+        "expected": "true",
+        "actual": "false"
+      },
+      {
+        "resultType": "fail",
+        "expected": "true",
+        "actual": "false"
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      }
+    ]
+  })
 })
 
 test('stream grader OK, student OK, partial', async () => {
-  const results = await runAll(makeAwsEvent(grader.valid, student.valid.partial))
-  expect(results).toEqual([
-    {'grade': 1, 'resultType': 'pass'},
-    {'grade': 0, 'resultType': 'pass'},
-    {'grade': 1, 'resultType': 'pass'},
-    {'grade': 1, 'resultType': 'pass'},
-  ])
+  const results = await runAll(makeAwsEvent({
+    prependProgram: grader.validPrepend,
+    studentProgram: student.valid.partial!,
+    postpendProgram: grader.validPostpend,
+    testcases: grader.validTestcases
+  }))
+  expect(results).toEqual({
+    "totalScore": 3,
+    "results": [
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "fail",
+        "expected": "true",
+        "actual": "false"
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      }
+    ]
+  })
 })
 
 test('stream grader OK, student runtimeError', async () => {
-  const results = await runAll(makeAwsEvent(grader.valid, student.invalid.runtime))
-  expect(results).toEqual([
-    {'grade': 1, 'resultType': 'pass'},
-    {'grade': 2, 'resultType': 'pass'},
-    {'grade': 1, 'resultType': 'pass'},
-    {'errors': [{'errorType': 'runtime', 'line': 3, 'location': 'grader'}], 'resultType': 'error'},
-  ])
+  const results = await runAll(makeAwsEvent({
+    prependProgram: grader.validPrepend,
+    studentProgram: student.invalid.runtime,
+    postpendProgram: grader.validPostpend,
+    testcases: grader.validTestcases
+  }))
+  expect(results).toEqual({
+    "totalScore": 3,
+    "results": [
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "pass",
+        "score": 1
+      },
+      {
+        "resultType": "error",
+        "errors": [
+          {
+            "errorType": "runtime",
+            "line": 3,
+            "location": "testcase",
+            "errorLine": "return is_stream(odd_stream, 1);",
+            "errorExplanation": "RangeError: Maximum call stack size exceeded"
+          }
+        ]
+      }
+    ]
+  })
 })
