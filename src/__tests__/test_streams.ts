@@ -31,7 +31,7 @@ test('stream grader OK, student OK, correct', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.correct,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 4,
@@ -61,7 +61,7 @@ test('stream grader OK, student OK, wrong', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.wrong,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 2,
@@ -93,7 +93,7 @@ test('stream grader OK, student OK, partial', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.partial!,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 3,
@@ -124,7 +124,7 @@ test('stream grader OK, student runtimeError', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.invalid.runtime,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 3,

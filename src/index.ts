@@ -37,7 +37,7 @@ export type AwsEvent = {
   prependProgram: string
   studentProgram: string
   postpendProgram: string
-  testCases: TestCase[]
+  testcases: TestCase[]
 }
 
 /**
@@ -138,7 +138,7 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
     }
   }
   evaluateGlobals(event.library.globals)
-  const promises: Promise<Output>[] = event.testCases.map(
+  const promises: Promise<Output>[] = event.testcases.map(
     (testCase: TestCase) => run({
       library: event.library,
       prependProgram: event.prependProgram,

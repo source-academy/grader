@@ -39,7 +39,7 @@ test('curve grader correct', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.correct,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual(
     {
@@ -59,7 +59,7 @@ test('wrong answer', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.wrong,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual(
     {

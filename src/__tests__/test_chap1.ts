@@ -12,12 +12,12 @@ const makeAwsEvent = awsEventFactory({
   globals: []
 })
 
-test('prepend OK, postpend OK, testCases OK, student OK, correct', async () => {
+test('prepend OK, postpend OK, testcases OK, student OK, correct', async () => {
   const results = await runAll(makeAwsEvent({
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.correct,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 3,
@@ -38,12 +38,12 @@ test('prepend OK, postpend OK, testCases OK, student OK, correct', async () => {
   })
 })
 
-test('prepend OK, postpend OK, testCases OK, student OK, partial', async () => {
+test('prepend OK, postpend OK, testcases OK, student OK, partial', async () => {
   const results = await runAll(makeAwsEvent({
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.partial!,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 3,
@@ -64,12 +64,12 @@ test('prepend OK, postpend OK, testCases OK, student OK, partial', async () => {
   })
 })
 
-test('prepend OK, postpend OK, testCases OK, student OK, wrong', async () => {
+test('prepend OK, postpend OK, testcases OK, student OK, wrong', async () => {
   const results = await runAll(makeAwsEvent({
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.wrong,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 0,
@@ -93,12 +93,12 @@ test('prepend OK, postpend OK, testCases OK, student OK, wrong', async () => {
   })
 })
 
-test('prepend OK, postpend OK, testCases OK, student runtimeError', async () => {
+test('prepend OK, postpend OK, testcases OK, student runtimeError', async () => {
   const results = await runAll(makeAwsEvent({
     prependProgram: grader.validPrepend,
     studentProgram: student.invalid.runtime,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 0,
@@ -143,12 +143,12 @@ test('prepend OK, postpend OK, testCases OK, student runtimeError', async () => 
   })
 })
 
-test('prepend OK, postpend OK, testCases OK, student syntaxError', async () => {
+test('prepend OK, postpend OK, testcases OK, student syntaxError', async () => {
   const results = await runAll(makeAwsEvent({
     prependProgram: grader.validPrepend,
     studentProgram: student.invalid.syntax,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 0,
@@ -193,12 +193,12 @@ test('prepend OK, postpend OK, testCases OK, student syntaxError', async () => {
   })
 })
 
-test('prepend OK, postpend OK, testCases OK, student timeoutError', async () => {
+test('prepend OK, postpend OK, testcases OK, student timeoutError', async () => {
   const results = await runAll(makeAwsEvent({
     prependProgram: grader.validPrepend,
     studentProgram: student.invalid.timeout!,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 0,
@@ -231,12 +231,12 @@ test('prepend OK, postpend OK, testCases OK, student timeoutError', async () => 
   })
 })
 
-test('prepend OK, postpend OK, testCases runtimeError, student OK', async () => {
+test('prepend OK, postpend OK, testcases runtimeError, student OK', async () => {
   const results = await runAll(makeAwsEvent({
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.correct,
     postpendProgram: grader.validPostpend,
-    testCases: grader.invalidTestcases!.runtime
+    testcases: grader.invalidTestcases!.runtime
   }))
   expect(results).toEqual({
     "totalScore": 0,
@@ -257,12 +257,12 @@ test('prepend OK, postpend OK, testCases runtimeError, student OK', async () => 
   })
 })
 
-test('prepend OK, postpend OK, testCases syntaxError, student OK', async () => {
+test('prepend OK, postpend OK, testcases syntaxError, student OK', async () => {
   const results = await runAll(makeAwsEvent({
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.correct,
     postpendProgram: grader.validPostpend,
-    testCases: grader.invalidTestcases!.syntax
+    testcases: grader.invalidTestcases!.syntax
   }))
   expect(results).toEqual({
     "totalScore": 0,
