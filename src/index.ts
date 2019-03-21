@@ -2,11 +2,6 @@ import { createContext, runInContext, Result as SourceResult } from 'js-slang'
 import { SourceError } from 'js-slang/dist/types'
 
 
-exports.handler = function (event: AwsEvent, context: any, callback: Function) {
-  const _ = require("./index.js")
-  _.runAll(event).then((result: any) => callback(null, result))
-};
-
 const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT!, 10) : 3000 // in milliseconds
 
 /**
