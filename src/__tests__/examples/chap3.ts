@@ -12,18 +12,15 @@ import { Grader, Student } from './types'
 
 const validStudentCorrect =
   `
-   let x = 1;
    function reassign_x() {
        x = 2;
    }
 
-   let arr = [];
    function assign_array() {
        arr[0] = 'a';
        arr[1] = 'b';
    }
 
-   let obj = {};
    function assign_object() {
        obj['a'] = 1;
        obj['b'] = 2;
@@ -32,32 +29,26 @@ const validStudentCorrect =
 
 const validStudentWrong =
   `
-   let x = 1;
    function reassign_x() {}
 
-   let arr = [];
    function assign_array() {}
 
-   let obj = {};
    function assign_object() {}
   `
 
 const validStudentPartial =
   `
-   let x = 0;
    // wrong function
    function reassign_x() {
        x = 'a';
    }
 
-   let arr = [];
    // wrong function
    function assign_array() {
        arr[0] = 1;
        arr[1] = 'b';
    }
 
-   let obj = {};
    function assign_object() {
        obj['a'] = 1;
        obj['b'] = 2;
@@ -65,84 +56,152 @@ const validStudentPartial =
   `
 
 const invalidStudentRuntime =
-   `
-   function f() {
-       x = 'a';
-   }
-   f();
   `
+  function reassign_x() {
+      y = 'a';
+  }
 
+  function assign_array() {
+    arr[0] = 'a';
+    arr[1] = 'b';
+  }
+
+  function assign_object() {
+    obj['a'] = 1;
+    obj['b'] = 2;
+  }
+  `
 
 const invalidStudentSyntax =
   `
-   let x;
-   function reassign_x() {}
+  function reassign_x() { g }
+
+  function assign_array() {
+    arr[0] = 'a';
+    arr[1] = 'b';
+  }
+
+  function assign_object() {
+    obj['a'] = 1;
+    obj['b'] = 2;
+  }
   `
 const invalidStudentTimeout =
   `while(true) {}`
 
 export const student: Student = {
-  invalid: {
-    runtime: invalidStudentRuntime,
-    syntax: invalidStudentSyntax,
-    timeout: invalidStudentTimeout
-  },
   valid: {
     correct: validStudentCorrect,
     wrong: validStudentWrong,
     partial: validStudentPartial
+  },
+  invalid: {
+    runtime: invalidStudentRuntime,
+    syntax: invalidStudentSyntax,
+    timeout: invalidStudentTimeout
   }
 }
 
-const invalidGraderRuntime = [
-  `function ek0chei0y1() {
-    return nonexistent_function();
-  }
+const validPrepend = `
+  let x = 1;
+  let arr = [];
+  let obj = {};`
 
-  ek0chei0y1();`
+const invalidPrependSyntax = `
+  let x = 1;
+  let arr = []
+  let obj = {};`
+
+const invalidPrependRuntime = `
+  let x = 1;
+  let arr = list1();
+  let obj = {};`
+
+const invalidPostpendRuntime = `a();`
+
+const invalidPostpendSyntax = `a()`
+
+const validPostpend = `
+  function check_x(x, y) {
+    return x === y;
+  }
+  
+  function check_arr(f, arr) {
+    return f(arr);
+  }
+  
+  function check_obj(f, obj) {
+    return f(obj);
+  }`
+
+const invalidTestcaseRuntime = [
+  {
+    program: `check();`,
+    answer: "true",
+    score: 1
+  }
 ]
 
-const invalidGraderSyntax = [
-  `function ek0chei0y1() {
-    return 1;
-  }
-
-  ek0chei0y1()`
+const invalidTestcaseSyntax = [
+  {
+    program: `check_x(x, 1)`,
+    answer: "true",
+    score: 1
+  },
 ]
 
-const validGrader = [
-  `function ek0chei0y1() {
-    const initial = (x === 1);
+const validTestcases = [
+  {
+    program:
+      `const a1 = check_x(x, 1);
     reassign_x();
-    const final = (x === 2);
-    return (initial && final) ? 1 : 0;
-  }
-
-  ek0chei0y1();`,
-
-  `function ek0chei0y1() {
-    const initial = is_empty_list(arr);
+    const a2 = check_x(x, 2);
+    
+    a1 === a2;`,
+    answer: "true",
+    score: 1
+  },
+  {
+    program:
+      `const a1 = check_arr(is_empty_list, arr);
     assign_array();
-    const final = (arr[0] === 'a' && arr[1] === 'b');
-    return (initial && final) ? 1 : 0;
-  }
-
-  ek0chei0y1();`,
-
-  `function ek0chei0y1() {
-    const initial = (obj.a === undefined && obj.b === undefined);
+    const f = (arr) => arr[0] === 'a' && arr[1] === 'b';
+    const a2 = check_arr(f, arr);
+    
+    a1 === a2;`,
+    answer: "true",
+    score: 1
+  },
+  {
+    program:
+      `const f = (obj) => obj.a === undefined && obj.b === undefined;
+    const a1 = check_obj(f, obj);
     assign_object();
-    const final = (obj.a === 1 && obj.b === 2);
-    return (initial && final) ? 1 : 0;
+    const g = (obj) => obj.a === 1 && obj.b === 2;
+    const a2 = check_obj(g, obj);
+    
+    a1 === a2;`,
+    answer: "true",
+    score: 1
   }
-
-  ek0chei0y1();`
 ]
 
 export const grader: Grader = {
-  invalid: {
-    runtime: invalidGraderRuntime,
-    syntax: invalidGraderSyntax
+  validPrepend: validPrepend,
+  invalidPrepend: {
+    runtime: invalidPrependRuntime,
+    syntax: invalidPrependSyntax,
+    timeout: `while(true) {}`
   },
-  valid: validGrader
+  validPostpend: validPostpend,
+  invalidPostpend: {
+    runtime: invalidPostpendRuntime,
+    syntax: invalidPostpendSyntax,
+    timeout: `while(true) {}`
+  },
+  validTestcases: validTestcases,
+  invalidTestcases: {
+    runtime: invalidTestcaseRuntime,
+    syntax: invalidTestcaseSyntax
+  }
 }

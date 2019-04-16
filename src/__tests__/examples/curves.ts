@@ -1,7 +1,7 @@
 import { Grader, Student } from './types';
 
 const validStudentCorrect =
-    `function forward_sine(t) {
+  `function forward_sine(t) {
       return make_point(t, math_sin(t * math_PI));
     }
 
@@ -12,7 +12,7 @@ const validStudentCorrect =
     `
 
 const validStudentWrong =
-    `function forward_sine(t) {
+  `function forward_sine(t) {
       return make_point(t, math_sin(t * math_PI));
     }
 
@@ -24,33 +24,32 @@ const validStudentWrong =
     `
 
 export const student: Student = {
-    valid: {
-        correct: validStudentCorrect,
-        wrong: validStudentWrong,
-    }
+  valid: {
+    correct: validStudentCorrect,
+    wrong: validStudentWrong,
+  },
+  invalid: {
+    runtime: "a;",
+    syntax: "a"
+  }
 }
 
 const validGrader = [
- `__check_canvas(
+  {
+    program: `__check_canvas(
         draw_connected_squeezed_to_window,
         2000,
         backward_sine,
         50,
         0.80
-      ) ? 1 : 0;
-`]
-
-const scanGrader = [
- `__scan_canvas(
-        draw_connected_squeezed_to_window,
-        300,
-        backward_sine,
-        50,
-      ) ? 1 : 0;
-`]
+      );`,
+    answer: "true",
+    score: 1
+  }
+]
 
 export const grader: Grader = {
-    pixel: validGrader,
-    scan: validGrader
-
+  validPrepend: "",
+  validTestcases: validGrader,
+  validPostpend: ""
 }

@@ -46,8 +46,8 @@ const validStudentPartial =
 
 export const student: Student = {
     invalid: {
-        runtime: null,
-        syntax: null
+        runtime: "a;",
+        syntax: "a"
     },
     valid: {
         correct: validStudentCorrect,
@@ -57,7 +57,8 @@ export const student: Student = {
 }
 
 const validGrader = [
-`
+    {
+        program: `
     function sound_testcase_noise() {
         __reset_function_count("play");
         __reset_function_count("sound_to_sourcesound");
@@ -70,11 +71,15 @@ const validGrader = [
         const has_correct_sound_to_sourcesounds = __get_function_count("sound_to_sourcesound") === 0;
         const has_correct_sourcesound_to_sounds = __get_function_count("sourcesound_to_sound") === 1;
 
-        return has_correct_sound_to_sourcesounds && has_correct_sourcesound_to_sounds ? 1 : 0;
+        return has_correct_sound_to_sourcesounds && has_correct_sourcesound_to_sounds;
     }
     sound_testcase_noise();
 `,
-`
+        answer: "true",
+        score: 1
+    },
+    {
+        program: `
     function sound_testcase_disciplined_sourcesound() {
         __reset_function_count("play");
         __reset_function_count("sound_to_sourcesound");
@@ -101,7 +106,11 @@ const validGrader = [
     }
     sound_testcase_disciplined_sourcesound();
 `,
-`
+        answer: "3",
+        score: 1
+    },
+    {
+        program: `
     function sound_testcase_disciplined_sound() {
         __reset_function_count("play");
         __reset_function_count("sound_to_sourcesound");
@@ -129,13 +138,13 @@ const validGrader = [
         return 2 + deductions;
     }
     sound_testcase_disciplined_sound();
-`
+`, answer: "2",
+        score: 1
+    }
 ]
 
 export const grader: Grader = {
-    invalid: {
-        runtime: null,
-        syntax: null
-    },
-    valid: validGrader
+    validPrepend: "",
+    validPostpend: "",
+    validTestcases: validGrader
 }
