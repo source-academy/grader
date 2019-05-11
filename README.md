@@ -129,7 +129,7 @@ For example, the above gradings may be represented like so,
                 }
             </TEMPLATE>
             <SOLUTION>
-                // Accept recursive solutions only
+                // This content isn't used by the autograder, but it will be displayed for the manual graders to see.
                 function fib(n) {
                     if (n <= 1) {
                         return n;
@@ -189,7 +189,6 @@ The grader will receive a set of strings, consisting of the prepend, student, po
 
 
 
-Note that the `SOLUTION` node is not related to the Autograder program, but it will be displayed for the manual graders to see.
 
 <a name="1"></a>[1] Prepend programs should be created in assessments that require students to make use of abstracted functions / variables that are declared but hidden away.
 
