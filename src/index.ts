@@ -11,7 +11,7 @@ const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT!, 10
  */
 export type Library = {
   chapter: number
-  external: {
+  external: { 
     name: 'NONE' | 'TWO_DIM_RUNES' | 'THREE_DIM_RUNES' | 'CURVES' | 'SOUND' | 'STREAMS'
     symbols: string[]
   }
@@ -240,22 +240,19 @@ const parseError = (
   const testProgLines = getLines(testProg)
   const errors = sourceErrors.map((err: SourceError) => {
     const line = err.location.end.line
-    const location = line <= preProgLines.length ? 'prepend'
-      : line <= preProgLines.length + stdProgLines.length ? 'student'
-        : line <= preProgLines.length + stdProgLines.length + postProgLines.length ? 'postpend'
-          : 'testcase'
-    const locationLine = location == 'prepend' ? line
-      : location == 'student' ? line - preProgLines.length
-        : location == 'postpend' ? line - preProgLines.length - stdProgLines.length
-          : line - preProgLines.length - stdProgLines.length - postProgLines.length
+    const [location, locationLine] = line <= preProgLines.length ? ['prepend', line]
+      : line <= preProgLines.length + stdProgLines.length ? ['student', line - preProgLines.length]
+        : line <= preProgLines.length + stdProgLines.length + postProgLines.length ? ['postpend', line - preProgLines.length - stdProgLines.length]
+          : ['testcase', line - preProgLines.length - stdProgLines.length - postProgLines.length]
+    const errorLine = (location == 'prepend' ? preProgLines[locationLine - 1]
+      : location == 'student' ? stdProgLines[locationLine - 1]
+        : location == 'postpend' ? postProgLines[locationLine - 1]
+          : testProgLines[locationLine - 1]).trim()
     return {
       errorType: err.type.toLowerCase() as 'syntax' | 'runtime',
       line: locationLine,
       location: location,
-      errorLine: (location == 'prepend' ? preProgLines[locationLine - 1]
-        : location == 'student' ? stdProgLines[locationLine - 1]
-          : location == 'postpend' ? postProgLines[locationLine - 1]
-            : testProgLines[locationLine - 1]).trim(),
+      errorLine: errorLine,
       errorExplanation: err.explain()
     }
   })
