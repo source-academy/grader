@@ -1,6 +1,7 @@
 import { grader, student } from './examples/curves'
 import { awsEventFactory } from './helpers'
 import { runAll } from '../index'
+import 'jest'
 
 const makeAwsEvent = awsEventFactory({
   chapter: 2,
@@ -34,30 +35,42 @@ const makeAwsEvent = awsEventFactory({
 })
 
 test('curve grader correct', async () => {
-  const results = await runAll(makeAwsEvent(grader.pixel, student.valid.correct))
-  expect(results).toEqual([
-      {'grade': 1, 'resultType': 'pass'}
-  ])
+  const results = await runAll(makeAwsEvent({
+    prependProgram: grader.validPrepend,
+    studentProgram: student.valid.correct,
+    postpendProgram: grader.validPostpend,
+    testCases: grader.validTestcases
+  }))
+  expect(results).toEqual(
+    {
+      "totalScore": 1,
+      "results": [
+        {
+          "resultType": "pass",
+          "score": 1
+        }
+      ]
+    }
+  )
 })
 
 test('wrong answer', async () => {
-  const results = await runAll(makeAwsEvent(grader.pixel, student.valid.wrong))
-  expect(results).toEqual([
-      {'grade': 0, 'resultType': 'pass'}
-  ])
+  const results = await runAll(makeAwsEvent({
+    prependProgram: grader.validPrepend,
+    studentProgram: student.valid.wrong,
+    postpendProgram: grader.validPostpend,
+    testCases: grader.validTestcases
+  }))
+  expect(results).toEqual(
+    {
+      "totalScore": 0,
+      "results": [
+        {
+          "resultType": "fail",
+          "expected": "true",
+          "actual": "false"
+        }
+      ]
+    }
+  )
 })
-
-test('scan grader correct', async () => {
-  const results = await runAll(makeAwsEvent(grader.scan, student.valid.correct))
-  expect(results).toEqual([
-      {'grade': 1, 'resultType': 'pass'}
-  ])
-})
-
-test('scan grader wrong', async () => {
-  const results = await runAll(makeAwsEvent(grader.scan, student.valid.wrong))
-  expect(results).toEqual([
-      {'grade': 0, 'resultType': 'pass'}
-  ])
-})
-

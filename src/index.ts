@@ -2,13 +2,7 @@ import { createContext, runInContext, Result as SourceResult } from 'js-slang'
 import { SourceError } from 'js-slang/dist/types'
 
 
-const TIMEOUT_DURATION = parseInt(process.env.TIMEOUT!, 10) // in milliseconds
-
-type AwsEvent = {
-  graderPrograms: string[]
-  studentProgram: string
-  library: Library
-}
+const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT!, 10) : 3000 // in milliseconds
 
 /**
  * @property globals - an array of two element string arrays. The first element
@@ -17,34 +11,81 @@ type AwsEvent = {
  */
 export type Library = {
   chapter: number
-  external: {
+  external: { 
     name: 'NONE' | 'TWO_DIM_RUNES' | 'THREE_DIM_RUNES' | 'CURVES' | 'SOUND' | 'STREAMS'
     symbols: string[]
   }
   globals: Array<string[]>
 }
 
+export type TestCase = {
+  program: string
+  answer: string
+  score: number
+}
+
+/**
+ * Set of properties of an event from the backend
+ */
+export type AwsEvent = {
+  library: Library
+  prependProgram: string
+  studentProgram: string
+  postpendProgram: string
+  testCases: TestCase[]
+}
+
+/**
+ * Set of properties of a unit test
+ */
+export type UnitTest = {
+  library: Library
+  prependProgram: string
+  studentProgram: string
+  postpendProgram: string
+  testCase: TestCase
+}
+
+/**
+ * Summary is the JSON object the backend receives
+ * @property totalScore - the total score of the student program
+ * @property results - the array of Output types
+ */
+type Summary = {
+  totalScore: number
+  results: Output[]
+}
+
 /**
  * Output is the 'refined' version of a @type {Result}.
- *   OutputError - program raises an error
- *   OutputPass - program raises no errors
+ *  OutputPass - program raises no errors  
+ *  OutputFail - program raises no errors but answer is wrong 
+ *  OutputError - program raises an error  
  */
-type Output = OutputPass | OutputError
+type Output = OutputPass | OutputFail | OutputError
 
 type OutputPass = {
-  grade: number
   resultType: 'pass'
+  score: number
+}
+
+type OutputFail = {
+  resultType: 'fail'
+  expected: string
+  actual: string
 }
 
 type OutputError = {
-  errors: Array<ErrorFromSource | ErrorFromTimeout>
   resultType: 'error'
+  errors: Array<ErrorFromSource | ErrorFromTimeout>
 }
 
 type ErrorFromSource = {
   errorType: 'runtime' | 'syntax'
   line: number
   location: string
+  errorLine: string
+  errorExplanation: string
 }
 
 type ErrorFromTimeout = {
@@ -62,13 +103,17 @@ type TimeoutResult = {
   status: 'timeout'
 }
 
-export const runAll = async (event: AwsEvent): Promise<Output[]> => {
+/**
+ * Runs all the unit tests provided by the @param event
+ * @param event the AwsEvent from the Backend
+ */
+export const runAll = async (event: AwsEvent): Promise<Summary> => {
   require('./util.js')
   require('./list.js')
   require('./tree.js')
   if (event.library && event.library.external) {
-    switch(event.library.external.name) {
-      case 'TWO_DIM_RUNES': {}
+    switch (event.library.external.name) {
+      case 'TWO_DIM_RUNES': { }
       case 'THREE_DIM_RUNES': {
         require('./graphics/rune_library.js')
         break
@@ -88,28 +133,61 @@ export const runAll = async (event: AwsEvent): Promise<Output[]> => {
     }
   }
   evaluateGlobals(event.library.globals)
-  const stdPrg = event.studentProgram
-  const promises = event.graderPrograms.map(
-    gdrPrg => run(event.library, stdPrg, gdrPrg)
-  )
+  const promises: Promise<Output>[] = event.testCases.map(
+    (testCase: TestCase) => run({
+      library: event.library,
+      prependProgram: event.prependProgram,
+      studentProgram: event.studentProgram,
+      postpendProgram: event.postpendProgram,
+      testCase: testCase
+    }))
   const results = await Promise.all(promises)
-  return results
+  const totalScore = results.reduce<number>(
+    (total: number, result) => result.resultType === 'pass'
+      ? total + result.score
+      : total,
+    0)
+  return {
+    totalScore: totalScore,
+    results: results
+  }
 }
 
-const run = async (library: Library, stdPrg: string, gdrPrg: string): Promise<Output> => {
-  const context = createContext<{}>(library.chapter, library.external.symbols)
-  const program = stdPrg + '\n' + gdrPrg
+/**
+ * Runs individual unit tests
+ * @param unitTest the individual unit tests composed from runAll()
+ */
+export const run = async (unitTest: UnitTest): Promise<Output> => {
+  const context = createContext<{}>(unitTest.library.chapter, unitTest.library.external.symbols)
+  const program = unitTest.prependProgram + '\n'
+    + unitTest.studentProgram + '\n'
+    + unitTest.postpendProgram + '\n'
+    + unitTest.testCase.program
   const result = await catchTimeouts(runInContext(
     program, context, { scheduler: 'preemptive' }
   ))
   if (result.status === 'finished') {
-    return { resultType: "pass", grade: result.value } as OutputPass
+    const resultValue = JSON.stringify(result.value)
+    return resultValue === unitTest.testCase.answer
+      ? {
+        resultType: 'pass',
+        score: unitTest.testCase.score
+      } as OutputPass
+      : {
+        resultType: 'fail',
+        expected: unitTest.testCase.answer,
+        actual: resultValue
+      } as OutputFail
   } else if (result.status === 'error') {
-    return parseError(context.errors, stdPrg, gdrPrg)
+    return parseError(context.errors,
+      unitTest.prependProgram,
+      unitTest.studentProgram,
+      unitTest.postpendProgram,
+      unitTest.testCase.program)
   } else {
     return {
-      errors: [ { errorType: 'timeout' } ],
-      resultType: 'error'
+      resultType: 'error',
+      errors: [{ errorType: 'timeout' }]
     }
   }
 }
@@ -144,31 +222,47 @@ const timeout = (msDuration: number): Promise<TimeoutResult> => (
  * Transforms the given SourceErrors and student, grader programs into an output
  * of @type {OutputError}.
  * @param sourceErrors Non-empty array of SourceErrors.
- * @param stdProg Student program.
- * @param grdProg Grader program.
+ * @param preProg prepend program string
+ * @param stdProg student program string
+ * @param postProg postpend program string
+ * @param testProg test case program string
  */
 const parseError = (
   sourceErrors: Array<SourceError>,
+  preProg: string,
   stdProg: string,
-  grdProg: string
+  postProg: string,
+  testProg: string
 ): OutputError => {
-  const stdProgLines = numLines(stdProg)
-  const errors =  sourceErrors.map((err: SourceError) => {
+  const preProgLines = getLines(preProg)
+  const stdProgLines = getLines(stdProg)
+  const postProgLines = getLines(postProg)
+  const testProgLines = getLines(testProg)
+  const errors = sourceErrors.map((err: SourceError) => {
     const line = err.location.end.line
-    const location = line <= stdProgLines ? 'student' : 'grader'
+    const [location, locationLine] = line <= preProgLines.length ? ['prepend', line]
+      : line <= preProgLines.length + stdProgLines.length ? ['student', line - preProgLines.length]
+        : line <= preProgLines.length + stdProgLines.length + postProgLines.length ? ['postpend', line - preProgLines.length - stdProgLines.length]
+          : ['testcase', line - preProgLines.length - stdProgLines.length - postProgLines.length]
+    const errorLine = (location == 'prepend' ? preProgLines[locationLine - 1]
+      : location == 'student' ? stdProgLines[locationLine - 1]
+        : location == 'postpend' ? postProgLines[locationLine - 1]
+          : testProgLines[locationLine - 1]).trim()
     return {
       errorType: err.type.toLowerCase() as 'syntax' | 'runtime',
-      line: location == 'student' ? line : line - stdProgLines,
-      location: location
+      line: locationLine,
+      location: location,
+      errorLine: errorLine,
+      errorExplanation: err.explain()
     }
   })
   return {
-    "resultType": "error",
-    "errors": errors
+    resultType: 'error',
+    errors: errors
   }
 }
 
 /**
- * Count the number of lines in a given string.
+ * Split a program string into an array of strings.
  */
-const numLines = (str: string) => str.split("\n").length
+const getLines = (str: string) => str.split("\n")
