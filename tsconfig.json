@@ -20,15 +20,12 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "skipLibCheck": true
   },
   "exclude": [
     "node_modules",
     "build",
-    "dist",
-    "src/__tests__"
-  ],
-  "types": [
-    "typePatches"
+    "dist"
   ]
 }

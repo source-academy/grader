@@ -10,16 +10,16 @@
     "test-coveralls": "TIMEOUT=2000 jest --env=node --coverage --coverageReporters=text-lcov --forceExit | coveralls"
   },
   "dependencies": {
-    "@ericandrewlewis/bitmap": "^1.0.0",
-    "@types/node": "^10.5.2",
     "js-slang": "0.1.14",
-    "lodash": "4.17.11",
-    "typescript": "^2.9.2"
+    "lodash": "4.17.11"
   },
   "devDependencies": {
+    "@types/jest": "^24.0.13",
+    "@types/node": "^10.14.8",
     "coveralls": "^3.0.2",
     "jest": "^23.4.0",
-    "ts-jest": "^23.0.0"
+    "ts-jest": "^23.0.0",
+    "typescript": "^2.9.2"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -27,7 +27,7 @@
       "js"
     ],
     "transform": {
-      "\\.ts$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      "\\.ts$": "ts-jest"
     },
     "testRegex": "/__tests__/test.*\\.ts$"
   }
