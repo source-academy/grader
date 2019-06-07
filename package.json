@@ -7,7 +7,7 @@
     "build": "./scripts/build.sh",
     "typecheck": "tsc --noEmit",
     "test": "TIMEOUT=2000 jest --env=node",
-    "test-coveralls": "TIMEOUT=2000 jest --env=node --coverage --coverageReporters=text-lcov --forceExit | coveralls"
+    "test-coveralls": "TIMEOUT=2000 jest --env=node --coverage --coverageReporters=text-lcov --detectOpenHandles | coveralls"
   },
   "dependencies": {
     "js-slang": "0.1.14",
@@ -22,6 +22,9 @@
     "typescript": "^2.9.2"
   },
   "jest": {
+    "collectCoverageFrom": [
+      "src/index.ts"
+    ],
     "moduleFileExtensions": [
       "ts",
       "js"
