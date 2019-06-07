@@ -1,10 +1,9 @@
 language: node_js
 node_js:
   - 10
-cache: yarn
 branches:
   except:
     - /^no-ci.*$/
 script:
-  - yarn test-coveralls
-  - yarn typecheck
+  - npm run test-coveralls
+  - npm run typecheck
