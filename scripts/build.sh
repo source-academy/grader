@@ -28,8 +28,6 @@ npm install -s --production=true
 
 cp -r node_modules/ build
 
-cd build && rm *.map && cd .. && echo "Removed unnecessary files"
-
 cross-zip build grader.zip && echo "Successfully zipped build"
 
 npm install -s --production=false
