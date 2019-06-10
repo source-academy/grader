@@ -7,7 +7,7 @@
     "build": "bash ./scripts/build.sh",
     "typecheck": "tsc --noEmit",
     "test": "cross-env TIMEOUT=2000 jest --env=node --detectOpenHandles",
-    "test-coveralls": "cross-env TIMEOUT=2000 jest --env=node --coverage --coverageReporters=text-lcov --detectOpenHandles | coveralls"
+    "test-coveralls": "cross-env TIMEOUT=2000 jest --env=node --coverage --coverageReporters=text-lcov --forceExit | coveralls"
   },
   "dependencies": {
     "js-slang": "0.1.14",
