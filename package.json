@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "./scripts/build.sh",
+    "build": "bash ./scripts/build.sh",
     "typecheck": "tsc --noEmit",
     "test": "cross-env TIMEOUT=2000 jest --env=node --detectOpenHandles",
     "test-coveralls": "cross-env TIMEOUT=2000 jest --env=node --coverage --coverageReporters=text-lcov --detectOpenHandles | coveralls"
