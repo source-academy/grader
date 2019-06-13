@@ -29,9 +29,9 @@ Example input:
     },
     "globals": []
   },
-  "prependProgram": "",
+  "prependProgram": "// This line will be ignored",
   "studentProgram": "const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2);",
-  "postpendProgram": "",
+  "postpendProgram": "// This line will also be ignored",
   "testCases": [
     {
       "program": "f(1);",
@@ -58,7 +58,9 @@ Each test case consists of the prepend, student, postpend and testcase program c
 
 For example, testcase 1 will look like:
 ```javascript
+// This line will be ignored
 const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2);
+// This line will also be ignored
 f(1);
 ```
 
