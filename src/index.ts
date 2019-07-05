@@ -122,10 +122,6 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
         require('./graphics/curves_library.js')
         break
       }
-      case 'SOUND': {
-        require('./sound/sounds.js')
-        break
-      }
       case 'STREAMS': {
         require('./streams/streams.js')
         break
