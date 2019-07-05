@@ -164,7 +164,7 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
     + unitTest.postpendProgram + '\n'
     + unitTest.testCase.program
   const result = await catchTimeouts(runInContext(
-    program, context, { scheduler: 'preemptive' }
+    program, context, { scheduler: 'preemptive', executionMethod: 'interpreter' }
   ))
   if (result.status === 'finished') {
     const resultValue = JSON.stringify(result.value)
