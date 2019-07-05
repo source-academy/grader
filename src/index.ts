@@ -12,7 +12,7 @@ const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT!, 10
 export type Library = {
   chapter: number
   external: { 
-    name: 'NONE' | 'TWO_DIM_RUNES' | 'THREE_DIM_RUNES' | 'CURVES' | 'SOUND' | 'STREAMS'
+    name: 'NONE' | 'RUNES' | 'CURVES' | 'SOUNDS' 
     symbols: string[]
   }
   globals: Array<string[]>
@@ -110,11 +110,11 @@ type TimeoutResult = {
 export const runAll = async (event: AwsEvent): Promise<Summary> => {
   require('./util.js')
   require('./list.js')
+  require('./stream.js')
   require('./tree.js')
   if (event.library && event.library.external) {
     switch (event.library.external.name) {
-      case 'TWO_DIM_RUNES': { }
-      case 'THREE_DIM_RUNES': {
+      case 'RUNES': {
         require('./graphics/rune_library.js')
         break
       }
@@ -122,12 +122,8 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
         require('./graphics/curves_library.js')
         break
       }
-      case 'SOUND': {
+      case 'SOUNDS': {
         require('./sound/sounds.js')
-        break
-      }
-      case 'STREAMS': {
-        require('./streams/streams.js')
         break
       }
     }

@@ -4314,7 +4314,7 @@ var vertices = [
   -1.0,
   0.0,
   1.0,
-  // for rcross_bb
+  // for rcross
   0.5,
   0.5,
   0.0,
@@ -4331,7 +4331,7 @@ var vertices = [
   -0.5,
   0.0,
   1.0,
-  // for nova_bb
+  // for nova
   0.0,
   0.5,
   0.0,
@@ -4344,14 +4344,14 @@ var vertices = [
 // indices is an array of indices, each refer to a point in vertices
 // (will be converted to Uint16Array later)
 var indices = [
-  // black_bb
+  // square
   2,
   4,
   6,
   2,
   6,
   8,
-  // rcross_bb
+  // rcross
   2,
   4,
   10,
@@ -4367,15 +4367,15 @@ var indices = [
   10,
   11,
   12,
-  // sail_bb
+  // sail
   7,
   8,
   3,
-  // corner_bb
+  // corner
   1,
   2,
   3,
-  // nova_bb
+  // nova
   3,
   0,
   14,
@@ -4499,16 +4499,16 @@ function makeRibbon() {
   return new PrimaryShape(firstInd, 3 * totalPoints - 6);
 }
 
-var black_bb = new PrimaryShape(0, 6);
-var blank_bb = new PrimaryShape(0, 0);
-var rcross_bb = new PrimaryShape(6, 15);
-var sail_bb = new PrimaryShape(21, 3);
-var corner_bb = new PrimaryShape(24, 3);
-var nova_bb = new PrimaryShape(27, 6);
-var circle_bb = makeCircle();
-var heart_bb = makeHeart();
-var pentagram_bb = makePentagram();
-var ribbon_bb = makeRibbon();
+var square = new PrimaryShape(0, 6);
+var blank = new PrimaryShape(0, 0);
+var rcross = new PrimaryShape(6, 15);
+var sail = new PrimaryShape(21, 3);
+var corner = new PrimaryShape(24, 3);
+var nova = new PrimaryShape(27, 6);
+var circle = makeCircle();
+var heart = makeHeart();
+var pentagram = makePentagram();
+var ribbon = makeRibbon();
 
 // convert vertices and indices to typed arrays
 vertices = new Float32Array(vertices);
@@ -4532,7 +4532,7 @@ function generateFlattenedShapeList(shape) {
   function helper(shape, color) {
     if (shape.isPrimary) {
       if (shape.count === 0) {
-        // this is blank_bb, do nothing
+        // this is blank, do nothing
         return;
       }
       if (!shape_list[shape.first]) {
@@ -4569,7 +4569,7 @@ function generateFlattenedShapeList(shape) {
   var flattened_shape_list = [];
   // draw a white square background first
   flattened_shape_list.push({
-    shape: black_bb,
+    shape: square,
     instanceArray: new Float32Array([
       1,
       0,
@@ -4857,16 +4857,16 @@ global.white = white;
 global.random_color = random_color;
 
 // runes
-global.black_bb = black_bb;
-global.blank_bb = blank_bb;
-global.rcross_bb = rcross_bb;
-global.sail_bb = sail_bb;
-global.corner_bb = corner_bb;
-global.nova_bb = nova_bb;
-global.circle_bb = circle_bb;
-global.heart_bb = heart_bb;
-global.pentagram_bb = pentagram_bb;
-global.ribbon_bb = ribbon_bb;
+global.black = square;
+global.blank = blank;
+global.rcross = rcross;
+global.sail = sail;
+global.corner = corner;
+global.nova = nova;
+global.circle = circle;
+global.heart = heart;
+global.pentagram = pentagram;
+global.ribbon = ribbon;
 
 // transforms
 global.quarter_turn_left = quarter_turn_left;

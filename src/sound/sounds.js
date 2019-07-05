@@ -15,25 +15,25 @@ duration: real value in seconds 0<x<Infinity
 sound: (time -> amplitude) x duration
 
 */
-function make_sourcesound(wave, duration) {
+function make_sound(wave, duration) {
     return pair(wave, duration);
 }
 
-function get_wave(sourcesound) {
-    return head(sourcesound);
+function get_wave(sound) {
+    return head(sound);
 }
 
-function get_duration(sourcesound) {
-    return tail(sourcesound);
+function get_duration(sound) {
+    return tail(sound);
 }
 
 function is_sound(sound) {
-    return is_pair(sound) && head(sound) === 'sound';
+    return is_pair(sound) && is_function(head(sound)) && is_number(tail(sound));
 }
 
 function play(sound) {
     if (!is_sound(sound)) {
-        throw new Error("play() expects sound as input, did you forget to sourcesound_to_sound()?");
+        throw new Error("play() expects sound as input");
     }
     return;
 }
@@ -42,53 +42,23 @@ function stop() {
     return;
 }
 
-function cut_sourcesound(sourcesound, duration) {
-    var wave = get_wave(sourcesound);
-    return make_sourcesound(function(t) {
-        if (t >= duration) {
-            return 0;
-        } else {
-            return wave(t);
-        }
-    }, duration);
-}
-
-function sourcesound_to_sound(sourcesound) {
-    var sound = pair('sound', sourcesound);
-    sound.toString = function() {
-        return "[object Sound]";
-    }
-
-    return sound;
-}
-
-function sound_to_sourcesound(sound) {
-    if (!is_sound(sound)) {
-        throw new Error("sound_to_sourcesound() expects sound as input, did you forget to sourcesound_to_sound()?");
-    }
-
-    return tail(sound);
-}
-
 function consecutively(list_of_sounds) {
     if (is_empty_list(list_of_sounds)) {
         return silence(0);
     } else {
-        const head_sourcesound = sound_to_sourcesound(head(list_of_sounds));
-        const tail_sourcesound = sound_to_sourcesound(consecutively(tail(list_of_sounds)));
+        const head_sound = head(list_of_sounds);
+        const tail_sound = consecutively(tail(list_of_sounds));
 
-        const head_wave = get_wave(head_sourcesound);
-        const head_duration = get_duration(head_sourcesound);
-        const tail_wave = get_wave(tail_sourcesound);
-        const tail_duration = get_duration(tail_sourcesound);
+        const head_wave = get_wave(head_sound);
+        const head_duration = get_duration(head_sound);
+        const tail_wave = get_wave(tail_sound);
+        const tail_duration = get_duration(tail_sound);
 
-        return sourcesound_to_sound(make_sourcesound(function(t) {
-            if (t >= head_duration) {
-                return tail_wave(t - head_duration);
-            } else {
-                return head_wave(t);
-            }
-        }, head_duration + tail_duration));
+        return make_sound(t =>
+			  t >= head_duration
+	                  ? tail_wave(t - head_duration)
+			  : head_wave(t),
+			  head_duration + tail_duration);
     }
 }
 
@@ -97,84 +67,37 @@ function simultaneously(list_of_sounds) {
         return silence(0);
     } else {
         const number_of_sounds = length(list_of_sounds);
-        const list_of_sourcesounds = map(sound_to_sourcesound, list_of_sounds);
-        const max_duration = accumulate(function(sourcesound, longest_duration) {
-            return Math.max(longest_duration, get_duration(sourcesound));
-        }, 0, list_of_sourcesounds);
+        const max_duration = accumulate((sound, longest_duration) => 
+					Math.max(longest_duration,
+						 get_duration(sound)),
+					0, list_of_sounds);
 
-        return sourcesound_to_sound(make_sourcesound(function(t) {
-            if (t >= max_duration) {
-                return 0;
+        return make_sound(t => {
+	    if (t >= max_duration) {
+		return 0;
             } else {
-                const current_amplitude = accumulate(function(sourcesound, total_amplitude) {
-                    return total_amplitude + (get_wave(sourcesound))(t);
-                }, 0, list_of_sourcesounds);
+                const current_amplitude = accumulate((sound, total_amplitude) =>
+						     total_amplitude +
+						     (get_wave(sound))(t),
+						     0, list_of_sounds);
                 return current_amplitude / number_of_sounds;
             }
-        }, max_duration));
+        }, max_duration);
     }
 }
 
-function noise_sourcesound(duration) {
+function noise_sound(duration) {
     const wave = t => t >= duration ? 0 : Math.random() * 2 - 1;
-    return make_sourcesound(wave, duration);
-}
-
-function noise(duration) {
-    return sourcesound_to_sound(noise_sourcesound(duration));
-}
-
-function sine_sourcesound(freq, duration) {
-    const wave = t => t >= duration ? 0 : Math.sin(2 * Math.PI * t * freq);
-    return make_sourcesound(wave, duration);
+    return make_sound(wave, duration);
 }
 
 function sine_sound(freq, duration) {
-    return sourcesound_to_sound(sine_sourcesound(freq, duration));
+    const wave = t => t >= duration ? 0 : Math.sin(2 * Math.PI * t * freq);
+    return make_sound(wave, duration);
 }
 
-function constant_sourcesound(constant, duration) {
-    const wave = t => t >= duration ? 0 : constant;
-    return make_sourcesound(wave, duration);
-}
-
-function silence_sourcesound(duration) {
-    return constant_sourcesound(0, duration);
-}
-
-function high_sourcesound(duration) {
-    return constant_sourcesound(1, duration);
-}
-
-function silence(duration) {
-    return sourcesound_to_sound(silence_sourcesound(duration));
-}
-
-function high(duration) {
-    return sourcesound_to_sound(high_sourcesound(duration));
-}
-
-function invert_sourcesound(sourcesound) {
-    var wave = get_wave(sourcesound);
-    var duration = get_duration(sourcesound);
-    return make_sourcesound(function(t) {
-        return -wave(t);
-    }, duration);
-}
-
-function clamp_sourcesound(sourcesound) {
-    var wave = get_wave(sourcesound);
-    var duration = get_duration(sourcesound);
-    return make_sourcesound(function(t) {
-        var a = wave(t);
-        if (a > 1) {
-            return 1;
-        } else if (a < -1) {
-            return -1;
-        } else {
-            return a;
-        }
-    }, duration);
+function silence_sound(duration) {
+    return constant_sound(0, duration);
 }
 
 // for mission 14
@@ -241,7 +164,7 @@ function midi_note_to_frequency(note) {
     return 8.1757989156 * Math.pow(2, (note / 12));
 }
 
-function square_sourcesound(freq, duration) {
+function square_sound(freq, duration) {
     function fourier_expansion_square(level, t) {
         var answer = 0;
         for (var i = 1; i <= level; i++) {
@@ -264,14 +187,10 @@ function square_sourcesound(freq, duration) {
             }
         }
     }
-    return make_sourcesound(wave, duration);
+    return make_sound(wave, duration);
 }
 
-function square_sound(freq, duration) {
-    return sourcesound_to_sound(square_sourcesound(freq, duration));
-}
-
-function triangle_sourcesound(freq, duration) {
+function triangle_sound(freq, duration) {
     function fourier_expansion_triangle(level, t) {
         var answer = 0;
         for (var i = 0; i < level; i++) {
@@ -294,14 +213,10 @@ function triangle_sourcesound(freq, duration) {
             }
         }
     }
-    return make_sourcesound(wave, duration);
+    return make_sound(wave, duration);
 }
 
-function triangle_sound(freq, duration) {
-    return sourcesound_to_sound(triangle_sourcesound(freq, duration));
-}
-
-function sawtooth_sourcesound(freq, duration) {
+function sawtooth_sound(freq, duration) {
     function fourier_expansion_sawtooth(level, t) {
         var answer = 0;
         for (var i = 1; i <= level; i++) {
@@ -324,17 +239,7 @@ function sawtooth_sourcesound(freq, duration) {
             }
         }
     }
-    return make_sourcesound(wave, duration);
-}
-
-function sawtooth_sound(freq, duration) {
-    return sourcesound_to_sound(sawtooth_sourcesound(freq, duration));
-}
-
-function play_concurrently(sound) {
-    if (!is_sound(sound)) {
-        throw new Error("play() expects sound as input, did you forget to sourcesound_to_sound()?");
-    }
+    return make_sound(wave, duration);
 }
 
 function exponential_decay(decay_period) {
@@ -351,22 +256,22 @@ function exponential_decay(decay_period) {
 
 function adsr(attack_time, decay_time, sustain_level, release_time) {
   return function (sound) {
-    var sourcesound = sound_to_sourcesound(sound);
-    var wave = get_wave(sourcesound);
-    var duration = get_duration(sourcesound);
-    return sourcesound_to_sound(make_sourcesound(function (t) {
-      if (t < attack_time) {
-        return wave(t) * (t / attack_time);
-      } else if (t < attack_time + decay_time) {
-        return ((exponential_decay(1 - sustain_level, decay_time))(t - attack_time) + sustain_level) * wave(t);
-      } else if (t < duration - release_time) {
-        return wave(t) * sustain_level;
-      } else if (t <= duration) {
-        return wave(t) * sustain_level * (exponential_decay(release_time))(t - (duration - release_time));
-      } else {
-        return 0;
-      }
-    }, duration));
+    var wave = get_wave(sound);
+    var duration = get_duration(sound);
+    return make_sound(t =>
+		      t < attack_time
+		      ? wave(t) * (t / attack_time)
+		      : t < attack_time + decay_time
+		      ? ((exponential_decay(1 - sustain_level,
+					    decay_time))(t - attack_time) +
+			 sustain_level) * wave(t)
+		      : t < duration - release_time
+                      ? wave(t) * sustain_level
+	              : t <= duration
+		      ? wave(t) * sustain_level *
+		      (exponential_decay(release_time))(t - (duration - release_time))
+		      : 0,
+		     duration);
   };
 }
 
@@ -433,17 +338,13 @@ function cello(note, duration) {
 
 // Sound API
 global.is_sound = is_sound;
-global.make_sourcesound = make_sourcesound;
+global.make_sound = make_sound;
 global.get_wave = get_wave;
 global.get_duration = get_duration;
 global.play = play;
 global.consecutively = consecutively;
 global.simultaneously = simultaneously;
-global.sourcesound_to_sound = sourcesound_to_sound;
-global.sound_to_sourcesound = sound_to_sourcesound;
 
-global.noise = noise;
-global.silence = silence;
 global.sine_sound = sine_sound;
 global.square_sound = square_sound;
 global.triangle_sound = triangle_sound;

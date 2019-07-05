@@ -6,14 +6,14 @@ import 'jest'
 const makeAwsEvent = awsEventFactory({
   chapter: 2,
   external: {
-    name: 'SOUND',
+    name: 'SOUNDS',
     symbols: [
       'consecutively',
+      'make_sound',
       'get_duration',
       'get_wave',
       'is_sound',
       'letter_name_to_midi_note',
-      'make_sourcesound',
       'midi_note_to_frequency',
       'noise',
       'play',
@@ -21,8 +21,6 @@ const makeAwsEvent = awsEventFactory({
       'silence',
       'simultaneously',
       'sine_sound',
-      'sound_to_sourcesound',
-      'sourcesound_to_sound',
       'square_sound',
       'triangle_sound',
       '__track_function',
@@ -34,8 +32,6 @@ const makeAwsEvent = awsEventFactory({
     ['__tracking_function', 'global.__track_function("get_duration");'],
     ['__tracking_function', 'global.__track_function("get_wave");'],
     ['__tracking_function', 'global.__track_function("play");'],
-    ['__tracking_function', 'global.__track_function("sourcesound_to_sound");'],
-    ['__tracking_function', 'global.__track_function("sound_to_sourcesound");'],
   ]
 })
 

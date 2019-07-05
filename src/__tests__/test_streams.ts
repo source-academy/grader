@@ -6,22 +6,8 @@ import 'jest'
 const makeAwsEvent = awsEventFactory({
   chapter: 3,
   external: {
-    name: 'STREAMS',
-    symbols: [
-      'stream_filter',
-      'stream_to_list',
-      'stream_take_max',
-      'stream_tail',
-      'stream_ref',
-      'stream_member',
-      'is_stream',
-      'integers_from',
-      'enum_stream',
-      'list_to_stream',
-      'stream_append',
-      'equal',
-      'list',
-    ]
+    name: 'NONE',
+    symbols: []
   },
   globals: []
 })
