@@ -71,7 +71,7 @@ const validGrader = [
   {
     program: `
   function stream_testcase_c() {
-    return !is_empty_list(stream_member(3, odd_stream)) &&
+    return !is_null(stream_member(3, odd_stream)) &&
       stream_ref(odd_stream, 1) === 3;
   }
   stream_testcase_c();
@@ -92,6 +92,10 @@ const validGrader = [
 
 export const grader: Grader = {
   validPrepend: "",
-  validPostpend: "",
+  validPostpend: `function stream_take_max(str, n) {
+    return is_null(str) || n === 0
+      ? null
+      : pair(head(str), () => stream_take_max(stream_tail(str), n - 1));
+  }`,
   validTestcases: validGrader
 }

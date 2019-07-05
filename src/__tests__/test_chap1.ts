@@ -111,7 +111,7 @@ test('prepend OK, postpend OK, testCases OK, student runtimeError', async () => 
             "line": 1,
             "location": "student",
             "errorLine": "const f = i => f(j+1);",
-            "errorExplanation": "Name j not declared"
+            "errorExplanation": "Name j not declared."
           }
         ]
       },
@@ -123,7 +123,7 @@ test('prepend OK, postpend OK, testCases OK, student runtimeError', async () => 
             "line": 1,
             "location": "student",
             "errorLine": "const f = i => f(j+1);",
-            "errorExplanation": "Name j not declared"
+            "errorExplanation": "Name j not declared."
           }
         ]
       },
@@ -135,7 +135,7 @@ test('prepend OK, postpend OK, testCases OK, student runtimeError', async () => 
             "line": 1,
             "location": "student",
             "errorLine": "const f = i => f(j+1);",
-            "errorExplanation": "Name j not declared"
+            "errorExplanation": "Name j not declared."
           }
         ]
       }
@@ -249,7 +249,7 @@ test('prepend OK, postpend OK, testCases runtimeError, student OK', async () => 
             "line": 1,
             "location": "testcase",
             "errorLine": "g(1);",
-            "errorExplanation": "Name g not declared"
+            "errorExplanation": "Name g not declared."
           }
         ]
       }
