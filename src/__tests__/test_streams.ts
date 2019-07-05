@@ -10,7 +10,6 @@ const makeAwsEvent = awsEventFactory({
     symbols: [
       'stream_filter',
       'stream_to_list',
-      'stream_take_max',
       'stream_tail',
       'stream_ref',
       'stream_member',
@@ -19,8 +18,6 @@ const makeAwsEvent = awsEventFactory({
       'enum_stream',
       'list_to_stream',
       'stream_append',
-      'equal',
-      'list',
     ]
   },
   globals: []

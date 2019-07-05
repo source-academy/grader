@@ -122,10 +122,6 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
         require('./graphics/curves_library.js')
         break
       }
-      case 'SOUND': {
-        require('./sound/sounds.js')
-        break
-      }
       case 'STREAMS': {
         require('./streams/streams.js')
         break
@@ -164,7 +160,7 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
     + unitTest.postpendProgram + '\n'
     + unitTest.testCase.program
   const result = await catchTimeouts(runInContext(
-    program, context, { scheduler: 'preemptive' }
+    program, context, { scheduler: 'preemptive', executionMethod: 'interpreter' }
   ))
   if (result.status === 'finished') {
     const resultValue = JSON.stringify(result.value)
