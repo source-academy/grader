@@ -111,6 +111,9 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
   require('./util.js')
   require('./list.js')
   require('./tree.js')
+  require('./stream.js')
+  
+  /* Disabled until we can test runes, curves, etc.
   if (event.library && event.library.external) {
     switch (event.library.external.name) {
       case 'TWO_DIM_RUNES': { }
@@ -128,6 +131,8 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
       }
     }
   }
+  */
+ 
   evaluateGlobals(event.library.globals)
   const promises: Promise<Output>[] = event.testCases.map(
     (testCase: TestCase) => run({
