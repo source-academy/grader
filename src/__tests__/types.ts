@@ -1,4 +1,4 @@
-import { TestCase } from '../../index'
+import { TestCase } from '../index'
 
 export type Grader = {
   validPrepend: string
