@@ -137,9 +137,9 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
   const promises: Promise<Output>[] = event.testCases.map(
     (testCase: TestCase) => run({
       library: event.library,
-      prependProgram: event.prependProgram,
+      prependProgram: event.prependProgram || '',
       studentProgram: event.studentProgram,
-      postpendProgram: event.postpendProgram,
+      postpendProgram: event.postpendProgram || '',
       testCase: testCase
     }))
   const results = await Promise.all(promises)
