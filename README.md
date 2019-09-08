@@ -32,7 +32,7 @@ Example input:
   "prependProgram": "// This line will be ignored",
   "studentProgram": "const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2);",
   "postpendProgram": "// This line will also be ignored",
-  "testCases": [
+  "testcases": [
     {
       "program": "f(1);",
       "answer": "1",

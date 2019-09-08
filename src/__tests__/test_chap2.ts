@@ -128,7 +128,7 @@ test('chap2 grader OK, student OK, correct', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.correct,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 2,
@@ -150,7 +150,7 @@ test('chap2 grader OK, student OK, wrong', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.wrong,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 0,
@@ -174,7 +174,7 @@ test('chap2 grader OK, student OK, prepend runtime', async () => {
     prependProgram: grader.invalidPrepend!.runtime,
     studentProgram: student.valid.correct,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 0,
@@ -212,7 +212,7 @@ test('chap2 grader OK, student OK, prepend syntax', async () => {
     prependProgram: grader.invalidPrepend!.syntax,
     studentProgram: student.valid.correct,
     postpendProgram: grader.validPostpend,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 0,
@@ -249,7 +249,7 @@ test('chap2 grader OK, student OK, postpend runtime', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.correct,
     postpendProgram: grader.invalidPostpend!.runtime,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 0,
@@ -286,7 +286,7 @@ test('chap2 grader OK, student OK, postpend syntax', async () => {
     prependProgram: grader.validPrepend,
     studentProgram: student.valid.correct,
     postpendProgram: grader.invalidPostpend!.syntax,
-    testCases: grader.validTestcases
+    testcases: grader.validTestcases
   }))
   expect(results).toEqual({
     "totalScore": 0,

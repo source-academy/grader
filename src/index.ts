@@ -18,7 +18,7 @@ export type Library = {
   globals: Array<string[]>
 }
 
-export type TestCase = {
+export type Testcase = {
   program: string
   answer: string
   score: number
@@ -32,7 +32,7 @@ export type AwsEvent = {
   prependProgram: string
   studentProgram: string
   postpendProgram: string
-  testCases: TestCase[]
+  testcases: Testcase[]
 }
 
 /**
@@ -43,7 +43,7 @@ export type UnitTest = {
   prependProgram: string
   studentProgram: string
   postpendProgram: string
-  testCase: TestCase
+  testcase: Testcase
 }
 
 /**
@@ -134,13 +134,13 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
   */
 
   evaluateGlobals(event.library.globals)
-  const promises: Promise<Output>[] = event.testCases.map(
-    (testCase: TestCase) => run({
+  const promises: Promise<Output>[] = event.testcases.map(
+    (testcase: Testcase) => run({
       library: event.library,
       prependProgram: event.prependProgram || '',
       studentProgram: event.studentProgram,
       postpendProgram: event.postpendProgram || '',
-      testCase: testCase
+      testcase: testcase
     }))
   const results = await Promise.all(promises)
   const totalScore = results.reduce<number>(
@@ -163,20 +163,20 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
   const program = unitTest.prependProgram + '\n'
     + unitTest.studentProgram + '\n'
     + unitTest.postpendProgram + '\n'
-    + unitTest.testCase.program
+    + unitTest.testcase.program
   const result = await catchTimeouts(runInContext(
     program, context, { scheduler: 'preemptive', executionMethod: 'interpreter' }
   ))
   if (result.status === 'finished') {
     const resultValue = JSON.stringify(result.value)
-    return resultValue === unitTest.testCase.answer
+    return resultValue === unitTest.testcase.answer
       ? {
         resultType: 'pass',
-        score: unitTest.testCase.score
+        score: unitTest.testcase.score
       } as OutputPass
       : {
         resultType: 'fail',
-        expected: unitTest.testCase.answer,
+        expected: unitTest.testcase.answer,
         actual: resultValue
       } as OutputFail
   } else if (result.status === 'error') {
@@ -184,7 +184,7 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
       unitTest.prependProgram,
       unitTest.studentProgram,
       unitTest.postpendProgram,
-      unitTest.testCase.program)
+      unitTest.testcase.program)
   } else {
     return {
       resultType: 'error',

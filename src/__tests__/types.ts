@@ -1,12 +1,12 @@
-import { TestCase } from '../index'
+import { Testcase } from '../index'
 
 export type Grader = {
   validPrepend: string
   invalidPrepend?: InvalidPrograms<string>
   validPostpend: string
   invalidPostpend?: InvalidPrograms<string>
-  validTestcases: TestCase[]
-  invalidTestcases?: InvalidPrograms<TestCase[]>
+  validTestcases: Testcase[]
+  invalidTestcases?: InvalidPrograms<Testcase[]>
 }
 
 export type Student = {
