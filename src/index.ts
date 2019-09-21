@@ -1,4 +1,5 @@
 import { createContext, runInContext, Result as SourceResult } from 'js-slang'
+import { stringify } from 'js-slang/dist/interop'
 import { SourceError } from 'js-slang/dist/types'
 
 
@@ -168,7 +169,7 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
     program, context, { scheduler: 'preemptive', executionMethod: 'interpreter' }
   ))
   if (result.status === 'finished') {
-    const resultValue = JSON.stringify(result.value)
+    const resultValue = stringify(result.value)
     return resultValue === unitTest.testcase.answer
       ? {
         resultType: 'pass',

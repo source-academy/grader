@@ -95,7 +95,7 @@ const validGrader = [
       `
 my_map(ist, x => x + 1);
 `,
-    answer: "[2,[3,[4,null]]]",
+    answer: "[2, [3, [4, null]]]",
     score: 1
   },
   {
@@ -157,8 +157,8 @@ test('chap2 grader OK, student OK, wrong', async () => {
     "results": [
       {
         "resultType": "fail",
-        "expected": "[2,[3,[4,null]]]",
-        "actual": "[1,[2,[3,null]]]"
+        "expected": "[2, [3, [4, null]]]",
+        "actual": "[1, [2, [3, null]]]"
       },
       {
         "resultType": "fail",
