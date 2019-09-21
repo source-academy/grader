@@ -112,7 +112,6 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
   require('./util.js')
   require('./list.js')
   require('./tree.js')
-  require('./stream.js')
 
   /* Disabled until we can test runes, curves, etc.
   if (event.library && event.library.external) {
