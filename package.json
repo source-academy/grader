@@ -10,7 +10,7 @@
     "test-coveralls": "cross-env TIMEOUT=2000 jest --env=node --coverage --coverageReporters=text-lcov --forceExit | coveralls"
   },
   "dependencies": {
-    "js-slang": "^0.3.3",
+    "js-slang": "^0.4.49",
     "lodash": "4.17.13"
   },
   "devDependencies": {
