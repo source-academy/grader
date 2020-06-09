@@ -1,5 +1,5 @@
 import { createContext, runInContext, Result as SourceResult } from 'js-slang'
-import { stringify } from 'js-slang/dist/interop'
+import { stringify } from 'js-slang/dist/utils/stringify'
 import { SourceError } from 'js-slang/dist/types'
 
 
@@ -59,9 +59,9 @@ type Summary = {
 
 /**
  * Output is the 'refined' version of a @type {Result}.
- *  OutputPass - program raises no errors  
- *  OutputFail - program raises no errors but answer is wrong 
- *  OutputError - program raises an error  
+ *  OutputPass - program raises no errors
+ *  OutputFail - program raises no errors but answer is wrong
+ *  OutputError - program raises an error
  */
 type Output = OutputPass | OutputFail | OutputError
 
@@ -159,7 +159,7 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
  * @param unitTest the individual unit tests composed from runAll()
  */
 export const run = async (unitTest: UnitTest): Promise<Output> => {
-  const context = createContext<{}>(unitTest.library.chapter, unitTest.library.external.symbols)
+  const context = createContext(unitTest.library.chapter, "default", unitTest.library.external.symbols)
   const program = unitTest.prependProgram + '\n'
     + unitTest.studentProgram + '\n'
     + unitTest.postpendProgram + '\n'
