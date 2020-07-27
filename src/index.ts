@@ -163,14 +163,12 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
     'default',
     unitTest.library.external.symbols
   )
-  const program =
-    unitTest.prependProgram +
-    '\n' +
-    unitTest.studentProgram +
-    '\n' +
-    unitTest.postpendProgram +
-    '\n' +
+  const program = [
+    unitTest.prependProgram,
+    unitTest.studentProgram,
+    unitTest.postpendProgram,
     unitTest.testcase.program
+  ].join('\n')
   const result = await catchTimeouts(runInContext(program, context, { executionMethod: 'native' }))
   if (result.status === 'finished') {
     const resultValue = stringify(result.value)
