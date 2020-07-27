@@ -112,6 +112,14 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
   require('./list.js')
   require('./tree.js')
 
+  if (event.library && event.library.external) {
+    switch (event.library.external.name) {
+      case 'RUNES': {
+        require('./graphics/webGLrune.js')
+        break
+      }
+    }
+  }
   /* Disabled until we can test runes, curves, etc.
   if (event.library && event.library.external) {
     switch (event.library.external.name) {
