@@ -2,7 +2,6 @@ import { createContext, runInContext, Result as SourceResult } from 'js-slang'
 import { stringify } from 'js-slang/dist/utils/stringify'
 import { SourceError } from 'js-slang/dist/types'
 
-
 const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT!, 10) : 3000 // in milliseconds
 
 /**
@@ -134,20 +133,20 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
   */
 
   evaluateGlobals(event.library.globals)
-  const promises: Promise<Output>[] = event.testcases.map(
-    (testcase: Testcase) => run({
+  const promises: Promise<Output>[] = event.testcases.map((testcase: Testcase) =>
+    run({
       library: event.library,
       prependProgram: event.prependProgram || '',
       studentProgram: event.studentProgram,
       postpendProgram: event.postpendProgram || '',
       testcase: testcase
-    }))
+    })
+  )
   const results = await Promise.all(promises)
   const totalScore = results.reduce<number>(
-    (total: number, result) => result.resultType === 'pass'
-      ? total + result.score
-      : total,
-    0)
+    (total: number, result) => (result.resultType === 'pass' ? total + result.score : total),
+    0
+  )
   return {
     totalScore: totalScore,
     results: results
@@ -159,32 +158,40 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
  * @param unitTest the individual unit tests composed from runAll()
  */
 export const run = async (unitTest: UnitTest): Promise<Output> => {
-  const context = createContext(unitTest.library.chapter, "default", unitTest.library.external.symbols)
-  const program = unitTest.prependProgram + '\n'
-    + unitTest.studentProgram + '\n'
-    + unitTest.postpendProgram + '\n'
-    + unitTest.testcase.program
-  const result = await catchTimeouts(runInContext(
-    program, context, { scheduler: 'preemptive', executionMethod: 'interpreter' }
-  ))
+  const context = createContext(
+    unitTest.library.chapter,
+    'default',
+    unitTest.library.external.symbols
+  )
+  const program =
+    unitTest.prependProgram +
+    '\n' +
+    unitTest.studentProgram +
+    '\n' +
+    unitTest.postpendProgram +
+    '\n' +
+    unitTest.testcase.program
+  const result = await catchTimeouts(runInContext(program, context, { executionMethod: 'native' }))
   if (result.status === 'finished') {
     const resultValue = stringify(result.value)
     return resultValue === unitTest.testcase.answer
-      ? {
-        resultType: 'pass',
-        score: unitTest.testcase.score
-      } as OutputPass
-      : {
-        resultType: 'fail',
-        expected: unitTest.testcase.answer,
-        actual: resultValue
-      } as OutputFail
+      ? ({
+          resultType: 'pass',
+          score: unitTest.testcase.score
+        } as OutputPass)
+      : ({
+          resultType: 'fail',
+          expected: unitTest.testcase.answer,
+          actual: resultValue
+        } as OutputFail)
   } else if (result.status === 'error') {
-    return parseError(context.errors,
+    return parseError(
+      context.errors,
       unitTest.prependProgram,
       unitTest.studentProgram,
       unitTest.postpendProgram,
-      unitTest.testcase.program)
+      unitTest.testcase.program
+    )
   } else {
     return {
       resultType: 'error',
@@ -215,9 +222,8 @@ const catchTimeouts = (slangPromise: Promise<Result>): Promise<Result> => {
   return Promise.race([slangPromise, timeout(TIMEOUT_DURATION)])
 }
 
-const timeout = (msDuration: number): Promise<TimeoutResult> => (
+const timeout = (msDuration: number): Promise<TimeoutResult> =>
   new Promise(resolve => setTimeout(resolve, msDuration, { status: 'timeout' }))
-)
 
 /**
  * Transforms the given SourceErrors and student, grader programs into an output
@@ -241,14 +247,22 @@ const parseError = (
   const testProgLines = getLines(testProg)
   const errors = sourceErrors.map((err: SourceError) => {
     const line = err.location.end.line
-    const [location, locationLine] = line <= preProgLines.length ? ['prepend', line]
-      : line <= preProgLines.length + stdProgLines.length ? ['student', line - preProgLines.length]
-        : line <= preProgLines.length + stdProgLines.length + postProgLines.length ? ['postpend', line - preProgLines.length - stdProgLines.length]
-          : ['testcase', line - preProgLines.length - stdProgLines.length - postProgLines.length]
-    const errorLine = (location == 'prepend' ? preProgLines[locationLine - 1]
-      : location == 'student' ? stdProgLines[locationLine - 1]
-        : location == 'postpend' ? postProgLines[locationLine - 1]
-          : testProgLines[locationLine - 1]).trim()
+    const [location, locationLine] =
+      line <= preProgLines.length
+        ? ['prepend', line]
+        : line <= preProgLines.length + stdProgLines.length
+        ? ['student', line - preProgLines.length]
+        : line <= preProgLines.length + stdProgLines.length + postProgLines.length
+        ? ['postpend', line - preProgLines.length - stdProgLines.length]
+        : ['testcase', line - preProgLines.length - stdProgLines.length - postProgLines.length]
+    const errorLine = (location == 'prepend'
+      ? preProgLines[locationLine - 1]
+      : location == 'student'
+      ? stdProgLines[locationLine - 1]
+      : location == 'postpend'
+      ? postProgLines[locationLine - 1]
+      : testProgLines[locationLine - 1]
+    ).trim()
     return {
       errorType: err.type.toLowerCase() as 'syntax' | 'runtime',
       line: locationLine,
@@ -266,4 +280,4 @@ const parseError = (
 /**
  * Split a program string into an array of strings.
  */
-const getLines = (str: string) => str.split("\n")
+const getLines = (str: string) => str.split('\n')
