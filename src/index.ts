@@ -12,7 +12,7 @@ const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT!, 10
 export type Library = {
   chapter: number
   external: {
-    name: 'NONE' | 'TWO_DIM_RUNES' | 'THREE_DIM_RUNES' | 'CURVES' | 'SOUND' | 'STREAMS'
+    name: 'NONE' | 'RUNES' | 'CURVES' | 'SOUNDS' | 'BINARYTREES' | 'PIXNFLIX'
     symbols: string[]
   }
   globals: Array<string[]>
