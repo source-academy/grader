@@ -74,7 +74,7 @@ function my_map(xs, f) {
 const invalidStudentRuntime =
   `
 function my_map(xs, f) {
-  return pair(xs, my_map(tail(xs), f));  
+  return pair(xs, my_map(tail(xs), f));
 }
 `
 
@@ -186,7 +186,7 @@ test('chap2 grader OK, student OK, prepend runtime', async () => {
             "errorType": "runtime",
             "line": 2,
             "location": "prepend",
-            "errorExplanation": "Name ist declared later in current scope but not yet assigned",
+            "errorExplanation": "ReferenceError: Cannot access 'ist' before initialization",
             "errorLine": "const ist = ist;",
           }
         ]
@@ -198,7 +198,7 @@ test('chap2 grader OK, student OK, prepend runtime', async () => {
             "errorType": "runtime",
             "line": 2,
             "location": "prepend",
-            "errorExplanation": "Name ist declared later in current scope but not yet assigned",
+            "errorExplanation": "ReferenceError: Cannot access 'ist' before initialization",
             "errorLine": "const ist = ist;",
           }
         ]
@@ -261,7 +261,7 @@ test('chap2 grader OK, student OK, postpend runtime', async () => {
             "errorType": "runtime",
             "line": 2,
             "location": "postpend",
-            "errorExplanation": "Name __checkDeepEquality declared later in current scope but not yet assigned",
+            "errorExplanation": "ReferenceError: Cannot access '__checkDeepEquality' before initialization",
             "errorLine": "const __checkDeepEquality = __checkDeepEquality;",
           }
         ]
@@ -273,7 +273,7 @@ test('chap2 grader OK, student OK, postpend runtime', async () => {
             "errorType": "runtime",
             "line": 2,
             "location": "postpend",
-            "errorExplanation": "Name __checkDeepEquality declared later in current scope but not yet assigned",
+            "errorExplanation": "ReferenceError: Cannot access '__checkDeepEquality' before initialization",
             "errorLine": "const __checkDeepEquality = __checkDeepEquality;",
           }
         ]

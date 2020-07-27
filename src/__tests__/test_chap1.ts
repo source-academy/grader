@@ -38,9 +38,8 @@ const invalidStudentRuntime =
 const invalidStudentSyntax =
   `const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2)`
 
-// Does not compute fast enough to exceed max call stacks, relies on timeout
 const invalidStudentTimeout =
-  `const f = i => i < -3 ? 0 : f(i+1) + f(i+2);`
+  `const f = i => f(i);`
 
 const student: Student = {
   valid: {

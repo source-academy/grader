@@ -169,7 +169,12 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
     unitTest.postpendProgram,
     unitTest.testcase.program
   ].join('\n')
-  const result = await catchTimeouts(runInContext(program, context, { executionMethod: 'native' }))
+  const result = await catchTimeouts(
+    runInContext(program, context, {
+      executionMethod: 'native',
+      originalMaxExecTime: TIMEOUT_DURATION
+    })
+  )
   if (result.status === 'finished') {
     const resultValue = stringify(result.value)
     return resultValue === unitTest.testcase.answer
@@ -244,7 +249,25 @@ const parseError = (
   const postProgLines = getLines(postProg)
   const testProgLines = getLines(testProg)
   const errors = sourceErrors.map((err: SourceError) => {
-    const line = err.location.end.line
+    switch (err.constructor.name) {
+      case 'PotentialInfiniteLoopError':
+      case 'PotentialInfiniteRecursionError':
+        return {
+          errorType: 'timeout' as 'timeout'
+        }
+    }
+
+    const line = err.location.end.line > 0 ? err.location.end.line : err.location.start.line
+    if (line <= 0) {
+      return {
+        errorType: err.type.toLowerCase() as 'syntax' | 'runtime',
+        line: 0,
+        location: 'unknown',
+        errorLine: '',
+        errorExplanation: err.explain()
+      }
+    }
+
     const [location, locationLine] =
       line <= preProgLines.length
         ? ['prepend', line]
@@ -253,19 +276,19 @@ const parseError = (
         : line <= preProgLines.length + stdProgLines.length + postProgLines.length
         ? ['postpend', line - preProgLines.length - stdProgLines.length]
         : ['testcase', line - preProgLines.length - stdProgLines.length - postProgLines.length]
-    const errorLine = (location == 'prepend'
-      ? preProgLines[locationLine - 1]
-      : location == 'student'
-      ? stdProgLines[locationLine - 1]
-      : location == 'postpend'
-      ? postProgLines[locationLine - 1]
-      : testProgLines[locationLine - 1]
-    ).trim()
+    const errorLine =
+      (location == 'prepend'
+        ? preProgLines[locationLine - 1]
+        : location == 'student'
+        ? stdProgLines[locationLine - 1]
+        : location == 'postpend'
+        ? postProgLines[locationLine - 1]
+        : testProgLines[locationLine - 1]) || ''
     return {
       errorType: err.type.toLowerCase() as 'syntax' | 'runtime',
       line: locationLine,
       location: location,
-      errorLine: errorLine,
+      errorLine: errorLine.trim(),
       errorExplanation: err.explain()
     }
   })
