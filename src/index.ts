@@ -1,6 +1,14 @@
 import { createContext, runInContext, Result as SourceResult } from 'js-slang'
 import { stringify } from 'js-slang/dist/utils/stringify'
-import { SourceError } from 'js-slang/dist/types'
+import { SourceError, Context, Frame, Value } from 'js-slang/dist/types'
+import {
+  defineBuiltin,
+  ensureGlobalEnvironmentExist,
+  importBuiltins
+} from 'js-slang/dist/createContext'
+
+const externals = {}
+Object.assign(externals, require('./tree.js'))
 
 const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT!, 10) : 3000 // in milliseconds
 
@@ -83,7 +91,7 @@ type OutputError = {
 type ErrorFromSource = {
   errorType: 'runtime' | 'syntax'
   line: number
-  location: string
+  location: 'prepend' | 'student' | 'postpend' | 'testcase' | 'unknown'
   errorLine: string
   errorExplanation: string
 }
@@ -108,37 +116,14 @@ type TimeoutResult = {
  * @param event the AwsEvent from the Backend
  */
 export const runAll = async (event: AwsEvent): Promise<Summary> => {
-  require('./util.js')
-  require('./list.js')
-  require('./tree.js')
-
   if (event.library && event.library.external) {
     switch (event.library.external.name) {
       case 'RUNES': {
-        require('./graphics/webGLrune.js')
+        Object.assign(externals, require('./graphics/webGLrune.js'))
         break
       }
     }
   }
-  /* Disabled until we can test runes, curves, etc.
-  if (event.library && event.library.external) {
-    switch (event.library.external.name) {
-      case 'TWO_DIM_RUNES': { }
-      case 'THREE_DIM_RUNES': {
-        require('./graphics/rune_library.js')
-        break
-      }
-      case 'CURVES': {
-        require('./graphics/curves_library.js')
-        break
-      }
-      case 'STREAMS': {
-        require('./streams/streams.js')
-        break
-      }
-    }
-  }
-  */
 
   evaluateGlobals(event.library.globals)
   const promises: Promise<Output>[] = event.testcases.map((testcase: Testcase) =>
@@ -166,49 +151,77 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
  * @param unitTest the individual unit tests composed from runAll()
  */
 export const run = async (unitTest: UnitTest): Promise<Output> => {
-  const context = createContext(
-    unitTest.library.chapter,
-    'default',
-    unitTest.library.external.symbols
+  const context = createContext(unitTest.library.chapter, 'default', [])
+  for (const name of unitTest.library.external.symbols) {
+    defineBuiltin(context, name, externals[name])
+  }
+
+  // Run prepend
+  const [prependResult, elevatedBase] = await runInElevatedContext(context, () =>
+    catchTimeouts(
+      runInContext(unitTest.prependProgram, context, {
+        executionMethod: 'native',
+        originalMaxExecTime: TIMEOUT_DURATION
+      })
+    )
   )
-  const program = [
-    unitTest.prependProgram,
-    unitTest.studentProgram,
-    unitTest.postpendProgram,
-    unitTest.testcase.program
-  ].join('\n')
-  const result = await catchTimeouts(
-    runInContext(program, context, {
+  if (prependResult.status !== 'finished') {
+    return handleResult(prependResult, context, unitTest.prependProgram, 'prepend')
+  }
+
+  // Run student program
+  const studentResult = await catchTimeouts(
+    runInContext(unitTest.studentProgram, context, {
       executionMethod: 'native',
       originalMaxExecTime: TIMEOUT_DURATION
     })
   )
-  if (result.status === 'finished') {
-    const resultValue = stringify(result.value)
-    return resultValue === unitTest.testcase.answer
-      ? ({
-          resultType: 'pass',
-          score: unitTest.testcase.score
-        } as OutputPass)
-      : ({
-          resultType: 'fail',
-          expected: unitTest.testcase.answer,
-          actual: resultValue
-        } as OutputFail)
-  } else if (result.status === 'error') {
-    return parseError(
-      context.errors,
-      unitTest.prependProgram,
-      unitTest.studentProgram,
-      unitTest.postpendProgram,
-      unitTest.testcase.program
-    )
-  } else {
-    return {
-      resultType: 'error',
-      errors: [{ errorType: 'timeout' }]
-    }
+  if (studentResult.status !== 'finished') {
+    return handleResult(studentResult, context, unitTest.studentProgram, 'student')
   }
+
+  // Run postpend
+  const [postpendResult] = await runInElevatedContext(
+    context,
+    () =>
+      catchTimeouts(
+        runInContext(unitTest.postpendProgram, context, {
+          executionMethod: 'native',
+          originalMaxExecTime: TIMEOUT_DURATION
+        })
+      ),
+    elevatedBase
+  )
+  if (postpendResult.status !== 'finished') {
+    return handleResult(postpendResult, context, unitTest.postpendProgram, 'postpend')
+  }
+
+  const [testcaseResult] = await runInElevatedContext(
+    context,
+    () =>
+      catchTimeouts(
+        runInContext(unitTest.testcase.program, context, {
+          executionMethod: 'native',
+          originalMaxExecTime: TIMEOUT_DURATION
+        })
+      ),
+    elevatedBase
+  )
+  if (testcaseResult.status !== 'finished') {
+    return handleResult(testcaseResult, context, unitTest.testcase.program, 'testcase')
+  }
+
+  const resultValue = stringify(testcaseResult.value)
+  return resultValue === unitTest.testcase.answer
+    ? ({
+        resultType: 'pass',
+        score: unitTest.testcase.score
+      } as OutputPass)
+    : ({
+        resultType: 'fail',
+        expected: unitTest.testcase.answer,
+        actual: resultValue
+      } as OutputFail)
 }
 
 /**
@@ -217,11 +230,53 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
  * and bind it to the identifier, in the global frame. Used for Library.globals
  */
 const evaluateGlobals = (nameValuePairs: Array<string[]>) => {
-  nameValuePairs.map(nameValuePair => {
-    const name = nameValuePair[0]
-    const value = nameValuePair[1]
-    global[name] = eval(value)
-  })
+  for (const [name, value] of nameValuePairs) {
+    ;(() => {
+      externals[name] = eval(value)
+    })()
+  }
+}
+
+const slangDisplay = (value: Value, str: string) => {
+  console.log((str === undefined ? '' : str + ' ') + value.toString())
+  return value
+}
+
+async function runInElevatedContext<T>(
+  context: Context,
+  fn: () => Promise<T>,
+  base?: any
+): Promise<[T, Frame]>
+async function runInElevatedContext<T>(
+  context: Context,
+  fn: () => T,
+  base?: any
+): Promise<[T, Frame]> {
+  ensureGlobalEnvironmentExist(context)
+  const originalChapter = context.chapter
+  const originalFrame = context.runtime.environments[0].head
+
+  const overrideFrame = base || Object.create(originalFrame)
+
+  context.chapter = 4
+  context.runtime.environments[0].head = overrideFrame
+
+  if (!base) {
+    importBuiltins(context, {
+      rawDisplay: slangDisplay,
+      prompt: slangDisplay,
+      alert: slangDisplay,
+      visualiseList: (v: Value) => {
+        throw new Error('List visualizer is not enabled')
+      }
+    })
+  }
+
+  const result = await Promise.resolve(fn())
+
+  context.chapter = originalChapter
+  context.runtime.environments[0].head = originalFrame
+  return [result, overrideFrame]
 }
 
 /**
@@ -236,77 +291,67 @@ const catchTimeouts = (slangPromise: Promise<Result>): Promise<Result> => {
 const timeout = (msDuration: number): Promise<TimeoutResult> =>
   new Promise(resolve => setTimeout(resolve, msDuration, { status: 'timeout' }))
 
-/**
- * Transforms the given SourceErrors and student, grader programs into an output
- * of @type {OutputError}.
- * @param sourceErrors Non-empty array of SourceErrors.
- * @param preProg prepend program string
- * @param stdProg student program string
- * @param postProg postpend program string
- * @param testProg test case program string
- */
-const parseError = (
-  sourceErrors: Array<SourceError>,
-  preProg: string,
-  stdProg: string,
-  postProg: string,
-  testProg: string
+const handleResult = (
+  result: Result,
+  context: Context,
+  program: string,
+  location: ErrorFromSource['location']
 ): OutputError => {
-  const preProgLines = getLines(preProg)
-  const stdProgLines = getLines(stdProg)
-  const postProgLines = getLines(postProg)
-  const testProgLines = getLines(testProg)
-  const errors = sourceErrors.map((err: SourceError) => {
-    switch (err.constructor.name) {
-      case 'PotentialInfiniteLoopError':
-      case 'PotentialInfiniteRecursionError':
-        return {
-          errorType: 'timeout' as 'timeout'
+  switch (result.status) {
+    case 'error': {
+      const errors = context.errors.map((err: SourceError): ErrorFromSource | ErrorFromTimeout => {
+        switch (err.constructor.name) {
+          case 'PotentialInfiniteLoopError':
+          case 'PotentialInfiniteRecursionError':
+            return {
+              errorType: 'timeout' as const
+            }
         }
-    }
 
-    const line = err.location.end.line > 0 ? err.location.end.line : err.location.start.line
-    if (line <= 0) {
+        const line = err.location.end.line > 0 ? err.location.end.line : err.location.start.line
+        if (line <= 0) {
+          return {
+            errorType: err.type.toLowerCase() as 'syntax' | 'runtime',
+            line: 0,
+            location: 'unknown',
+            errorLine: '',
+            errorExplanation: err.explain()
+          }
+        }
+
+        const lines = program.split('\n')
+        return {
+          errorType: err.type.toLowerCase() as 'syntax' | 'runtime',
+          line,
+          location,
+          errorLine: lines[line - 1].trim(),
+          errorExplanation: err.explain()
+        }
+      })
       return {
-        errorType: err.type.toLowerCase() as 'syntax' | 'runtime',
-        line: 0,
-        location: 'unknown',
-        errorLine: '',
-        errorExplanation: err.explain()
+        resultType: 'error',
+        errors: errors
       }
     }
 
-    const [location, locationLine] =
-      line <= preProgLines.length
-        ? ['prepend', line]
-        : line <= preProgLines.length + stdProgLines.length
-        ? ['student', line - preProgLines.length]
-        : line <= preProgLines.length + stdProgLines.length + postProgLines.length
-        ? ['postpend', line - preProgLines.length - stdProgLines.length]
-        : ['testcase', line - preProgLines.length - stdProgLines.length - postProgLines.length]
-    const errorLine =
-      (location == 'prepend'
-        ? preProgLines[locationLine - 1]
-        : location == 'student'
-        ? stdProgLines[locationLine - 1]
-        : location == 'postpend'
-        ? postProgLines[locationLine - 1]
-        : testProgLines[locationLine - 1]) || ''
-    return {
-      errorType: err.type.toLowerCase() as 'syntax' | 'runtime',
-      line: locationLine,
-      location: location,
-      errorLine: errorLine.trim(),
-      errorExplanation: err.explain()
-    }
-  })
-  return {
-    resultType: 'error',
-    errors: errors
+    case 'timeout':
+      return {
+        resultType: 'error',
+        errors: [{ errorType: 'timeout' }]
+      }
+
+    default:
+      return {
+        resultType: 'error',
+        errors: [
+          {
+            errorType: 'runtime',
+            line: 0,
+            location: 'unknown',
+            errorLine: '',
+            errorExplanation: `Unexpected result status ${result.status}`
+          }
+        ]
+      }
   }
 }
-
-/**
- * Split a program string into an array of strings.
- */
-const getLines = (str: string) => str.split('\n')

@@ -1,8 +1,21 @@
+/**
+ * FIXME FIXME FIXME
+ *
+ * This file is derived from the concatenation of
+ * cadet-frontend/public/externalLibs/graphics/{webGLgraphics.js,webGLrune.js},
+ * followed by:
+ * - importing ./gl-matrix.js, which is copied from the frontend verbatim
+ * - importing node-canvas-webgl, and substituting DOM calls with calls to it
+ *
+ */
+
 var glm = require('./gl-matrix.js')
 var mat4 = glm.mat4
 var vec3 = glm.vec3
 
 var nodecanvaswebgl = require('node-canvas-webgl')
+
+// BEGIN modified webGLgraphics.js and webGLrune.js
 
 //-----------------------Shaders------------------------------
 var shaders = {}
@@ -188,13 +201,14 @@ var halfEyeDistance = 0.03 // rune 3d only
 
 //----------------------Global variables----------------------
 // common
+var stringify // stringify function we should use (eg for error messages)
 var gl // the WebGL context
 var curShaderProgram // the shader program currently in use
 var normalShaderProgram // the default shader program
 var vertexBuffer
 var vertexPositionAttribute // location of a_position
 var colorAttribute // location of a_color
-const canvas = createCanvas(); // the <canvas> object that is used to display webGL output
+var canvas = canvas || createCanvas(); // the <canvas> object that is used to display webGL output
 
 // rune 2d and 3d
 var instance_ext // ANGLE_instanced_arrays extension
@@ -225,12 +239,6 @@ var copyTexture
 function open_viewport(name, horiz, vert, aa_off) {
   var canvas
   canvas = open_pixmap(name, horiz, vert, aa_off)
-  document.body.appendChild(canvas)
-  canvas.setAttribute(
-    'style',
-    canvas.getAttribute('style') +
-      ' display: block; margin-left: auto; margin-right: auto; padding: 25px'
-  )
   return canvas
 }
 
@@ -257,9 +265,11 @@ function open_pixmap(name, horiz, vert, aa_off) {
  */
 function createCanvas() {
   const canvas = nodecanvaswebgl.createCanvas(512, 512)
-  canvas.className = 'rune-canvas';
-  canvas.hidden = true;
   return canvas;
+}
+
+function getReadyStringifyForRunes(stringify_) {
+  stringify = stringify_
 }
 
 /*
@@ -275,6 +285,9 @@ function createCanvas() {
  */
 function getReadyWebGLForCanvas(mode) {
   // Get the rendering context for WebGL
+  if (!canvas) {
+    canvas = createCanvas();
+  }
   gl = initWebGL(canvas)
   if (gl) {
     gl.clearColor(1.0, 1.0, 1.0, 1.0) // Set clear color to white, fully opaque
@@ -348,13 +361,12 @@ function initWebGL(canvas) {
   var gl = null
 
   try {
-    // Try to grab the standard context. If it fails, fallback to experimental.
     gl = nodecanvaswebgl.createCanvas(512, 512).getContext('webgl')
   } catch (e) {}
 
   // If we don't have a GL context, give up now
   if (!gl) {
-    throw new Error('Unable to initialize WebGL. Your browser may not support it.')
+    alert('Unable to initialize WebGL. Your browser may not support it.')
     gl = null
   }
   return gl
@@ -375,7 +387,7 @@ function initShader(programName) {
   gl.bindAttribLocation(shaderProgram, 0, 'a_position')
   gl.linkProgram(shaderProgram)
   if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    throw new Error('Unable to initialize the shader program.')
+    alert('Unable to initialize the shader program.')
     return null
   } else {
     return shaderProgram
@@ -399,7 +411,7 @@ function getShader(gl, id, type) {
 
   gl.compileShader(shader)
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    throw new Error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader))
+    alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader))
     return null
   }
   return shader
@@ -628,7 +640,6 @@ function initRune3d() {
   cyanUniform = gl.getUniformLocation(combineShaderProgram, 'u_sampler_cyan')
   u_sampler_image = gl.getUniformLocation(copyShaderProgram, 'u_sampler_image')
 
-
   // calculate the left and right camera matrices
   leftCameraMatrix = mat4.create()
   mat4.lookAt(
@@ -796,10 +807,7 @@ function drawCurve(drawMode, curvePosArray) {
 function ShapeDrawn(canvas) {
   this.$canvas = canvas;
 }
-
-global.getReadyWebGLForCanvas = getReadyWebGLForCanvas;
-
-var viewport_size = 512 // This is the height of the viewport
+var rune_viewport_size = 512 // This is the height of the viewport
 // while a curve is approximated by a polygon,
 // the side of the polygon will be no longer than maxArcLength pixels
 var maxArcLength = 20
@@ -810,6 +818,7 @@ function PrimaryRune(first, count) {
   this.first = first // the first index in the index buffer
   // that belongs to this rune
   this.count = count // number of indices to draw the rune
+  this.toReplString = () => '<RUNE>'
 }
 
 function Rune() {
@@ -817,6 +826,7 @@ function Rune() {
   this.transMatrix = mat4.create()
   this.runes = []
   this.color = undefined
+  this.toReplString = () => '<RUNE>'
 }
 
 // set the transformation matrix related to the rune
@@ -969,7 +979,7 @@ function makeCircle() {
   var centerVerInd = 0
   var firstVer = vertices.length / 4
   var firstInd = indices.length
-  var numPoints = Math.ceil(Math.PI * viewport_size / maxArcLength)
+  var numPoints = Math.ceil(Math.PI * rune_viewport_size / maxArcLength)
   // generate points and store it in the vertex buffer
   for (var i = 0; i < numPoints; i++) {
     var angle = Math.PI * 2 * i / numPoints
@@ -991,7 +1001,7 @@ function makeHeart() {
   var root2 = Math.sqrt(2)
   var r = 4 / (2 + 3 * root2)
   var scaleX = 1 / (r * (1 + root2 / 2))
-  var numPoints = Math.ceil(Math.PI / 2 * viewport_size * r / maxArcLength)
+  var numPoints = Math.ceil(Math.PI / 2 * rune_viewport_size * r / maxArcLength)
   // right semi-circle
   var rightCenterX = r / root2
   var rightCenterY = 1 - r
@@ -1074,58 +1084,58 @@ function makeRibbon() {
   return new PrimaryRune(firstInd, 3 * totalPoints - 6)
 }
 
-/** 
+/**
  * primitive Rune in the rune of a full square
 **/
 var square = new PrimaryRune(0, 6)
 
-/** 
+/**
  * primitive Rune in the rune of a blank square
 **/
 var blank = new PrimaryRune(0, 0)
 
-/** 
- * primitive Rune in the rune of a 
+/**
+ * primitive Rune in the rune of a
  * smallsquare inside a large square,
  * each diagonally split into a
  * black and white half
 **/
 var rcross = new PrimaryRune(6, 15)
 
-/** 
+/**
  * primitive Rune in the rune of a sail
 **/
 var sail = new PrimaryRune(21, 3)
 
-/** 
+/**
  * primitive Rune with black triangle,
  * filling upper right corner
 **/
 var corner = new PrimaryRune(24, 3)
 
-/** 
+/**
  * primitive Rune in the rune of two overlapping
  * triangles, residing in the upper half
- * of 
+ * of
 **/
 var nova = new PrimaryRune(27, 6)
 
-/** 
+/**
  * primitive Rune in the rune of a circle
 **/
 var circle = makeCircle()
 
-/** 
+/**
  * primitive Rune in the rune of a heart
 **/
 var heart = makeHeart()
 
-/** 
+/**
  * primitive Rune in the rune of a pentagram
 **/
 var pentagram = makePentagram()
 
-/** 
+/**
  * primitive Rune in the rune of a ribbon
  * winding outwards in an anticlockwise spiral
 **/
@@ -1151,6 +1161,7 @@ function generateFlattenedRuneList(rune) {
     }
   }
   function helper(rune, color) {
+    throwIfNotRune('primitive rune function', rune)
     if (rune.isPrimary) {
       if (rune.count === 0) {
         // this is blank, do nothing
@@ -1211,6 +1222,18 @@ function drawWithWebGL(flattened_rune_list, drawFunction) {
   }
 }
 
+function isRune(x) {
+  return x instanceof Rune || x instanceof PrimaryRune
+}
+
+function throwIfNotRune(name, x) {
+  for (var rune of Array.prototype.slice.call(arguments, 1)) {
+    if (!isRune(rune)) {
+      throw name + ' expects a rune as argument, received ' + stringify(rune)
+    }
+  }
+}
+
 /**
  * turns a given Rune into a two-dimensional Picture
  * @param {Rune} rune - given Rune
@@ -1218,8 +1241,10 @@ function drawWithWebGL(flattened_rune_list, drawFunction) {
  * If the result of evaluating a program is a Picture,
  * the REPL displays it graphically, instead of textually.
  */
+
 function show(rune) {
-  const frame = open_pixmap('frame', viewport_size, viewport_size, true);
+  throwIfNotRune('show', rune)
+  const frame = open_pixmap('frame', rune_viewport_size, rune_viewport_size, true);
   clear_viewport()
   var flattened_rune_list = generateFlattenedRuneList(rune)
   drawWithWebGL(flattened_rune_list, drawRune);
@@ -1237,7 +1262,8 @@ function show(rune) {
  * to view the Anaglyph.
  */
 function anaglyph(rune) {
-  const frame = open_pixmap('frame', viewport_size, viewport_size, true);
+  throwIfNotRune('anaglyph', rune)
+  const frame = open_pixmap('frame', rune_viewport_size, rune_viewport_size, true);
   clear_viewport()
   clearAnaglyphFramebuffer()
   var flattened_rune_list = generateFlattenedRuneList(rune)
@@ -1248,7 +1274,7 @@ function anaglyph(rune) {
 
 var hollusionTimeout
 /* // to view documentation, put two * in this line
- * // currently, this function is not documented; 
+ * // currently, this function is not documented;
  * // animation not working
  * turns a given Rune into Hollusion
  * @param {Rune} rune - given Rune
@@ -1263,7 +1289,7 @@ function hollusion(rune, num) {
   var flattened_rune_list = generateFlattenedRuneList(rune)
   var frame_list = []
   for (var j = 0; j < num; j++) {
-    var frame = open_pixmap('frame' + j, viewport_size, viewport_size, false)
+    var frame = open_pixmap('frame' + j, rune_viewport_size, rune_viewport_size, false)
     for (var i = 0; i < flattened_rune_list.length; i++) {
       var rune = flattened_rune_list[i].rune
       var instanceArray = flattened_rune_list[i].instanceArray
@@ -1284,7 +1310,7 @@ function hollusion(rune, num) {
   for (var i = frame_list.length - 2; i > 0; i--) {
     frame_list.push(frame_list[i])
   }
-  const outframe = open_pixmap('frame', viewport_size, viewport_size, true);
+  const outframe = open_pixmap('frame', rune_viewport_size, rune_viewport_size, true);
   function animate() {
     var frame = frame_list.shift()
     copy_viewport(frame, outframe);
@@ -1299,26 +1325,6 @@ function clearHollusion() {
   clearTimeout(hollusionTimeout)
 }
 
-/**
- * compares two Pictures and returns the mean squared error of the pixel intensities.
- * @param {Picture} picture1
- * @param {Picture} picture2
- * @return {number} mse
- * example: picture_mse(show(heart), show(nova));
- */
-function picture_mse(picture1, picture2) {
-  var width = picture1.$canvas.width
-  var height = picture1.$canvas.height
-  var data1 = picture1.$canvas.getContext('2d').getImageData(0, 0, width, height).data
-  var data2 = picture2.$canvas.getContext('2d').getImageData(0, 0, width, height).data
-  var sq_err = 0
-  for (var i = 0; i < data1.length; i++) {
-    var err = (data1[i] - data2[i]) / 255
-    sq_err += err * err
-  }
-  return sq_err / data1.length
-}
-
 /*-----------------------Transformation functions----------------------*/
 /**
  * scales a given Rune by separate factors in x and y direction
@@ -1328,6 +1334,7 @@ function picture_mse(picture1, picture2) {
  * @return {Rune} resulting scaled Rune
  */
 function scale_independent(ratio_x, ratio_y, rune) {
+  throwIfNotRune('scale_independent', rune)
   var scaleVec = vec3.fromValues(ratio_x, ratio_y, 1)
   var scaleMat = mat4.create()
   mat4.scale(scaleMat, scaleMat, scaleVec)
@@ -1345,6 +1352,7 @@ function scale_independent(ratio_x, ratio_y, rune) {
  * @return {Rune} resulting scaled Rune
  */
 function scale(ratio, rune) {
+  throwIfNotRune('scale', rune)
   return scale_independent(ratio, ratio, rune)
 }
 
@@ -1358,6 +1366,7 @@ function scale(ratio, rune) {
  * @return {Rune} resulting translated Rune
  */
 function translate(x, y, rune) {
+  throwIfNotRune('translate', rune)
   var translateVec = vec3.fromValues(x, -y, 0)
   var translateMat = mat4.create()
   mat4.translate(translateMat, translateMat, translateVec)
@@ -1377,6 +1386,7 @@ function translate(x, y, rune) {
  * @return {Rune} rotated Rune
  */
 function rotate(rad, rune) {
+  throwIfNotRune('rotate', rune)
   var rotateMat = mat4.create()
   mat4.rotateZ(rotateMat, rotateMat, rad)
   var wrapper = new Rune()
@@ -1388,8 +1398,8 @@ function rotate(rad, rune) {
 /**
  * makes a new Rune from two given Runes by
  * placing the first on top of the second
- * such that the first one occupies frac 
- * portion of the height of the result and 
+ * such that the first one occupies frac
+ * portion of the height of the result and
  * the second the rest
  * @param {number} frac - fraction between 0 and 1
  * @param {Rune} rune1 - given Rune
@@ -1397,6 +1407,7 @@ function rotate(rad, rune) {
  * @return {Rune} resulting Rune
  */
 function stack_frac(frac, rune1, rune2) {
+  throwIfNotRune('stack_frac', rune1, rune2)
   var upper = translate(0, -(1 - frac), scale_independent(1, frac, rune1))
   var lower = translate(0, frac, scale_independent(1, 1 - frac, rune2))
   var combined = new Rune()
@@ -1407,13 +1418,14 @@ function stack_frac(frac, rune1, rune2) {
 /**
  * makes a new Rune from two given Runes by
  * placing the first on top of the second, each
- * occupying equal parts of the height of the 
+ * occupying equal parts of the height of the
  * result
  * @param {Rune} rune1 - given Rune
  * @param {Rune} rune2 - given Rune
  * @return {Rune} resulting Rune
  */
 function stack(rune1, rune2) {
+  throwIfNotRune('stack', rune1, rune2)
   return stack_frac(1 / 2, rune1, rune2)
 }
 
@@ -1425,6 +1437,7 @@ function stack(rune1, rune2) {
  * @return {Rune} resulting Rune
  */
 function stackn(n, rune) {
+  throwIfNotRune('stackn', rune)
   if (n === 1) {
     return rune
   } else {
@@ -1435,11 +1448,12 @@ function stackn(n, rune) {
 /**
  * makes a new Rune from a given Rune
  * by turning it a quarter-turn around the centre in
- * clockwise direction. 
+ * clockwise direction.
  * @param {Rune} rune - given Rune
  * @return {Rune} resulting Rune
  */
 function quarter_turn_right(rune) {
+  throwIfNotRune('quarter_turn_right', rune)
   return rotate(-Math.PI / 2, rune)
 }
 
@@ -1451,6 +1465,7 @@ function quarter_turn_right(rune) {
  * @return {Rune} resulting Rune
  */
 function quarter_turn_left(rune) {
+  throwIfNotRune('quarter_turn_left', rune)
   return rotate(Math.PI / 2, rune)
 }
 
@@ -1461,14 +1476,15 @@ function quarter_turn_left(rune) {
  * @return {Rune} resulting Rune
  */
 function turn_upside_down(rune) {
+  throwIfNotRune('turn_upside_down', rune)
   return rotate(Math.PI, rune)
 }
 
 /**
  * makes a new Rune from two given Runes by
  * placing the first on the left of the second
- * such that the first one occupies frac 
- * portion of the width of the result and 
+ * such that the first one occupies frac
+ * portion of the width of the result and
  * the second the rest
  * @param {number} frac - fraction between 0 and 1
  * @param {Rune} rune1 - given Rune
@@ -1476,6 +1492,7 @@ function turn_upside_down(rune) {
  * @return {Rune} resulting Rune
  */
 function beside_frac(frac, rune1, rune2) {
+  throwIfNotRune('beside_frac', rune1, rune2)
   var left = translate(-(1 - frac), 0, scale_independent(frac, 1, rune1))
   var right = translate(frac, 0, scale_independent(1 - frac, 1, rune2))
   var combined = new Rune()
@@ -1486,13 +1503,14 @@ function beside_frac(frac, rune1, rune2) {
 /**
  * makes a new Rune from two given Runes by
  * placing the first on the left of the second,
- * both occupying equal portions of the width 
+ * both occupying equal portions of the width
  * of the result
  * @param {Rune} rune1 - given Rune
  * @param {Rune} rune2 - given Rune
  * @return {Rune} resulting Rune
  */
 function beside(rune1, rune2) {
+  throwIfNotRune('beside', rune1, rune2)
   return beside_frac(1 / 2, rune1, rune2)
 }
 
@@ -1504,6 +1522,7 @@ function beside(rune1, rune2) {
  * @return {Rune} resulting Rune
  */
 function flip_vert(rune) {
+  throwIfNotRune('flip_vert', rune)
   return scale_independent(1, -1, rune)
 }
 
@@ -1515,17 +1534,19 @@ function flip_vert(rune) {
  * @return {Rune} resulting Rune
  */
 function flip_horiz(rune) {
+  throwIfNotRune('flip_horiz', rune)
   return scale_independent(-1, 1, rune)
 }
 
 /**
  * makes a new Rune from a given Rune by
- * arranging into a square for copies of the 
+ * arranging into a square for copies of the
  * given Rune in different orientations
  * @param {Rune} rune - given Rune
  * @return {Rune} resulting Rune
  */
 function make_cross(rune) {
+  throwIfNotRune('make_cross', rune)
   return stack(
     beside(quarter_turn_right(rune), rotate(Math.PI, rune)),
     beside(rune, rotate(Math.PI / 2, rune))
@@ -1537,7 +1558,7 @@ function make_cross(rune) {
  * @param {number} n - a non-negative integer
  * @param {function} f - unary function from t to t
  * @param {t} initial - argument
- * @return {t} - result of n times application of 
+ * @return {t} - result of n times application of
  *               f to rune: f(f(...f(f(rune))...))
  */
 function repeat_pattern(n, pattern, initial) {
@@ -1560,7 +1581,7 @@ function hexToColor(hex) {
 }
 
 /**
- * adds color to rune by specifying 
+ * adds color to rune by specifying
  * the red, green, blue (RGB) value, ranging from 0.0 to 1.0.
  * RGB is additive: if all values are 1, the color is white,
  * and if all values are 0, the color is black.
@@ -1571,6 +1592,7 @@ function hexToColor(hex) {
  * @returns {Rune} the colored Rune
  */
 function color(rune, r, g, b) {
+  throwIfNotRune('color', rune)
   var wrapper = new Rune()
   wrapper.addS(rune)
   var color = [r, g, b, 1]
@@ -1579,6 +1601,7 @@ function color(rune, r, g, b) {
 }
 
 function addColorFromHex(rune, hex) {
+  throwIfNotRune('addColorFromHex', rune)
   var wrapper = new Rune()
   wrapper.addS(rune)
   wrapper.setColor(hexToColor(hex))
@@ -1587,12 +1610,13 @@ function addColorFromHex(rune, hex) {
 
 /**
  * Gives random color to the given rune.
- * The color is chosen randomly from the following nine 
+ * The color is chosen randomly from the following nine
  * colors: red, pink, purple, indigo, blue, green, yellow, orange, brown
  * @param {Rune} rune - the rune to color
  * @returns {Rune} the colored Rune
  */
 function random_color(rune) {
+  throwIfNotRune('random_color', rune)
   var wrapper = new Rune()
   wrapper.addS(rune)
   var randomColor = hexToColor(colorPalette[Math.floor(Math.random() * colorPalette.length)])
@@ -1620,6 +1644,7 @@ var colorPalette = [
  * @returns {Rune} the colored Rune
  */
 function red(rune) {
+  throwIfNotRune('red', rune)
   return addColorFromHex(rune, '#F44336')
 }
 
@@ -1629,6 +1654,7 @@ function red(rune) {
  * @returns {Rune} the colored Rune
  */
 function pink(rune) {
+  throwIfNotRune('pink', rune)
   return addColorFromHex(rune, '#E91E63')
 }
 
@@ -1638,6 +1664,7 @@ function pink(rune) {
  * @returns {Rune} the colored Rune
  */
 function purple(rune) {
+  throwIfNotRune('purple', rune)
   return addColorFromHex(rune, '#AA00FF')
 }
 
@@ -1647,6 +1674,7 @@ function purple(rune) {
  * @returns {Rune} the colored Rune
  */
 function indigo(rune) {
+  throwIfNotRune('indigo', rune)
   return addColorFromHex(rune, '#3F51B5')
 }
 
@@ -1656,6 +1684,7 @@ function indigo(rune) {
  * @returns {Rune} the colored Rune
  */
 function blue(rune) {
+  throwIfNotRune('blue', rune)
   return addColorFromHex(rune, '#2196F3')
 }
 
@@ -1665,6 +1694,7 @@ function blue(rune) {
  * @returns {Rune} the colored Rune
  */
 function green(rune) {
+  throwIfNotRune('green', rune)
   return addColorFromHex(rune, '#4CAF50')
 }
 
@@ -1674,6 +1704,7 @@ function green(rune) {
  * @returns {Rune} the colored Rune
  */
 function yellow(rune) {
+  throwIfNotRune('yellow', rune)
   return addColorFromHex(rune, '#FFEB3B')
 }
 
@@ -1683,6 +1714,7 @@ function yellow(rune) {
  * @returns {Rune} the colored Rune
  */
 function orange(rune) {
+  throwIfNotRune('orange', rune)
   return addColorFromHex(rune, '#FF9800')
 }
 
@@ -1692,6 +1724,7 @@ function orange(rune) {
  * @returns {Rune} the colored Rune
  */
 function brown(rune) {
+  throwIfNotRune('brown', rune)
   return addColorFromHex(rune, '#795548')
 }
 
@@ -1701,6 +1734,7 @@ function brown(rune) {
  * @returns {Rune} the colored Rune
  */
 function black(rune) {
+  throwIfNotRune('black', rune)
   return addColorFromHex(rune, '#000000')
 }
 
@@ -1710,14 +1744,15 @@ function black(rune) {
  * @returns {Rune} the colored Rune
  */
 function white(rune) {
+  throwIfNotRune('white', rune)
   return addColorFromHex(rune, '#FFFFFF')
 }
 
 /**
  * makes a 3D-Rune from two given Runes by
  * overlaying the first with the second
- * such that the first one occupies frac 
- * portion of the depth of the 3D result 
+ * such that the first one occupies frac
+ * portion of the depth of the 3D result
  * and the second the rest
  * @param {number} frac - fraction between 0 and 1
  * @param {Rune} rune1 - given Rune
@@ -1725,6 +1760,7 @@ function white(rune) {
  * @return {Rune} resulting Rune
  */
 function overlay_frac(frac, rune1, rune2) {
+  throwIfNotRune('overlay_frac', rune1, rune2)
   var front = new Rune()
   front.addS(rune1)
   var frontMat = front.getM()
@@ -1756,6 +1792,7 @@ function overlay_frac(frac, rune1, rune2) {
  * @return {Rune} resulting Rune
  */
 function overlay(rune1, rune2) {
+  throwIfNotRune('overlay', rune1, rune2)
   return overlay_frac(0.5, rune1, rune2)
 }
 
@@ -1763,7 +1800,7 @@ function overlay(rune1, rune2) {
 function stereogram(rune) {
   clear_viewport()
   var flattened_rune_list = generateFlattenedRuneList(rune)
-  var depth_map = open_pixmap('depth_map', viewport_size, viewport_size, true)
+  var depth_map = open_pixmap('depth_map', rune_viewport_size, rune_viewport_size, true)
   // draw the depth map
   for (var i = 0; i < flattened_rune_list.length; i++) {
     var rune = flattened_rune_list[i].rune
@@ -1846,48 +1883,69 @@ function stereogram(rune) {
 }
 */
 
-global.show = show;
-global.color = color;
-global.random_color = random_color;
-global.red = red;
-global.pink = pink;
-global.purple = purple;
-global.indigo = indigo;
-global.blue = blue;
-global.green = green;
-global.yellow = yellow;
-global.orange = orange;
-global.brown = brown;
-global.black = black;
-global.white = white;
-global.scale_independent = scale_independent;
-global.scale = scale;
-global.translate = translate;
-global.rotate = rotate;
-global.stack_frac = stack_frac;
-global.stack = stack;
-global.stackn = stackn;
-global.quarter_turn_right = quarter_turn_right;
-global.quarter_turn_left = quarter_turn_left;
-global.turn_upside_down = turn_upside_down;
-global.beside_frac = beside_frac;
-global.beside = beside;
-global.flip_vert = flip_vert;
-global.flip_horiz = flip_horiz;
-global.make_cross = make_cross;
-global.repeat_pattern = repeat_pattern;
-global.square = square;
-global.blank = blank;
-global.rcross = rcross;
-global.sail = sail;
-global.corner = corner;
-global.nova = nova;
-global.circle = circle;
-global.heart = heart;
-global.pentagram = pentagram;
-global.ribbon = ribbon;
-global.anaglyph = anaglyph;
-global.overlay_frac = overlay_frac;
-global.overlay = overlay;
-global.hollusion = hollusion;
-global.picture_mse = picture_mse;
+/**
+ * compares two Pictures and returns the mean squared error of the pixel intensities.
+ * @param {Picture} picture1
+ * @param {Picture} picture2
+ * @return {number} mse
+ * example: picture_mse(show(heart), show(nova));
+ */
+function picture_mse(picture1, picture2) {
+  var width = picture1.$canvas.width
+  var height = picture1.$canvas.height
+  var data1 = picture1.$canvas.getContext('2d').getImageData(0, 0, width, height).data
+  var data2 = picture2.$canvas.getContext('2d').getImageData(0, 0, width, height).data
+  var sq_err = 0
+  for (var i = 0; i < data1.length; i++) {
+    var err = (data1[i] - data2[i]) / 255
+    sq_err += err * err
+  }
+  return sq_err / data1.length
+}
+
+exports.getReadyWebGLForCanvas = getReadyWebGLForCanvas
+exports.show = show;
+exports.color = color;
+exports.random_color = random_color;
+exports.red = red;
+exports.pink = pink;
+exports.purple = purple;
+exports.indigo = indigo;
+exports.blue = blue;
+exports.green = green;
+exports.yellow = yellow;
+exports.orange = orange;
+exports.brown = brown;
+exports.black = black;
+exports.white = white;
+exports.scale_independent = scale_independent;
+exports.scale = scale;
+exports.translate = translate;
+exports.rotate = rotate;
+exports.stack_frac = stack_frac;
+exports.stack = stack;
+exports.stackn = stackn;
+exports.quarter_turn_right = quarter_turn_right;
+exports.quarter_turn_left = quarter_turn_left;
+exports.turn_upside_down = turn_upside_down;
+exports.beside_frac = beside_frac;
+exports.beside = beside;
+exports.flip_vert = flip_vert;
+exports.flip_horiz = flip_horiz;
+exports.make_cross = make_cross;
+exports.repeat_pattern = repeat_pattern;
+exports.square = square;
+exports.blank = blank;
+exports.rcross = rcross;
+exports.sail = sail;
+exports.corner = corner;
+exports.nova = nova;
+exports.circle = circle;
+exports.heart = heart;
+exports.pentagram = pentagram;
+exports.ribbon = ribbon;
+exports.anaglyph = anaglyph;
+exports.overlay_frac = overlay_frac;
+exports.overlay = overlay;
+exports.hollusion = hollusion;
+exports.picture_mse = picture_mse;
