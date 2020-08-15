@@ -40,17 +40,17 @@ const ist = list(1, 2, 3)
 
 const validPostpendCorrect =
   `
-const __checkDeepEquality = (l1, l2) => l1 === l2;
+const __checkEquality = (l1, l2) => equal(l1, l2);
 `
 
 const invalidPostpendRuntime =
   `
-const __checkDeepEquality = __checkDeepEquality;
+const __checkEquality = __checkEquality;
 `
 
 const invalidPostpendSyntax =
   `
-const __checkDeepEquality = (l1, l2) => l1 === l2
+const __checkEquality = (l1, l2) => equal(l1, l2)
 `
 
 const validStudentCorrect =
@@ -67,7 +67,7 @@ function my_map(xs, f) {
 const validStudentWrong =
   `
 function my_map(xs, f) {
-  return xs;
+  return pair(xs, xs);
 }
 `
 
@@ -102,9 +102,9 @@ my_map(ist, x => x + 1);
     program: `
 const ist2 = my_map(ist, x => x);
 
-__checkDeepEquality(ist, ist2);
+__checkEquality(ist, ist2);
   `,
-    answer: "false",
+    answer: "true",
     score: 1
   }
 ]
@@ -158,12 +158,12 @@ test('chap2 grader OK, student OK, wrong', async () => {
       {
         "resultType": "fail",
         "expected": "[2, [3, [4, null]]]",
-        "actual": "[1, [2, [3, null]]]"
+        "actual": "[[1, [2, [3, null]]], [1, [2, [3, null]]]]"
       },
       {
         "resultType": "fail",
-        "expected": "false",
-        "actual": "true"
+        "expected": "true",
+        "actual": "false"
       }
     ]
   })
@@ -261,8 +261,8 @@ test('chap2 grader OK, student OK, postpend runtime', async () => {
             "errorType": "runtime",
             "line": 2,
             "location": "postpend",
-            "errorExplanation": "ReferenceError: Cannot access '__checkDeepEquality' before initialization",
-            "errorLine": "const __checkDeepEquality = __checkDeepEquality;",
+            "errorExplanation": "ReferenceError: Cannot access '__checkEquality' before initialization",
+            "errorLine": "const __checkEquality = __checkEquality;",
           }
         ]
       },
@@ -273,8 +273,8 @@ test('chap2 grader OK, student OK, postpend runtime', async () => {
             "errorType": "runtime",
             "line": 2,
             "location": "postpend",
-            "errorExplanation": "ReferenceError: Cannot access '__checkDeepEquality' before initialization",
-            "errorLine": "const __checkDeepEquality = __checkDeepEquality;",
+            "errorExplanation": "ReferenceError: Cannot access '__checkEquality' before initialization",
+            "errorLine": "const __checkEquality = __checkEquality;",
           }
         ]
       }
@@ -296,7 +296,7 @@ test('chap2 grader OK, student OK, postpend syntax', async () => {
         "errors": [
           {
             "errorExplanation": "Missing semicolon at the end of statement",
-            "errorLine": "const __checkDeepEquality = (l1, l2) => l1 === l2",
+            "errorLine": "const __checkEquality = (l1, l2) => equal(l1, l2)",
             "errorType": "syntax",
             "line": 2,
             "location": "postpend",
@@ -308,7 +308,7 @@ test('chap2 grader OK, student OK, postpend syntax', async () => {
         "errors": [
           {
             "errorExplanation": "Missing semicolon at the end of statement",
-            "errorLine": "const __checkDeepEquality = (l1, l2) => l1 === l2",
+            "errorLine": "const __checkEquality = (l1, l2) => equal(l1, l2)",
             "errorType": "syntax",
             "line": 2,
             "location": "postpend",
