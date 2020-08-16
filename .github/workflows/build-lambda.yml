@@ -22,6 +22,7 @@ jobs:
           path: build.tar.bz2
   native:
     name: Build native modules
+    needs: tsc
     runs-on: ubuntu-latest
     container: lambci/lambda:build-nodejs12.x
     steps:
@@ -49,6 +50,7 @@ jobs:
           path: xvfb.tar.bz2
   combine:
     name: Combine artifacts
+    needs: [xvfb, native]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v2
