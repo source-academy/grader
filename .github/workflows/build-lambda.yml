@@ -20,6 +20,7 @@ jobs:
         with:
           name: build-lambda
           path: build.tar.bz2
+          if-no-files-found: error
   native:
     name: Build native modules
     needs: tsc
@@ -34,8 +35,9 @@ jobs:
         run: scripts/build-lambda-grader-in-docker.sh
       - uses: actions/upload-artifact@v2
         with:
-          name: build-lambda-2
+          name: build-lambda
           path: build.tar.bz2
+          if-no-files-found: error
   xvfb:
     name: Build Xvfb
     runs-on: ubuntu-latest
@@ -48,6 +50,7 @@ jobs:
         with:
           name: xvfb
           path: /var/task/xvfb.tar.bz2
+          if-no-files-found: error
   combine:
     name: Combine artifacts
     needs: [xvfb, native]
@@ -55,7 +58,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v2
         with:
-          name: build-lambda-2
+          name: build-lambda
       - uses: actions/download-artifact@v2
         with:
           name: xvfb
@@ -64,8 +67,13 @@ jobs:
           tar jxf build.tar.bz2
           cd build
           tar jxf ../xvfb.tar.bz2
-          zip -r ../grader.zip *
       - uses: actions/upload-artifact@v2
         with:
           name: grader
-          path: grader.zip
+          path: build
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          failOnError: false
+          name: |
+            build-lambda
+            xvfb
