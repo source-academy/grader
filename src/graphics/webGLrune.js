@@ -15,6 +15,10 @@ var vec3 = glm.vec3
 
 var nodecanvaswebgl = require('node-canvas-webgl')
 
+function alert(msg) {
+  throw new Error(msg)
+}
+
 // BEGIN modified webGLgraphics.js and webGLrune.js
 
 //-----------------------Shaders------------------------------
