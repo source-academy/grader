@@ -70,7 +70,7 @@ jobs:
           zip -r ../grader.zip *
       - uses: actions/upload-artifact@v2
         with:
-          name: grader
+          name: graderzip
           path: grader.zip
           if-no-files-found: error
       - uses: geekyeggo/delete-artifact@v1
