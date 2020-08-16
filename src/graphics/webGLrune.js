@@ -362,11 +362,7 @@ function getReadyWebGL(mode, name, horiz, vert, aa_off) {
 }
 
 function initWebGL(canvas) {
-  var gl = null
-
-  try {
-    gl = nodecanvaswebgl.createCanvas(512, 512).getContext('webgl')
-  } catch (e) {}
+  var gl = nodecanvaswebgl.createCanvas(512, 512).getContext('webgl')
 
   // If we don't have a GL context, give up now
   if (!gl) {
