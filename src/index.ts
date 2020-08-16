@@ -270,6 +270,11 @@ async function runInElevatedContext<T>(
         throw new Error('List visualizer is not enabled')
       }
     })
+    for (const [name, value] of Object.entries(externals)) {
+      if (!Object.prototype.hasOwnProperty.call(overrideFrame, name)) {
+        defineBuiltin(context, name, value)
+      }
+    }
   }
 
   const result = await Promise.resolve(fn())
