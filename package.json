@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "bash ./scripts/build.sh",
+    "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "cross-env TIMEOUT=2000 jest --env=node",
     "test-coveralls": "cross-env TIMEOUT=2000 jest --env=node --coverage --coverageReporters=text-lcov --forceExit | coveralls"

@@ -1,0 +1,69 @@
+name: Build package for AWS Lambda
+on:
+  push:
+    branches:
+      - lambda-runes
+
+jobs:
+  tsc:
+    name: Compile TypeScript
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Use Node.js
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: '12'
+      - name: Compile TypeScript
+        run: scripts/build-lambda-grader.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build-lambda
+          path: build.tar.bz2
+  native:
+    name: Build native modules
+    runs-on: ubuntu-latest
+    container: lambci/lambda:build-nodejs12.x
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/download-artifact@v2
+        with:
+          name: build-lambda
+      - name: Rebuild native modules
+        run: scripts/build-lambda-grader-in-docker.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build-lambda-2
+          path: build.tar.bz2
+  xvfb:
+    name: Build Xvfb
+    runs-on: ubuntu-latest
+    container: lambci/lambda:build-nodejs12.x
+    steps:
+      - uses: actions/checkout@master
+      - name: Build Xvfb
+        run: scripts/build-lambda-xvfb.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          name: xvfb
+          path: xvfb.tar.bz2
+  combine:
+    name: Combine artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: build-lambda-2
+      - uses: actions/download-artifact@v2
+        with:
+          name: xvfb
+      - name: Combine results
+        run:
+          tar jxf build.tar.bz2
+          cd build
+          tar jxf ../xvfb.tar.bz2
+          zip -r ../grader.zip *
+      - uses: actions/upload-artifact@v2
+        with:
+          name: grader
+          path: grader.zip
