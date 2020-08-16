@@ -47,7 +47,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: xvfb
-          path: xvfb.tar.bz2
+          path: /var/task/xvfb.tar.bz2
   combine:
     name: Combine artifacts
     needs: [xvfb, native]
