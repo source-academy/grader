@@ -43,7 +43,7 @@ make -j$(nproc) && make install
 popd
 
 pushd "xorg-server-$XORG_VER"
-./configure --prefix=/var/task
+./configure --prefix=/var/task --with-xkb-bin-directory=/tmp
 make -j$(nproc) && make install
 popd
 
