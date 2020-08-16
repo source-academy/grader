@@ -60,7 +60,7 @@ find -name '*.so' -type f -print0 | xargs -0 strip
 mkdir -p lib
 for lib in $(ldd bin/Xvfb | grep -oP '^\s+\S+\s=>\s\K/(usr/)?lib\S+'); do
   if ! grep "$(basename "$lib")" "$SCRIPT_DIR/lambda-env-libs" > /dev/null; then
-    echo cp "$lib" lib
+    cp "$lib" lib
   fi
 done
 

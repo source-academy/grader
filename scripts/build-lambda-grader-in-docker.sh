@@ -20,7 +20,7 @@ mkdir -p lib
 NEEDED_LIBS=$(find node_modules -name '*.node' -not -path '*/obj.target/*' -print0 | xargs -0 ldd | grep -oP '^\s+\S+\s=>\s\K/(usr/)?lib\S+')
 for lib in $NEEDED_LIBS; do
   if ! grep "$(basename "$lib")" "$SCRIPT_DIR/lambda-env-libs" > /dev/null; then
-    echo cp "$lib" lib
+    cp "$lib" lib
   fi
 done
 
