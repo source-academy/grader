@@ -67,10 +67,12 @@ jobs:
           tar jxf build.tar.bz2
           cd build
           tar jxf ../xvfb.tar.bz2
+          zip -r ../grader.zip *
       - uses: actions/upload-artifact@v2
         with:
           name: grader
-          path: build
+          path: grader.zip
+          if-no-files-found: error
       - uses: geekyeggo/delete-artifact@v1
         with:
           failOnError: false
