@@ -60,7 +60,7 @@ jobs:
         with:
           name: xvfb
       - name: Combine results
-        run:
+        run: |
           tar jxf build.tar.bz2
           cd build
           tar jxf ../xvfb.tar.bz2
