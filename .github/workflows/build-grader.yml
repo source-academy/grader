@@ -2,7 +2,7 @@ name: Build package for AWS Lambda
 on:
   push:
     branches:
-      - lambda-runes
+      - master
 
 jobs:
   tsc:
