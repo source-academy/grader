@@ -14,7 +14,9 @@ JOBS=$(nproc) npm rebuild
 
 find node_modules/ -name 'obj.target' -type d -print0 | xargs -0 rm -rf
 find node_modules/ -path '*/build/Release/*' -not \( -name '*.so*' -or -name '*.node' \) -print0 | xargs -0 rm -rf
-find node_modules/ -name '*.node' -print0 | xargs -0 strip
+find node_modules/ \( -name '*.node' -or -name '*.so*' \)  -print0 | xargs -0 strip
+
+rm -rf node_modules/gl/angle
 
 mkdir -p lib
 NEEDED_LIBS=$(find node_modules -name '*.node' -not -path '*/obj.target/*' -print0 | xargs -0 ldd | grep -oP '^\s+\S+\s=>\s\K/(usr/)?lib\S+')
