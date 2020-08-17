@@ -9,10 +9,10 @@ const statAsync = promisify(stat)
 
 export async function setupXvfb() {
   await Promise.all([
-    copyBinary('/var/task/bin/xkbcomp', '/tmp/xkbcomp'),
-    copyBinary('/var/task/bin/Xvfb', '/tmp/Xvfb')
+    copyBinary('/opt/bin/xkbcomp', '/tmp/xkbcomp'),
+    copyBinary('/opt/bin/Xvfb', '/tmp/Xvfb')
   ])
-  process.env.LIBGL_DRIVERS_PATH = '/var/task/lib/dri'
+  process.env.LIBGL_DRIVERS_PATH = '/opt/lib/dri'
   const xvfb = spawn('/tmp/Xvfb', [':99', '-screen', '0', '1024x768x24', '-ac'], {
     stdio: 'ignore'
   })
