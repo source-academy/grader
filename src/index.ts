@@ -7,9 +7,9 @@ import {
   importBuiltins
 } from 'js-slang/dist/createContext'
 import { ChildProcess } from 'child_process'
-import { setupXvfb } from './setupXvfb'
+import { setupLambdaXvfb } from './setupXvfb'
 
-const externals = {}
+const externals: any = {}
 Object.assign(externals, require('./tree.js'))
 
 const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT!, 10) : 3000 // in milliseconds
@@ -122,8 +122,9 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
   if (event.library && event.library.external) {
     switch (event.library.external.name) {
       case 'RUNES': {
-        xvfb = await setupXvfb()
+        xvfb = await setupLambdaXvfb()
         Object.assign(externals, require('./graphics/webGLrune.js'))
+        externals.getReadyWebGLForCanvas('2d')
         break
       }
     }

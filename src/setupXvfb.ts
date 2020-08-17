@@ -7,7 +7,12 @@ const copyAsync = promisify(copyFile)
 const sleep = promisify(setTimeout)
 const statAsync = promisify(stat)
 
-export async function setupXvfb() {
+const IS_LAMBDA = !!process.env.AWS_LAMBDA_FUNCTION_NAME
+
+export async function setupLambdaXvfb() {
+  if (!IS_LAMBDA) {
+    return null
+  }
   await Promise.all([
     copyBinary('/opt/bin/xkbcomp', '/tmp/xkbcomp'),
     copyBinary('/opt/bin/Xvfb', '/tmp/Xvfb')
