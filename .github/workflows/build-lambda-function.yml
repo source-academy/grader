@@ -1,4 +1,4 @@
-name: Build package for AWS Lambda
+name: Build Lambda function
 on: workflow_dispatch
 
 jobs:
