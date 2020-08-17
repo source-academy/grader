@@ -6,7 +6,6 @@ import {
   ensureGlobalEnvironmentExist,
   importBuiltins
 } from 'js-slang/dist/createContext'
-import { ChildProcess } from 'child_process'
 import { setupLambdaXvfb } from './setupXvfb'
 
 const externals: any = {}
@@ -118,11 +117,10 @@ type TimeoutResult = {
  * @param event the AwsEvent from the Backend
  */
 export const runAll = async (event: AwsEvent): Promise<Summary> => {
-  let xvfb: ChildProcess | null = null
   if (event.library && event.library.external) {
     switch (event.library.external.name) {
       case 'RUNES': {
-        xvfb = await setupLambdaXvfb()
+        await setupLambdaXvfb()
         Object.assign(externals, require('./graphics/webGLrune.js'))
         externals.getReadyWebGLForCanvas('2d')
         break
@@ -145,10 +143,6 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
     (total: number, result) => (result.resultType === 'pass' ? total + result.score : total),
     0
   )
-
-  if (xvfb) {
-    xvfb.kill()
-  }
 
   return {
     totalScore: totalScore,
