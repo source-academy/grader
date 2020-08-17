@@ -147,7 +147,7 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
   )
 
   if (xvfb) {
-    xvfb.kill(9)
+    xvfb.kill()
   }
 
   return {
