@@ -26,7 +26,4 @@ for lib in $NEEDED_LIBS; do
   fi
 done
 
-cd ..
-
-rm build.tar.bz2
-tar jcf build.tar.bz2 build
+zip -r ../grader.zip *

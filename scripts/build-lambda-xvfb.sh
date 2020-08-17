@@ -35,25 +35,25 @@ tar jxf "xkeyboard-config-$XKEYBOARD_CONFIG_VER.tar.bz2"
 tar jxf "xorg-server-$XORG_VER.tar.bz2"
 tar jxf "xkbcomp-$XKBCOMP_VER.tar.bz2"
 
-export LD_LIBRARY_PATH=/var/task
-export PKG_CONFIG_PATH=/var/task/share/pkgconfig:/var/task/lib/pkgconfig
+export LD_LIBRARY_PATH=/opt/lib
+export PKG_CONFIG_PATH=/opt/share/pkgconfig:/opt/lib/pkgconfig
 
 pushd "xkeyboard-config-$XKEYBOARD_CONFIG_VER"
-./configure --prefix=/var/task
+./configure --prefix=/opt
 make -j$(nproc) && make install
 popd
 
 pushd "xorg-server-$XORG_VER"
-./configure --prefix=/var/task --with-xkb-bin-directory=/tmp
+./configure --prefix=/opt --with-xkb-bin-directory=/tmp
 make -j$(nproc) && make install
 popd
 
 pushd "xkbcomp-$XKBCOMP_VER"
-./configure --prefix=/var/task
+./configure --prefix=/opt
 make -j$(nproc) && make install
 popd
 
-cd /var/task
+cd /opt
 
 strip bin/*
 find -name '*.so' -type f -print0 | xargs -0 strip
@@ -70,4 +70,4 @@ for lib in $(ldd $BINS_TO_LDD | grep -oP '^\s+\S+\s=>\s\K/(usr/)?lib\S+'); do
   fi
 done
 
-tar jcf xvfb.tar.bz2 *
+zip -r xvfb.zip *

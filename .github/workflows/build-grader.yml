@@ -35,47 +35,10 @@ jobs:
         run: scripts/build-lambda-grader-in-docker.sh
       - uses: actions/upload-artifact@v2
         with:
-          name: build-lambda
-          path: build.tar.bz2
-          if-no-files-found: error
-  xvfb:
-    name: Build Xvfb
-    runs-on: ubuntu-latest
-    container: lambci/lambda:build-nodejs12.x
-    steps:
-      - uses: actions/checkout@master
-      - name: Build Xvfb
-        run: scripts/build-lambda-xvfb.sh
-      - uses: actions/upload-artifact@v2
-        with:
-          name: xvfb
-          path: /var/task/xvfb.tar.bz2
-          if-no-files-found: error
-  combine:
-    name: Combine artifacts
-    needs: [xvfb, native]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v2
-        with:
-          name: build-lambda
-      - uses: actions/download-artifact@v2
-        with:
-          name: xvfb
-      - name: Combine results
-        run: |
-          tar jxf build.tar.bz2
-          cd build
-          tar jxf ../xvfb.tar.bz2
-          zip -r ../grader.zip *
-      - uses: actions/upload-artifact@v2
-        with:
           name: graderzip
           path: grader.zip
           if-no-files-found: error
       - uses: geekyeggo/delete-artifact@v1
         with:
           failOnError: false
-          name: |
-            build-lambda
-            xvfb
+          name: build-lambda

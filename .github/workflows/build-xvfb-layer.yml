@@ -1,0 +1,17 @@
+name: Build layer
+on: workflow_dispatch
+
+jobs:
+  xvfb:
+    name: Build Xvfb
+    runs-on: ubuntu-latest
+    container: lambci/lambda:build-nodejs12.x
+    steps:
+      - uses: actions/checkout@master
+      - name: Build Xvfb
+        run: scripts/build-lambda-xvfb.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          name: xvfbzip
+          path: /opt/xvfb.zip
+          if-no-files-found: error
