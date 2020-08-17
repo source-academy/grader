@@ -1904,6 +1904,7 @@ function picture_mse(picture1, picture2) {
 }
 
 exports.getReadyWebGLForCanvas = getReadyWebGLForCanvas
+exports.getReadyStringifyForRunes = getReadyStringifyForRunes
 exports.show = show;
 exports.color = color;
 exports.random_color = random_color;
