@@ -20,7 +20,8 @@ yum install -y \
   xorg-x11-utils \
   libXtst-devel.x86_64 \
   libjpeg-turbo-devel.x86_64 \
-  libepoxy-devel.x86_64
+  libepoxy-devel.x86_64 \
+  mesa-dri-drivers.x86_64
 
 XKEYBOARD_CONFIG_VER=2.30
 XORG_VER=1.20.8
@@ -57,8 +58,13 @@ cd /var/task
 strip bin/*
 find -name '*.so' -type f -print0 | xargs -0 strip
 
-mkdir -p lib
-for lib in $(ldd bin/Xvfb bin/xkbcomp | grep -oP '^\s+\S+\s=>\s\K/(usr/)?lib\S+'); do
+BINS_TO_LDD="bin/Xvfb bin/xkbcomp /usr/lib64/libGLX_mesa.so.0 /usr/lib64/libGLX_system.so.0 /usr/lib64/dri/swrast_dri.so /usr/lib64/dri/kms_swrast_dri.so"
+
+mkdir -p lib/dri
+cp /usr/lib64/libGLX_mesa.so.0 /usr/lib64/libGLX_system.so.0 lib
+cp /usr/lib64/dri/*swrast* lib/dri
+
+for lib in $(ldd $BINS_TO_LDD | grep -oP '^\s+\S+\s=>\s\K/(usr/)?lib\S+'); do
   if ! grep "$(basename "$lib")" "$SCRIPT_DIR/lambda-env-libs" > /dev/null; then
     cp "$lib" lib
   fi
