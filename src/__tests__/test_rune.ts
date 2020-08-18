@@ -60,6 +60,23 @@ picture_mse(show(heart), show(nova)) < 0.01;
 `,
           answer: 'false',
           score: 1
+        },
+        {
+          program: `
+function mosaic(r1, r2, r3, r4){
+    return beside(stack(r4, r3), stack(r1, r2));
+}
+function steps(r1, r2, r3, r4){
+    return mosaic(overlay_frac(3 / 4, blank, r1),
+                  overlay(blank, r2),
+                  overlay_frac(1 / 4, blank, r3),
+                  r4);
+}
+picture_mse(show(steps(rcross, sail, corner, nova)),
+            show(mosaic(rcross, sail, corner, nova))) > 0;
+`,
+          answer: 'true',
+          score: 1
         }
       ]
     })
@@ -67,6 +84,10 @@ picture_mse(show(heart), show(nova)) < 0.01;
   expect(results).toMatchInlineSnapshot(`
     Object {
       "results": Array [
+        Object {
+          "resultType": "pass",
+          "score": 1,
+        },
         Object {
           "resultType": "pass",
           "score": 1,
