@@ -122,7 +122,7 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
       case 'RUNES': {
         await setupLambdaXvfb()
         Object.assign(externals, require('./graphics/webGLrune.js'))
-        externals.getReadyWebGLForCanvas('2d')
+        externals.getReadyWebGLForCanvas('3d')
         externals.getReadyStringifyForRunes(stringify)
         break
       }
