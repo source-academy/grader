@@ -109,7 +109,7 @@ picture_mse(show(steps(rcross, sail, corner, nova)),
           "score": 1,
         },
       ],
-      "totalScore": 5,
+      "totalScore": 6,
     }
   `)
 })
