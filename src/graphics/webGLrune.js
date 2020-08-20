@@ -1262,14 +1262,14 @@ function show(rune) {
  * to view the Anaglyph.
  */
 function anaglyph(rune) {
-  throwIfNotRune('anaglyph', rune)
+  /* throwIfNotRune('anaglyph', rune)
   const frame = open_pixmap('frame', rune_viewport_size, rune_viewport_size, true);
   clear_viewport()
   clearAnaglyphFramebuffer()
   var flattened_rune_list = generateFlattenedRuneList(rune)
   drawWithWebGL(flattened_rune_list, drawAnaglyph)
   copy_viewport(gl.canvas, frame);
-  return new ShapeDrawn(frame);
+  return new ShapeDrawn(frame); */
 }
 
 var hollusionTimeout
@@ -1284,7 +1284,7 @@ var hollusionTimeout
  * technology, instead of textually.
  */
 function hollusion(rune, num) {
-  clear_viewport()
+  /* clear_viewport()
   var num = num > 5 ? num : 5;
   var flattened_rune_list = generateFlattenedRuneList(rune)
   var frame_list = []
@@ -1318,11 +1318,11 @@ function hollusion(rune, num) {
     hollusionTimeout = setTimeout(animate, 500 / num)
   }
   animate();
-  return new ShapeDrawn(outframe);
+  return new ShapeDrawn(outframe); */
 }
 
 function clearHollusion() {
-  clearTimeout(hollusionTimeout)
+  // clearTimeout(hollusionTimeout)
 }
 
 /*-----------------------Transformation functions----------------------*/
