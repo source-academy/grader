@@ -2,9 +2,9 @@ import { createContext, runInContext, Result as SourceResult } from 'js-slang'
 import { stringify } from 'js-slang/dist/utils/stringify'
 import { SourceError, Context, Frame, Value } from 'js-slang/dist/types'
 import {
-  defineBuiltin,
   ensureGlobalEnvironmentExist,
-  importBuiltins
+  importBuiltins,
+  defineSymbol
 } from 'js-slang/dist/createContext'
 import { setupLambdaXvfb } from './setupXvfb'
 
@@ -158,7 +158,7 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
 export const run = async (unitTest: UnitTest): Promise<Output> => {
   const context = createContext(unitTest.library.chapter, 'default', [])
   for (const name of unitTest.library.external.symbols) {
-    defineBuiltin(context, name, externals[name])
+    defineSymbol(context, name, externals[name])
   }
 
   // Run prepend
@@ -277,7 +277,7 @@ async function runInElevatedContext<T>(
     })
     for (const [name, value] of Object.entries(externals)) {
       if (!Object.prototype.hasOwnProperty.call(overrideFrame, name)) {
-        defineBuiltin(context, name, value)
+        defineSymbol(context, name, value)
       }
     }
   }
