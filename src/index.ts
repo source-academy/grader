@@ -6,7 +6,9 @@ import {
   importBuiltins,
   defineSymbol
 } from 'js-slang/dist/createContext'
+
 import { setupLambdaXvfb } from './setupXvfb'
+import { loadCurves, loadRunes } from './graphicsLoader'
 
 const externals: any = {}
 Object.assign(externals, require('./tree.js'))
@@ -121,9 +123,15 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
     switch (event.library.external.name) {
       case 'RUNES': {
         await setupLambdaXvfb()
-        Object.assign(externals, require('./graphics/webGLrune.js'))
+        Object.assign(externals, await loadRunes())
         externals.getReadyWebGLForCanvas('3d')
         externals.getReadyStringifyForRunes(stringify)
+        break
+      }
+      case 'CURVES': {
+        await setupLambdaXvfb()
+        Object.assign(externals, await loadCurves())
+        externals.getReadyWebGLForCanvas('curve')
         break
       }
     }
