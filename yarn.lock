@@ -2523,10 +2523,10 @@ jest@^26.4.1:
     import-local "^3.0.2"
     jest-cli "^26.4.1"
 
-js-slang@^0.4.63:
-  version "0.4.63"
-  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-0.4.63.tgz#282b765511276e18d6fccb5014083a68a2c147b7"
-  integrity sha512-adXJc6KgBYo5gur+2/ybSPQwwEjeQUCFwI93PETsuuhCjTsQd+jeUfyhOeBlGbkM0J9hQ9DA6WzeBbCtZVc/Xw==
+js-slang@^0.4.64:
+  version "0.4.64"
+  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-0.4.64.tgz#4ca54d830f386184017428a841fc1fb7dac82f06"
+  integrity sha512-ywFVW1uN8ct34odgjJiGjOhlonKwQj7KtZGfWZo8Sf9zLUqNaIgk1zxp6DR5L/feCSlyqjiLDRO9uzCGfHXk6w==
   dependencies:
     "@types/estree" "0.0.45"
     acorn "^7.4.0"
