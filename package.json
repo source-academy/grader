@@ -36,5 +36,8 @@
       "\\.ts$": "ts-jest"
     },
     "testRegex": "/__tests__/test.*\\.ts$"
+  },
+  "resolutions": {
+    "acorn-walk": "7.2.0"
   }
 }
