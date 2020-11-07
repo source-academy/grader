@@ -338,11 +338,12 @@ const handleResult = (
         }
 
         const lines = program.split('\n')
+        const errorLine = (lines[line - 1] || '(unknown)').trim()
         return {
           errorType: err.type.toLowerCase() as 'syntax' | 'runtime',
           line,
           location,
-          errorLine: lines[line - 1].trim(),
+          errorLine,
           errorExplanation: err.explain()
         }
       })
