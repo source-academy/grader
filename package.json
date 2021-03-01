@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "js-slang": "^0.4.69",
-    "lodash": "4.17.20",
+    "lodash": "4.17.21",
     "node-canvas-webgl": "^0.2.6"
   },
   "devDependencies": {
