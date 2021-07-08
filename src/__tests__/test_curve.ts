@@ -37,6 +37,7 @@ test('curve correct', async () => {
   )
   expect(results).toMatchInlineSnapshot(`
     Object {
+      "maxScore": 2,
       "results": Array [
         Object {
           "resultType": "pass",

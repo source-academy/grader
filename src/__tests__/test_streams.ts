@@ -136,6 +136,7 @@ test('stream grader OK, student OK, correct', async () => {
   }))
   expect(results).toEqual({
     "totalScore": 3, // 4,
+    "maxScore": 3,
     "results": [
       {
         "resultType": "pass",
@@ -166,6 +167,7 @@ test('stream grader OK, student OK, wrong', async () => {
   }))
   expect(results).toEqual({
     "totalScore": 1, // 2,
+    "maxScore": 3,
     "results": [
       {
         "resultType": "fail",
@@ -198,6 +200,7 @@ test('stream grader OK, student OK, partial', async () => {
   }))
   expect(results).toEqual({
     "totalScore": 2, // 3,
+    "maxScore": 3,
     "results": [
       {
         "resultType": "pass",
@@ -229,6 +232,7 @@ test('stream grader OK, student runtimeError', async () => {
   }))
   expect(results).toEqual({
     "totalScore": 3,
+    "maxScore": 3,
     "results": [
       {
         "resultType": "pass",

@@ -132,6 +132,7 @@ test('chap2 grader OK, student OK, correct', async () => {
   }))
   expect(results).toEqual({
     "totalScore": 2,
+    "maxScore": 2,
     "results": [
       {
         "resultType": "pass",
@@ -154,6 +155,7 @@ test('chap2 grader OK, student OK, wrong', async () => {
   }))
   expect(results).toEqual({
     "totalScore": 0,
+    "maxScore": 2,
     "results": [
       {
         "resultType": "fail",
@@ -178,6 +180,7 @@ test('chap2 grader OK, student OK, prepend runtime', async () => {
   }))
   expect(results).toEqual({
     "totalScore": 0,
+    "maxScore": 2,
     "results": [
       {
         "resultType": "error",
@@ -216,6 +219,7 @@ test('chap2 grader OK, student OK, prepend syntax', async () => {
   }))
   expect(results).toEqual({
     "totalScore": 0,
+    "maxScore": 2,
     "results": [
       {
         "resultType": "error",
@@ -253,6 +257,7 @@ test('chap2 grader OK, student OK, postpend runtime', async () => {
   }))
   expect(results).toEqual({
     "totalScore": 0,
+    "maxScore": 2,
     "results": [
       {
         "resultType": "error",
@@ -290,6 +295,7 @@ test('chap2 grader OK, student OK, postpend syntax', async () => {
   }))
   expect(results).toEqual({
     "totalScore": 0,
+    "maxScore": 2,
     "results": [
       {
         "resultType": "error",
