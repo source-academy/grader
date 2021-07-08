@@ -107,6 +107,7 @@ test('prepend OK, postpend OK, testcases OK, student OK, correct', async () => {
   }))
   expect(results).toEqual({
     "totalScore": 3,
+    "maxScore": 3,
     "results": [
       {
         "resultType": "pass",
@@ -133,6 +134,7 @@ test('prepend OK, postpend OK, testcases OK, student OK, partial', async () => {
   }))
   expect(results).toEqual({
     "totalScore": 3,
+    "maxScore": 3,
     "results": [
       {
         "resultType": "pass",
@@ -159,6 +161,7 @@ test('prepend OK, postpend OK, testcases OK, student OK, wrong', async () => {
   }))
   expect(results).toEqual({
     "totalScore": 0,
+    "maxScore": 3,
     "results": [
       {
         "resultType": "fail",
@@ -188,6 +191,7 @@ test('prepend OK, postpend OK, testcases OK, student runtimeError', async () => 
   }))
   expect(results).toEqual({
     "totalScore": 0,
+    "maxScore": 3,
     "results": [
       {
         "resultType": "error",
@@ -238,6 +242,7 @@ test('prepend OK, postpend OK, testcases OK, student syntaxError', async () => {
   }))
   expect(results).toEqual({
     "totalScore": 0,
+    "maxScore": 3,
     "results": [
       {
         "resultType": "error",
@@ -288,6 +293,7 @@ test('prepend OK, postpend OK, testcases OK, student timeoutError', async () => 
   }))
   expect(results).toEqual({
     "totalScore": 0,
+    "maxScore": 3,
     "results": [
       {
         "resultType": "error",
@@ -326,6 +332,7 @@ test('prepend OK, postpend OK, testcases runtimeError, student OK', async () => 
   }))
   expect(results).toEqual({
     "totalScore": 0,
+    "maxScore": 1,
     "results": [
       {
         "resultType": "error",
@@ -352,6 +359,7 @@ test('prepend OK, postpend OK, testcases syntaxError, student OK', async () => {
   }))
   expect(results).toEqual({
     "totalScore": 0,
+    "maxScore": 1,
     "results": [
       {
         "resultType": "error",

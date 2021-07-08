@@ -83,6 +83,7 @@ picture_mse(show(steps(rcross, sail, corner, nova)),
   )
   expect(results).toMatchInlineSnapshot(`
     Object {
+      "maxScore": 6,
       "results": Array [
         Object {
           "resultType": "pass",
