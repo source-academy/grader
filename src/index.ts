@@ -64,6 +64,7 @@ export type UnitTest = {
  */
 type Summary = {
   totalScore: number
+  maxScore: number
   results: Output[]
 }
 
@@ -153,8 +154,14 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
     0
   )
 
+  const maxScore = event.testcases.reduce<number>(
+    (max: number, testcase) => (testcase.score + max),
+    0
+  )
+
   return {
     totalScore: totalScore,
+    maxScore: maxScore,
     results: results
   }
 }
