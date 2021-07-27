@@ -10,19 +10,19 @@
     "test-coveralls": "scripts/ci.sh"
   },
   "dependencies": {
-    "js-slang": "^0.4.69",
-    "lodash": "4.17.20",
+    "js-slang": "^0.5.13",
+    "lodash": "4.17.21",
     "node-canvas-webgl": "^0.2.6"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.15",
-    "@types/node": "^14.14.6",
-    "coveralls": "^3.1.0",
-    "cross-env": "^7.0.2",
+    "@types/jest": "^26.0.24",
+    "@types/node": "^16.4.3",
+    "coveralls": "^3.1.1",
+    "cross-env": "^7.0.3",
     "cross-zip-cli": "^1.0.0",
-    "jest": "^26.6.1",
-    "ts-jest": "^26.4.3",
-    "typescript": "^4.0.5"
+    "jest": "^27.0.6",
+    "ts-jest": "^27.0.4",
+    "typescript": "^4.3.5"
   },
   "jest": {
     "collectCoverageFrom": [
@@ -36,8 +36,5 @@
       "\\.ts$": "ts-jest"
     },
     "testRegex": "/__tests__/test.*\\.ts$"
-  },
-  "resolutions": {
-    "acorn-walk": "7.2.0"
   }
 }
