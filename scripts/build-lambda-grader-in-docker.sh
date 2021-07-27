@@ -10,6 +10,8 @@ yum install -y libXi-devel.x86_64 mesa-libGL-devel.x86_64
 
 cd build
 
+sed -i 's/node-pre-gyp install --fallback-to-build/node-gyp build/' node_modules/canvas/package.json
+
 JOBS=$(nproc) npm rebuild
 
 find node_modules/ -name 'obj.target' -type d -print0 | xargs -0 rm -rf
