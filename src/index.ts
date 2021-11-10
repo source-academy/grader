@@ -155,7 +155,7 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
   )
 
   const maxScore = event.testcases.reduce<number>(
-    (max: number, testcase) => (testcase.score + max),
+    (max: number, testcase) => testcase.score + max,
     0
   )
 
@@ -345,7 +345,7 @@ const handleResult = (
         }
 
         const lines = program.split('\n')
-        const errorLine = (lines[line - 1] || '(unknown)').trim()
+        const errorLine = (lines[line - 1] ?? '(unknown)').trim()
         return {
           errorType: err.type.toLowerCase() as 'syntax' | 'runtime',
           line,
