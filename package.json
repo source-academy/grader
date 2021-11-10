@@ -10,19 +10,19 @@
     "test-coveralls": "scripts/ci.sh"
   },
   "dependencies": {
-    "js-slang": "^0.5.13",
+    "js-slang": "^0.5.22",
     "lodash": "4.17.21",
     "node-canvas-webgl": "^0.2.6"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.24",
-    "@types/node": "^16.4.3",
+    "@types/jest": "^27.0.2",
+    "@types/node": "^16.11.7",
     "coveralls": "^3.1.1",
     "cross-env": "^7.0.3",
     "cross-zip-cli": "^1.0.0",
-    "jest": "^27.0.6",
-    "ts-jest": "^27.0.4",
-    "typescript": "^4.3.5"
+    "jest": "^27.3.1",
+    "ts-jest": "^27.0.7",
+    "typescript": "^4.4.4"
   },
   "jest": {
     "collectCoverageFrom": [
