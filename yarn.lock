@@ -2259,10 +2259,10 @@ jest@^27.3.1:
     import-local "^3.0.2"
     jest-cli "^27.3.1"
 
-js-slang@^0.5.22:
-  version "0.5.22"
-  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-0.5.22.tgz#2649271f6e6494c6b8fa1bb3567bffcea9f4b9e7"
-  integrity sha512-9iXrmcs/56/kdWBUzpsIdIBd4PE1FYIB0l+T9rkutRhI2QNL+bbQD6dQy/v7WtZgNzB7lUQsviGjjPaKSlL12w==
+js-slang@^0.5.25:
+  version "0.5.25"
+  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-0.5.25.tgz#b25d8275bc425f9d17156dda4d07f4de1884c420"
+  integrity sha512-lxLxXxauqG91XYERY0p/ANjmUf02LuRCvzmekWhaypR27XsEsmPxllMJycllZ2oGZR8pJVFkiLSgihXyP3c/Jw==
   dependencies:
     "@joeychenofficial/alt-ergo-modified" "^2.4.0"
     "@types/estree" "0.0.50"
