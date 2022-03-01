@@ -1332,6 +1332,11 @@ escodegen@^2.0.0:
   optionalDependencies:
     source-map "~0.6.1"
 
+eslint-plugin-simple-import-sort@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-simple-import-sort/-/eslint-plugin-simple-import-sort-7.0.0.tgz#a1dad262f46d2184a90095a60c66fef74727f0f8"
+  integrity sha512-U3vEDB5zhYPNfxT5TYR7u01dboFZp+HNpnGhkDB2g/2E4wZ/g1Q9Ton8UwCLfRV9yAKyYqDh62oHOamvkFxsvw==
+
 esprima@^4.0.0, esprima@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-4.0.1.tgz#13b04cdb3e6c5d19df91ab6987a8695619b0aa71"
@@ -2259,10 +2264,10 @@ jest@^27.3.1:
     import-local "^3.0.2"
     jest-cli "^27.3.1"
 
-js-slang@^0.5.22:
-  version "0.5.22"
-  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-0.5.22.tgz#2649271f6e6494c6b8fa1bb3567bffcea9f4b9e7"
-  integrity sha512-9iXrmcs/56/kdWBUzpsIdIBd4PE1FYIB0l+T9rkutRhI2QNL+bbQD6dQy/v7WtZgNzB7lUQsviGjjPaKSlL12w==
+js-slang@^0.5.31:
+  version "0.5.31"
+  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-0.5.31.tgz#fa2f43a28815b981a3d4e11d4f374c7b5871e738"
+  integrity sha512-WePMRLq7vkSEpx9lqHOAej8nIEIkJH6JMbpaOTQfF2TahPujejx6aT/viXPzSzjmAIq4d/em0qjPNGXfWw4i+Q==
   dependencies:
     "@joeychenofficial/alt-ergo-modified" "^2.4.0"
     "@types/estree" "0.0.50"
@@ -2270,6 +2275,7 @@ js-slang@^0.5.22:
     acorn-loose "^8.0.0"
     acorn-walk "^8.0.0"
     astring "^1.4.3"
+    eslint-plugin-simple-import-sort "^7.0.0"
     gpu.js "^2.10.4"
     lodash "^4.17.20"
     node-getopt "^0.3.2"
