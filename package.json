@@ -12,7 +12,7 @@
   "dependencies": {
     "js-slang": "^0.5.22",
     "lodash": "4.17.21",
-    "node-canvas-webgl": "^0.2.6"
+    "node-canvas-webgl": "^0.2.7"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",

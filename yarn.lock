@@ -2534,10 +2534,10 @@ node-abi@^2.18.0, node-abi@^2.7.0:
   dependencies:
     semver "^5.4.1"
 
-node-canvas-webgl@^0.2.6:
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/node-canvas-webgl/-/node-canvas-webgl-0.2.6.tgz#b375ae00b3a0f87a4256805f49c71d21cb9be9cf"
-  integrity sha512-ewGRVkxSdGTml5KJXYDgOOd7RS7JAE4BGs9jNNOmUMo/HWmEzJLuTXZuitt2ov0mKkeNIK4EiE32KYRw8D6I3g==
+node-canvas-webgl@^0.2.7:
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/node-canvas-webgl/-/node-canvas-webgl-0.2.7.tgz#6aa961015415072bcc0e797edc1b5be3729ebb04"
+  integrity sha512-Rg3vlqdvvjglJW1aHb9JEBIGt6PsYCs1w/XXQk/5WztFQ9+IjBpqLsmavQr0jq6hbqMuiSMoFcn6BH+MUHpX/g==
   dependencies:
     canvas "^2.6.0"
     gl "^4.4.0"
