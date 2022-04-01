@@ -10,7 +10,7 @@
     "test-coveralls": "scripts/ci.sh"
   },
   "dependencies": {
-    "js-slang": "^0.5.22",
+    "js-slang": "^0.5.32",
     "lodash": "4.17.21",
     "node-canvas-webgl": "^0.2.6"
   },
