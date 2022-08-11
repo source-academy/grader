@@ -19,6 +19,7 @@ find node_modules/ -name 'obj.target' -type d -print0 | xargs -0 rm -rf
 find node_modules/ -path '*/build/Release/*' -not \( -name '*.so*' -or -name '*.node' \) -print0 | xargs -0 rm -rf
 find node_modules/ \( -name '*.node' -or -name '*.so*' \)  -print0 | xargs -0 strip || :
 
+chmod -R 777 node_modules
 rm -rf node_modules/gl/angle
 
 mkdir -p lib
