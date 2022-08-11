@@ -22,7 +22,7 @@ jobs:
     name: Build native modules
     needs: tsc
     runs-on: ubuntu-latest
-    container: amazon/aws-lambda-nodejs:16.x
+    container: amazon/aws-lambda-nodejs:16
     steps:
       - uses: actions/checkout@master
       - uses: actions/download-artifact@v2
