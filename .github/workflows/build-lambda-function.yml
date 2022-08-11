@@ -10,7 +10,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v2-beta
         with:
-          node-version: '12'
+          node-version: '16'
       - name: Compile TypeScript
         run: scripts/build-lambda-grader.sh
       - uses: actions/upload-artifact@v2
@@ -22,7 +22,7 @@ jobs:
     name: Build native modules
     needs: tsc
     runs-on: ubuntu-latest
-    container: lambci/lambda:build-nodejs12.x
+    container: amazon/aws-lambda-nodejs:16
     steps:
       - uses: actions/checkout@master
       - uses: actions/download-artifact@v2
