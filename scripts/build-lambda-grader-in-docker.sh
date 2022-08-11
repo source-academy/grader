@@ -11,12 +11,9 @@ yum install -y libXi-devel.x86_64 mesa-libGL-devel.x86_64 cairo-devel pango-deve
 cd build
 
 sed -i 's/node-pre-gyp install --fallback-to-build/node-gyp rebuild/' node_modules/canvas/package.json
-yum groupinstall -y "Development Tools"
+yum install make glibc-devel gcc patch
 
 JOBS=$(nproc) npm rebuild
-
-chmod -R 777 node_modules
-rm -rf node_modules/webgpu/generated/0.0.1/darwin/build/Release/addon-darwin.node
 
 find node_modules/ -name 'obj.target' -type d -print0 | xargs -0 rm -rf
 find node_modules/ -path '*/build/Release/*' -not \( -name '*.so*' -or -name '*.node' \) -print0 | xargs -0 rm -rf
