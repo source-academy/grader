@@ -6,12 +6,11 @@ SCRIPT_DIR="$(dirname "$(realpath -s "${BASH_SOURCE[0]}")")"
 
 tar jxf build.tar.bz2
 
-yum install -y libXi-devel.x86_64 mesa-libGL-devel.x86_64 cairo-devel pango-devel pixman-devel
+yum install -y libXi-devel.x86_64 mesa-libGL-devel.x86_64 cairo-devel pango-devel pixman-devel make glibc-devel gcc patch gcc-c++
 
 cd build
 
 sed -i 's/node-pre-gyp install --fallback-to-build/node-gyp rebuild/' node_modules/canvas/package.json
-yum -y install make glibc-devel gcc patch
 
 JOBS=$(nproc) npm rebuild
 
