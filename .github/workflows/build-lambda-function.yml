@@ -24,6 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     container: amazon/aws-lambda-nodejs:16
     steps:
+      - name: install git and tar
+        run: sudo yum install git tar
       - uses: actions/checkout@master
       - uses: actions/download-artifact@v2
         with:
