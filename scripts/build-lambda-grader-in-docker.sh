@@ -11,7 +11,7 @@ yum install -y libXi-devel.x86_64 mesa-libGL-devel.x86_64 cairo-devel pango-deve
 cd build
 
 sed -i 's/node-pre-gyp install --fallback-to-build/node-gyp rebuild/' node_modules/canvas/package.json
-yum install make glibc-devel gcc patch
+yum install -y make glibc-devel gcc patch
 
 JOBS=$(nproc) npm rebuild
 
