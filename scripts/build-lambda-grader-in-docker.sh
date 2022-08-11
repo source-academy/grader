@@ -21,7 +21,7 @@ find node_modules/ \( -name '*.node' -or -name '*.so*' \)  -print0 | xargs -0 st
 rm -rf node_modules/gl/angle
 
 mkdir -p lib
-NEEDED_LIBS=$(find node_modules -name '*.node' -not -path '*/obj.target/*' -print0 | xargs -0 ldd | grep -oP '^\s+\S+\s=>\s\K/(usr/)?lib\S+')
+NEEDED_LIBS=$(find node_modules -name '*.node' -not -path '*/obj.target/*' -print0 | xargs -0 ldd | grep -oP '^\s+\S+\s=>\s\K/(usr/)?lib\S+' || :)
 for lib in $NEEDED_LIBS; do
   if ! grep "$(basename "$lib")" "$SCRIPT_DIR/lambda-env-libs" > /dev/null; then
     cp "$lib" lib
