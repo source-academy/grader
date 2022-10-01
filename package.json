@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@types/jest": "^28.1.6",
-    "@types/node": "^18.7.1",
+    "@types/node": "^18.7.23",
     "coveralls": "^3.1.1",
     "cross-env": "^7.0.3",
     "cross-zip-cli": "^1.0.0",
