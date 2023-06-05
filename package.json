@@ -10,6 +10,7 @@
     "test-coveralls": "scripts/ci.sh"
   },
   "dependencies": {
+    "gpu.js": "2.15.2",
     "js-slang": "^1.0.14",
     "lodash": "4.17.21",
     "node-canvas-webgl": "^0.2.6"
