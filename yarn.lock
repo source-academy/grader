@@ -1776,24 +1776,13 @@ gpu-mock.js@^1.3.0:
   resolved "https://registry.yarnpkg.com/gpu-mock.js/-/gpu-mock.js-1.3.1.tgz#f7deaa09da3f672762eda944ecf948fd2c4b1490"
   integrity sha512-+lbp8rQ0p1nTa6Gk6HoLiw4yM6JTpql82U+nCF3sZbX4FJWP9PzzF1018dW8K+pbmqRmhLHbn6Bjc6i6tgUpbA==
 
-gpu.js@2.15.2:
+gpu.js@^2.10.4:
   version "2.15.2"
   resolved "https://registry.yarnpkg.com/gpu.js/-/gpu.js-2.15.2.tgz#481d389cd984fcd3f88d9dd5b2fce08c1505443c"
   integrity sha512-tgTRoWEE0X2PE3OgTNub9OwadXND2K7qwOW/VwhIiedY/mbiT93jJIrgWAKBgdhQR0JmyN4ObkSu0/vjSpbuiQ==
   dependencies:
     acorn "^7.1.1"
     gl "^4.5.2"
-    gl-wiretap "^0.6.2"
-    gpu-mock.js "^1.3.0"
-    webgpu "^0.1.16"
-
-gpu.js@^2.10.4:
-  version "2.16.0"
-  resolved "https://registry.yarnpkg.com/gpu.js/-/gpu.js-2.16.0.tgz#35531f8ee79292b71a454455e7bf0aaf6693182a"
-  integrity sha512-ZKmWdRXi3F/9nim5ew2IPXZaMlSyqtMtVC8Itobjl+qYUgUqcBHxu8WKqK0AqIyjBVBl7A5ORo4Db2hzgrPd4A==
-  dependencies:
-    acorn "^7.1.1"
-    gl "^5.0.3"
     gl-wiretap "^0.6.2"
     gpu-mock.js "^1.3.0"
     webgpu "^0.1.16"
