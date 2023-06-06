@@ -6,7 +6,7 @@ SCRIPT_DIR="$(dirname "$(realpath -s "${BASH_SOURCE[0]}")")"
 
 tar jxf build.tar.bz2
 
-yum install -y libXi-devel.x86_64 mesa-libGL-devel.x86_64 cairo-devel pango-devel pixman-devel make glibc-devel gcc patch gcc-c++
+yum install -y libXi-devel.x86_64 mesa-libGL-devel.x86_64 cairo-devel pango-devel pixman-devel make glibc-devel gcc patch gcc-c++ python3
 
 cd build
 
