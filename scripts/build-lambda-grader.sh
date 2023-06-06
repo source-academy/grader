@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-yum install -y libXi-devel.x86_64 mesa-libGL-devel.x86_64 cairo-devel pango-devel pixman-devel make glibc-devel gcc patch gcc-c++
+sudo apt-get install -y build-essential libxi-dev libglu1-mesa-dev libglew-dev pkg-config
 
 rm -rf build grader.zip node_modules
 JOBS=$(nproc) yarn install --frozen-lockfile
