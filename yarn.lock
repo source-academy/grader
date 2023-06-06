@@ -1132,9 +1132,9 @@ camelcase@^6.2.0:
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
 caniuse-lite@^1.0.30001489:
-  version "1.0.30001494"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001494.tgz#3e56e04a48da7a79eae994559eb1ec02aaac862f"
-  integrity sha512-sY2B5Qyl46ZzfYDegrl8GBCzdawSLT4ThM9b9F+aDYUrAG2zCOyMbd2Tq34mS1g4ZKBfjRlzOohQMxx28x6wJg==
+  version "1.0.30001495"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001495.tgz#64a0ccef1911a9dcff647115b4430f8eff1ef2d9"
+  integrity sha512-F6x5IEuigtUfU5ZMQK2jsy5JqUUlEFRVZq8bO2a+ysq5K7jD6PPc9YXZj78xDNS3uNchesp1Jw47YXEqr+Viyg==
 
 canvas@^2.6.0:
   version "2.11.2"
@@ -1411,9 +1411,9 @@ ecc-jsbn@~0.1.1:
     safer-buffer "^2.1.0"
 
 electron-to-chromium@^1.4.411:
-  version "1.4.420"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.420.tgz#21d4b55e9deef16cdbf009557fb2fe8f96798248"
-  integrity sha512-BpPy2KXZc+UPbI8NGo2QdHU1Mkq11pO/zaNDHY57L09K/0ytrPw+IiLOUvZ1NjI5BlAVF5DkNr1UBUS76Tc4ow==
+  version "1.4.421"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.421.tgz#2b8c0ef98ba00d4aef4c664933d570922da52161"
+  integrity sha512-wZOyn3s/aQOtLGAwXMZfteQPN68kgls2wDAnYOA8kCjBvKVrW5RwmWVspxJYTqrcN7Y263XJVsC66VCIGzDO3g==
 
 emittery@^0.10.2:
   version "0.10.2"
@@ -1703,7 +1703,7 @@ gl-wiretap@^0.6.2:
   resolved "https://registry.yarnpkg.com/gl-wiretap/-/gl-wiretap-0.6.2.tgz#e4aa19622831088fbaa7e5a18d01768f7a3fb07c"
   integrity sha512-fxy1XGiPkfzK+T3XKDbY7yaqMBmozCGvAFyTwaZA3imeZH83w7Hr3r3bYlMRWIyzMI/lDUvUMM/92LE2OwqFyQ==
 
-gl@^4.4.0, gl@^4.5.2:
+gl@^4.4.0:
   version "4.9.2"
   resolved "https://registry.yarnpkg.com/gl/-/gl-4.9.2.tgz#dd31cdaec7d3c4b6761648111e55531f86137821"
   integrity sha512-lLYaicQxsRPxOnKWX9pIGmtKRuw0epvI089yl9uBvemYxR9xE01eRuXJgje1U0/06Df7bdOmmcW87IPOsu52Ow==
@@ -1777,12 +1777,12 @@ gpu-mock.js@^1.3.0:
   integrity sha512-+lbp8rQ0p1nTa6Gk6HoLiw4yM6JTpql82U+nCF3sZbX4FJWP9PzzF1018dW8K+pbmqRmhLHbn6Bjc6i6tgUpbA==
 
 gpu.js@^2.10.4:
-  version "2.15.2"
-  resolved "https://registry.yarnpkg.com/gpu.js/-/gpu.js-2.15.2.tgz#481d389cd984fcd3f88d9dd5b2fce08c1505443c"
-  integrity sha512-tgTRoWEE0X2PE3OgTNub9OwadXND2K7qwOW/VwhIiedY/mbiT93jJIrgWAKBgdhQR0JmyN4ObkSu0/vjSpbuiQ==
+  version "2.16.0"
+  resolved "https://registry.yarnpkg.com/gpu.js/-/gpu.js-2.16.0.tgz#35531f8ee79292b71a454455e7bf0aaf6693182a"
+  integrity sha512-ZKmWdRXi3F/9nim5ew2IPXZaMlSyqtMtVC8Itobjl+qYUgUqcBHxu8WKqK0AqIyjBVBl7A5ORo4Db2hzgrPd4A==
   dependencies:
     acorn "^7.1.1"
-    gl "^4.5.2"
+    gl "^5.0.3"
     gl-wiretap "^0.6.2"
     gpu-mock.js "^1.3.0"
     webgpu "^0.1.16"
