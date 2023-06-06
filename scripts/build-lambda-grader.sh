@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-sudo apt-get install -y build-essential libxi-dev libglu1-mesa-dev libglew-dev pkg-config
+sudo apt-get install -y build-essential libxi-dev libglu1-mesa-dev libglew-dev pkg-config glew-utils
 
 rm -rf build grader.zip node_modules
 JOBS=$(nproc) yarn install --frozen-lockfile
