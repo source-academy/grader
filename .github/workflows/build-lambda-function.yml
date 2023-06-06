@@ -10,7 +10,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
       - name: Compile TypeScript
         run: scripts/build-lambda-grader.sh
       - uses: actions/upload-artifact@v3
@@ -22,7 +22,7 @@ jobs:
     name: Build native modules
     needs: tsc
     runs-on: ubuntu-latest
-    container: amazon/aws-lambda-nodejs:16
+    container: amazon/aws-lambda-nodejs:18
     steps:
       - name: install git and tar
         run: yum install -y git tar bzip2 zip
