@@ -1673,11 +1673,10 @@ gl-wiretap@^0.6.2:
   resolved "https://registry.yarnpkg.com/gl-wiretap/-/gl-wiretap-0.6.2.tgz#e4aa19622831088fbaa7e5a18d01768f7a3fb07c"
   integrity sha512-fxy1XGiPkfzK+T3XKDbY7yaqMBmozCGvAFyTwaZA3imeZH83w7Hr3r3bYlMRWIyzMI/lDUvUMM/92LE2OwqFyQ==
 
-gl@^4.4.0, gl@^5.0.3, gl@^6.0.2:
+gl@^4.4.0, gl@^4.5.2, gl@^6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/gl/-/gl-6.0.2.tgz#685579732a19075e3acf4684edb1270278e551c7"
   integrity sha512-yBbfpChOtFvg5D+KtMaBFvj6yt3vUnheNAH+UrQH2TfDB8kr0tERdL0Tjhe0W7xJ6jR6ftQBluTZR9jXUnKe8g==
-
   dependencies:
     bindings "^1.5.0"
     bit-twiddle "^1.0.2"
@@ -3489,10 +3488,10 @@ type-fest@^0.21.3:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.21.3.tgz#d260a24b0198436e133fa26a524a6d65fa3b2e37"
   integrity sha512-t0rzBq87m3fVcduHDUFhKmyyX+9eo6WQjZvf51Ea/M0Q7+T374Jp1aUiyUl0GKxp8M/OETVHSDvmkyPgvX+X2w==
 
-typescript@^5.1.3:
-  version "5.1.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.1.3.tgz#8d84219244a6b40b6fb2b33cc1c062f715b9e826"
-  integrity sha512-XH627E9vkeqhlZFQuL+UsyAXEnibT0kWR2FWONlr4sTjvxyJYnyefgrkyECLzM5NenmKzRAy2rR/OlYLA1HkZw==
+typescript@^5.1.6:
+  version "5.1.6"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.1.6.tgz#02f8ac202b6dad2c0dd5e0913745b47a37998274"
+  integrity sha512-zaWCozRZ6DLEWAWFrVDz1H6FVXzUSfTy5FUMWsQlU8Ym5JP9eO4xkTIROFCQvhQf61z6O/G6ugw3SgAnvvm+HA==
 
 unique-filename@^2.0.0:
   version "2.0.1"
