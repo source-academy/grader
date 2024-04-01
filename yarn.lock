@@ -2428,10 +2428,10 @@ js-base64@^3.7.5:
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.5.tgz#21e24cf6b886f76d6f5f165bfcd69cc55b9e3fca"
   integrity sha512-3MEt5DTINKqfScXKfJFrRbxkrnk2AxPWGBL/ycjz4dK8iqiSJ06UxD8jh8xuh6p10TX4t2+7FsBYVxxQbMg+qA==
 
-js-slang@^1.0.45:
-  version "1.0.45"
-  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-1.0.45.tgz#7246ff653a0fde98af0252202a62c4f6f3126f7a"
-  integrity sha512-NnAvoPwryXzqqMRXbP8ArEqKm6GKAJVkqqZZTKzg0D1wwB3I/n9PZrLHyaoJYJ+xr/XhulRbnfEe0bxR1ITTLw==
+js-slang@^1.0.57:
+  version "1.0.57"
+  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-1.0.57.tgz#e52a6c1fe4e6ba2516dddaf50d632ad7d263ec04"
+  integrity sha512-iQPfmZLe7oTygVE+n7vlpRy224/GYx7TgvjG/bxuN0Ydnr9TTqwrvZ7B6IZF89j+3Z3PbGtVIFJLD9NLd+l25g==
   dependencies:
     "@babel/parser" "^7.19.4"
     "@joeychenofficial/alt-ergo-modified" "^2.4.0"
