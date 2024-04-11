@@ -1737,7 +1737,7 @@ gl-wiretap@^0.6.2:
   resolved "https://registry.yarnpkg.com/gl-wiretap/-/gl-wiretap-0.6.2.tgz#e4aa19622831088fbaa7e5a18d01768f7a3fb07c"
   integrity sha512-fxy1XGiPkfzK+T3XKDbY7yaqMBmozCGvAFyTwaZA3imeZH83w7Hr3r3bYlMRWIyzMI/lDUvUMM/92LE2OwqFyQ==
 
-gl@^4.4.0, gl@^5.0.3, gl@^6.0.2:
+gl@^5.0.3, gl@^6.0.0, gl@^6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/gl/-/gl-6.0.2.tgz#685579732a19075e3acf4684edb1270278e551c7"
   integrity sha512-yBbfpChOtFvg5D+KtMaBFvj6yt3vUnheNAH+UrQH2TfDB8kr0tERdL0Tjhe0W7xJ6jR6ftQBluTZR9jXUnKe8g==
@@ -2779,13 +2779,13 @@ node-abi@^3.26.0, node-abi@^3.3.0:
   dependencies:
     semver "^7.3.5"
 
-node-canvas-webgl@^0.2.6:
-  version "0.2.7"
-  resolved "https://registry.yarnpkg.com/node-canvas-webgl/-/node-canvas-webgl-0.2.7.tgz#6aa961015415072bcc0e797edc1b5be3729ebb04"
-  integrity sha512-Rg3vlqdvvjglJW1aHb9JEBIGt6PsYCs1w/XXQk/5WztFQ9+IjBpqLsmavQr0jq6hbqMuiSMoFcn6BH+MUHpX/g==
+node-canvas-webgl@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/node-canvas-webgl/-/node-canvas-webgl-0.3.0.tgz#80f8e4fb676564ffd5d1bf7c1fff7f3b4534b41b"
+  integrity sha512-wDRCTEE2TCqKDeSef5cNgtLv8kgjRlnFN3aYgB9yni0kHRNnKBSSP93lT8VIV5GuMWiy5KNXBU0ilyWL5wTvFg==
   dependencies:
     canvas "^2.6.0"
-    gl "^4.4.0"
+    gl "^6.0.0"
 
 node-fetch@^2.6.7:
   version "2.6.11"
