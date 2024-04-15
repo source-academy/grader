@@ -216,11 +216,17 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
   // Run all files with entrypoint file in context
   const [runFilesResult, elevatedBase] = await runInElevatedContext(context, () =>
     catchTimeouts(
-      runFilesInContext(unitTest.files, unitTest.entrypointFile)
-      )
+      runFilesInContext(unitTest.files, unitTest.entrypointFile, context, {
+        executionMethod: 'native',
+        originalMaxExecTime: TIMEOUT_DURATION
+      })
+    )
   )
+
+  // since both prepend and postpend files are combined into the same file (1 string), we target
+  // the main entrypoint file only
   if (runFilesResult.status !== 'finished') {
-    return handleResult(runFilesResult, context, runFilesResult.postpendProgram, 'postpend')
+    return handleResult(runFilesResult, context, unitTest.files[unitTest.entrypointFile], 'student')
   }
 
   const [testcaseResult] = await runInElevatedContext(
