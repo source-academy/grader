@@ -1,4 +1,4 @@
-import { createContext, runInContext, Result as SourceResult } from 'js-slang'
+import { createContext, runInContext, runFilesInContext, Result as SourceResult } from 'js-slang'
 import { stringify } from 'js-slang/dist/utils/stringify'
 import { SourceError, Context, Frame, Value, Variant } from 'js-slang/dist/types'
 import {
@@ -40,10 +40,9 @@ export type Testcase = {
  */
 export type AwsEvent = {
   library: Library
-  prependProgram: string
-  studentProgram: string
-  postpendProgram: string
   testcases: Testcase[]
+  files: Record<string, string>
+  entrypointFile: string
 }
 
 /**
@@ -51,9 +50,8 @@ export type AwsEvent = {
  */
 export type UnitTest = {
   library: Library
-  prependProgram: string
-  studentProgram: string
-  postpendProgram: string
+  files: Record<string, string>
+  entrypointFile: string
   testcase: Testcase
 }
 
@@ -142,9 +140,8 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
   const promises: Promise<Output>[] = event.testcases.map((testcase: Testcase) =>
     run({
       library: event.library,
-      prependProgram: event.prependProgram || '',
-      studentProgram: event.studentProgram,
-      postpendProgram: event.postpendProgram || '',
+      files: event.files,
+      entrypointFile: event.entrypointFile,
       testcase: testcase
     })
   )
@@ -177,43 +174,59 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
   }
 
   // Run prepend
-  const [prependResult, elevatedBase] = await runInElevatedContext(context, () =>
+  // const [prependResult, elevatedBase] = await runInElevatedContext(context, () =>
+  //   catchTimeouts(
+  //     runInContext(unitTest.prependProgram, context, {
+  //       executionMethod: 'native',
+  //       originalMaxExecTime: TIMEOUT_DURATION
+  //     })
+  //   )
+  // )
+  // if (prependResult.status !== 'finished') {
+  //   return handleResult(prependResult, context, unitTest.prependProgram, 'prepend')
+  // }
+
+  // // Run student program
+  // const studentResult = await catchTimeouts(
+  //   runInContext(unitTest.studentProgram, context, {
+  //     executionMethod: 'native',
+  //     originalMaxExecTime: TIMEOUT_DURATION
+  //   })
+  // )
+  // if (studentResult.status !== 'finished') {
+  //   return handleResult(studentResult, context, unitTest.studentProgram, 'student')
+  // }
+
+  // // Run postpend
+  // const [postpendResult] = await runInElevatedContext(
+  //   context,
+  //   () =>
+  //     catchTimeouts(
+  //       runInContext(unitTest.postpendProgram, context, {
+  //         executionMethod: 'native',
+  //         originalMaxExecTime: TIMEOUT_DURATION
+  //       })
+  //     ),
+  //   elevatedBase
+  // )
+  // if (postpendResult.status !== 'finished') {
+  //   return handleResult(postpendResult, context, unitTest.postpendProgram, 'postpend')
+  // }
+
+  // Run all files with entrypoint file in context
+  const [runFilesResult, elevatedBase] = await runInElevatedContext(context, () =>
     catchTimeouts(
-      runInContext(unitTest.prependProgram, context, {
+      runFilesInContext(unitTest.files, unitTest.entrypointFile, context, {
         executionMethod: 'native',
         originalMaxExecTime: TIMEOUT_DURATION
       })
     )
   )
-  if (prependResult.status !== 'finished') {
-    return handleResult(prependResult, context, unitTest.prependProgram, 'prepend')
-  }
 
-  // Run student program
-  const studentResult = await catchTimeouts(
-    runInContext(unitTest.studentProgram, context, {
-      executionMethod: 'native',
-      originalMaxExecTime: TIMEOUT_DURATION
-    })
-  )
-  if (studentResult.status !== 'finished') {
-    return handleResult(studentResult, context, unitTest.studentProgram, 'student')
-  }
-
-  // Run postpend
-  const [postpendResult] = await runInElevatedContext(
-    context,
-    () =>
-      catchTimeouts(
-        runInContext(unitTest.postpendProgram, context, {
-          executionMethod: 'native',
-          originalMaxExecTime: TIMEOUT_DURATION
-        })
-      ),
-    elevatedBase
-  )
-  if (postpendResult.status !== 'finished') {
-    return handleResult(postpendResult, context, unitTest.postpendProgram, 'postpend')
+  // since both prepend and postpend files are combined into the same file (1 string), we target
+  // the main entrypoint file only
+  if (runFilesResult.status !== 'finished') {
+    return handleResult(runFilesResult, context, unitTest.files[unitTest.entrypointFile], 'student')
   }
 
   const [testcaseResult] = await runInElevatedContext(
