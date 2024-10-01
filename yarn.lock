@@ -2438,10 +2438,10 @@ js-base64@^3.7.5:
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.5.tgz#21e24cf6b886f76d6f5f165bfcd69cc55b9e3fca"
   integrity sha512-3MEt5DTINKqfScXKfJFrRbxkrnk2AxPWGBL/ycjz4dK8iqiSJ06UxD8jh8xuh6p10TX4t2+7FsBYVxxQbMg+qA==
 
-js-slang@^1.0.74:
-  version "1.0.74"
-  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-1.0.74.tgz#1970459a60740a3535cd77846d13221bdd315669"
-  integrity sha512-PB6K0MRBHTOJWuAXa9cVZhNkYPyu0APQOZEtMN+KE1L0sLf0ksGfSwAEqapgvd9IB744KlpQ68njqwY2YPsf/A==
+js-slang@^1.0.76:
+  version "1.0.76"
+  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-1.0.76.tgz#5f2827b85b80880c5777913dbbac3f6b03f233e2"
+  integrity sha512-Ue/2aXJ7zwRCObW//aouHeqJMaP9110/5bcTBJ+jWF/EWnn3IXzh93CzR5bxsuYwGp6EYqLDSkSsxlmnZuDFFw==
   dependencies:
     "@babel/parser" "^7.19.4"
     "@commander-js/extra-typings" "^12.0.1"
