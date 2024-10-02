@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "fast-levenshtein": "^3.0.0",
-    "js-slang": "^1.0.74",
+    "js-slang": "^1.0.76",
     "lodash": "4.17.21",
     "node-canvas-webgl": "^0.2.6"
   },
