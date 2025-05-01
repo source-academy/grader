@@ -843,11 +843,6 @@ acorn-walk@^8.0.0:
   resolved "https://registry.yarnpkg.com/acorn-walk/-/acorn-walk-8.2.0.tgz#741210f2e2426454508853a2f44d0ab83b7f69c1"
   integrity sha512-k+iyHEuPgSw6SbuDpGQM+06HQUa04DZ3o+F6CSzXMvvI5KMvnaEqXe+YVe555R9nn6GPt404fos4wcgpw12SDA==
 
-acorn@^7.1.1:
-  version "7.4.1"
-  resolved "https://registry.yarnpkg.com/acorn/-/acorn-7.4.1.tgz#feaed255973d2e77555b83dbc08851a6c63520fa"
-  integrity sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==
-
 acorn@^8.5.0, acorn@^8.8.2:
   version "8.8.2"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.8.2.tgz#1b2f25db02af965399b9776b0c2c391276d37c4a"
@@ -1742,12 +1737,7 @@ github-from-package@0.0.0:
   resolved "https://registry.yarnpkg.com/github-from-package/-/github-from-package-0.0.0.tgz#97fb5d96bfde8973313f20e8288ef9a167fa64ce"
   integrity sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw==
 
-gl-wiretap@^0.6.2:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/gl-wiretap/-/gl-wiretap-0.6.2.tgz#e4aa19622831088fbaa7e5a18d01768f7a3fb07c"
-  integrity sha512-fxy1XGiPkfzK+T3XKDbY7yaqMBmozCGvAFyTwaZA3imeZH83w7Hr3r3bYlMRWIyzMI/lDUvUMM/92LE2OwqFyQ==
-
-gl@^4.4.0, gl@^5.0.3, gl@^6.0.2:
+gl@^4.4.0, gl@^6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/gl/-/gl-6.0.2.tgz#685579732a19075e3acf4684edb1270278e551c7"
   integrity sha512-yBbfpChOtFvg5D+KtMaBFvj6yt3vUnheNAH+UrQH2TfDB8kr0tERdL0Tjhe0W7xJ6jR6ftQBluTZR9jXUnKe8g==
@@ -1801,22 +1791,6 @@ glsl-tokenizer@^2.1.5:
   integrity sha512-XSZEJ/i4dmz3Pmbnpsy3cKh7cotvFlBiZnDOwnj/05EwNp2XrhQ4XKJxT7/pDt4kp4YcpRSKz8eTV7S+mwV6MA==
   dependencies:
     through2 "^0.6.3"
-
-gpu-mock.js@^1.3.0:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/gpu-mock.js/-/gpu-mock.js-1.3.1.tgz#f7deaa09da3f672762eda944ecf948fd2c4b1490"
-  integrity sha512-+lbp8rQ0p1nTa6Gk6HoLiw4yM6JTpql82U+nCF3sZbX4FJWP9PzzF1018dW8K+pbmqRmhLHbn6Bjc6i6tgUpbA==
-
-gpu.js@^2.16.0:
-  version "2.16.0"
-  resolved "https://registry.yarnpkg.com/gpu.js/-/gpu.js-2.16.0.tgz#35531f8ee79292b71a454455e7bf0aaf6693182a"
-  integrity sha512-ZKmWdRXi3F/9nim5ew2IPXZaMlSyqtMtVC8Itobjl+qYUgUqcBHxu8WKqK0AqIyjBVBl7A5ORo4Db2hzgrPd4A==
-  dependencies:
-    acorn "^7.1.1"
-    gl "^5.0.3"
-    gl-wiretap "^0.6.2"
-    gpu-mock.js "^1.3.0"
-    webgpu "^0.1.16"
 
 graceful-fs@^4.2.6, graceful-fs@^4.2.9:
   version "4.2.11"
@@ -2438,10 +2412,10 @@ js-base64@^3.7.5:
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.5.tgz#21e24cf6b886f76d6f5f165bfcd69cc55b9e3fca"
   integrity sha512-3MEt5DTINKqfScXKfJFrRbxkrnk2AxPWGBL/ycjz4dK8iqiSJ06UxD8jh8xuh6p10TX4t2+7FsBYVxxQbMg+qA==
 
-js-slang@^1.0.80:
-  version "1.0.80"
-  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-1.0.80.tgz#dadf9d7ec52024e68f9f08d1ee3b425dc347c6e6"
-  integrity sha512-0/DXBIa3CrvMzKyWBG4joxcLkZEqybpMKDeKXmUJk+lHrQQcOTb9AmXpSIS2rsvQT5EaHYQ2ROuuD6Gx701slg==
+js-slang@^1.0.82:
+  version "1.0.82"
+  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-1.0.82.tgz#d4a2db5be9a55c2a32be6e72626de16f71781ece"
+  integrity sha512-T8wHgPnQREF2qj5vXue0mGHLn63Tm1/oIsaq1slg6gDgigETKkKRA9bnkDDV4fGqHsxLggyrOaiOZ4suRE96mg==
   dependencies:
     "@babel/parser" "^7.19.4"
     "@commander-js/extra-typings" "^12.0.1"
@@ -2454,7 +2428,6 @@ js-slang@^1.0.80:
     acorn-walk "^8.0.0"
     astring "^1.4.3"
     commander "^12.0.0"
-    gpu.js "^2.16.0"
     js-base64 "^3.7.5"
     lodash "^4.17.21"
     source-map "0.7.3"
@@ -3625,11 +3598,6 @@ walker@^1.0.8:
   integrity sha512-ts/8E8l5b7kY0vlWLewOkDXMmPdLcVV4GmOQLyxuSswIJsweeFZtAsMF7k1Nszz+TYBQrlYRmzOnr398y1JemQ==
   dependencies:
     makeerror "1.0.12"
-
-webgpu@^0.1.16:
-  version "0.1.16"
-  resolved "https://registry.yarnpkg.com/webgpu/-/webgpu-0.1.16.tgz#dec416373e308181b28864b58c8a914461d7ceee"
-  integrity sha512-KAXn/f8lnL8o4B718zzdfi1l0nEWQpuoWlC1L5WM/svAbeHjShCEI0l5ZcZBEEUm9FF3ZTgRjWk8iwbJfnGKTA==
 
 webidl-conversions@^3.0.0:
   version "3.0.1"
