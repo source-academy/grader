@@ -1,6 +1,6 @@
-import { promisify } from 'util'
-import { chmod, copyFile, stat } from 'fs'
 import { spawn } from 'child_process'
+import { chmod, copyFile, stat } from 'fs'
+import { promisify } from 'util'
 
 const chmodAsync = promisify(chmod)
 const copyAsync = promisify(copyFile)
