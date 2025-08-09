@@ -27,7 +27,8 @@
     "typescript": "^5.8.3"
   },
   "resolutions": {
-    "**/gl": "^6.0.2"
+    "canvas": "^3.1.2",
+    "gl": "^8.0.2"
   },
   "jest": {
     "collectCoverageFrom": [
