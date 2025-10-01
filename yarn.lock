@@ -2418,10 +2418,10 @@ js-base64@^3.7.5:
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.5.tgz#21e24cf6b886f76d6f5f165bfcd69cc55b9e3fca"
   integrity sha512-3MEt5DTINKqfScXKfJFrRbxkrnk2AxPWGBL/ycjz4dK8iqiSJ06UxD8jh8xuh6p10TX4t2+7FsBYVxxQbMg+qA==
 
-js-slang@^1.0.82:
-  version "1.0.82"
-  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-1.0.82.tgz#d4a2db5be9a55c2a32be6e72626de16f71781ece"
-  integrity sha512-T8wHgPnQREF2qj5vXue0mGHLn63Tm1/oIsaq1slg6gDgigETKkKRA9bnkDDV4fGqHsxLggyrOaiOZ4suRE96mg==
+js-slang@^1.0.85:
+  version "1.0.85"
+  resolved "https://registry.yarnpkg.com/js-slang/-/js-slang-1.0.85.tgz#0141df5d3d53ff10589f8e1ae40b83816ad387e7"
+  integrity sha512-DFEr58ghGeZAjoAiD+KmzaS7U1WcvW0M0ayxo7aXWhCxtUDX8e0x0oNijIqd7e2B2M7BNv0qCu+oMvcFgl4iAg==
   dependencies:
     "@babel/parser" "^7.19.4"
     "@commander-js/extra-typings" "^12.0.1"
@@ -2436,7 +2436,7 @@ js-slang@^1.0.82:
     commander "^12.0.0"
     js-base64 "^3.7.5"
     lodash "^4.17.21"
-    source-map "0.7.3"
+    source-map "0.7.6"
 
 js-tokens@^4.0.0:
   version "4.0.0"
@@ -3273,10 +3273,10 @@ source-map-support@0.5.13:
     buffer-from "^1.0.0"
     source-map "^0.6.0"
 
-source-map@0.7.3:
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.7.3.tgz#5302f8169031735226544092e64981f751750383"
-  integrity sha512-CkCj6giN3S+n9qrYiBTX5gystlENnRW5jZeNLHpe6aue+SrHcG5VYwujhW9s4dY31mEGsxBDrHR6oI69fTXsaQ==
+source-map@0.7.6:
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.7.6.tgz#a3658ab87e5b6429c8a1f3ba0083d4c61ca3ef02"
+  integrity sha512-i5uvt8C3ikiWeNZSVZNWcfZPItFQOsYTUAOkcUPGd8DqDy1uOUikjt5dG+uRlwyvR108Fb9DOd4GvXfT0N2/uQ==
 
 source-map@^0.6.0, source-map@^0.6.1:
   version "0.6.1"
