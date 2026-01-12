@@ -6,11 +6,14 @@ jobs:
     name: Compile TypeScript
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - name: Enable corepack
+        run: corepack enable
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 22
+          cache: yarn
       - name: Compile TypeScript
         run: scripts/build-lambda-grader.sh
       - uses: actions/upload-artifact@v3
@@ -22,11 +25,11 @@ jobs:
     name: Build native modules
     needs: tsc
     runs-on: ubuntu-latest
-    container: amazon/aws-lambda-nodejs:18
+    container: amazon/aws-lambda-nodejs:22
     steps:
       - name: install git and tar
         run: yum install -y git tar bzip2 zip
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: build-lambda

@@ -1,14 +1,14 @@
 import { createContext, runInContext, Result as SourceResult } from 'js-slang'
-import { stringify } from 'js-slang/dist/utils/stringify'
-import { SourceError, Context, Frame, Value, Variant } from 'js-slang/dist/types'
 import {
+  defineSymbol,
   ensureGlobalEnvironmentExist,
-  importBuiltins,
-  defineSymbol
+  importBuiltins
 } from 'js-slang/dist/createContext'
+import { Context, Frame, SourceError, Value, Variant } from 'js-slang/dist/types'
+import { stringify } from 'js-slang/dist/utils/stringify'
 
-import { setupLambdaXvfb } from './setupXvfb'
 import { loadCurves, loadRunes } from './graphicsLoader'
+import { setupLambdaXvfb } from './setupXvfb'
 
 const externals: any = {}
 Object.assign(externals, require('./tree.js'))

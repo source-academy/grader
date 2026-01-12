@@ -5,9 +5,9 @@ jobs:
   xvfb:
     name: Build Xvfb
     runs-on: ubuntu-latest
-    container: amazon/aws-lambda-nodejs:16
+    container: amazon/aws-lambda-nodejs:22
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build Xvfb
         run: scripts/build-lambda-xvfb.sh
       - uses: actions/upload-artifact@v3
