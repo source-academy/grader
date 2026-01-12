@@ -1,18 +1,23 @@
 name: Build Lambda function
-on: workflow_dispatch
+on:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
   tsc:
     name: Compile TypeScript
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v6
       - name: Enable corepack
         run: corepack enable
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
           cache: yarn
       - name: Compile TypeScript
         run: scripts/build-lambda-grader.sh
@@ -25,11 +30,12 @@ jobs:
     name: Build native modules
     needs: tsc
     runs-on: ubuntu-latest
-    container: amazon/aws-lambda-nodejs:22
+    container: amazon/aws-lambda-nodejs:24
     steps:
       - name: install git and tar
         run: yum install -y git tar bzip2 zip
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v6
       - uses: actions/download-artifact@v3
         with:
           name: build-lambda
