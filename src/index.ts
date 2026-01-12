@@ -171,7 +171,7 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
  * @param unitTest the individual unit tests composed from runAll()
  */
 export const run = async (unitTest: UnitTest): Promise<Output> => {
-  const context = createContext(unitTest.library.chapter, Variant.DEFAULT, [])
+  const context = createContext(unitTest.library.chapter, Variant.DEFAULT, {})
   for (const name of unitTest.library.external.symbols) {
     defineSymbol(context, name, externals[name])
   }
@@ -328,6 +328,7 @@ const handleResult = (
         switch (err.constructor.name) {
           case 'PotentialInfiniteLoopError':
           case 'PotentialInfiniteRecursionError':
+          case 'InfiniteLoopError':
             return {
               errorType: 'timeout' as const
             }
