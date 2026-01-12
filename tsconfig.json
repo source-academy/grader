@@ -3,11 +3,7 @@
     "outDir": "./build",
     "module": "CommonJS",
     "target": "es2016",
-    "lib": [
-      "es2017.object",
-      "es2016",
-      "es2015"
-    ],
+    "lib": ["es2017.object", "es2016", "es2015"],
     "sourceMap": false,
     "allowJs": true,
     "removeComments": false,
@@ -22,9 +18,5 @@
     "noUnusedLocals": true,
     "skipLibCheck": true
   },
-  "exclude": [
-    "node_modules",
-    "build",
-    "dist"
-  ]
+  "exclude": ["node_modules", "build", "dist"]
 }

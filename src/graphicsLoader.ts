@@ -13,13 +13,13 @@ import { promisify } from 'util'
 async function loadGraphicsLibrary(...filenames: string[]) {
   const libraries = await Promise.all(
     ['webGLgraphics.js', ...filenames].map(filename =>
-      promisify(fs.readFile)(path.join(__dirname, 'graphics', filename), 'utf8')
-    )
+      promisify(fs.readFile)(path.join(__dirname, 'graphics', filename), 'utf8'),
+    ),
   )
 
   const libFn = new Function('module', 'exports', 'require', libraries.join('\n\n'))
   const module = {
-    exports: {}
+    exports: {},
   }
   libFn(module, module.exports, require)
   return module.exports as any

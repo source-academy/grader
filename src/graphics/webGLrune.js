@@ -33,33 +33,33 @@ function Rune() {
 }
 
 // set the transformation matrix related to the rune
-Rune.prototype.setM = function(matrix) {
+Rune.prototype.setM = function (matrix) {
   this.transMatrix = matrix
 }
 
 // get the transformation matrix related to the rune
-Rune.prototype.getM = function() {
+Rune.prototype.getM = function () {
   return this.transMatrix
 }
 
 // get the sub-runes (array) of the rune
-Rune.prototype.getS = function() {
+Rune.prototype.getS = function () {
   return this.runes
 }
 
-Rune.prototype.setS = function(runes) {
+Rune.prototype.setS = function (runes) {
   this.runes = runes
 }
 
-Rune.prototype.addS = function(rune) {
+Rune.prototype.addS = function (rune) {
   this.runes.push(rune)
 }
 
-Rune.prototype.getColor = function() {
+Rune.prototype.getColor = function () {
   return this.color
 }
 
-Rune.prototype.setColor = function(color) {
+Rune.prototype.setColor = function (color) {
   this.color = color
 }
 
@@ -70,111 +70,28 @@ Rune.prototype.setColor = function(color) {
 // (will be converted to Float32Array later)
 var vertices = [
   // center
-  0.0,
-  0.0,
-  0.0,
-  1.0,
+  0.0, 0.0, 0.0, 1.0,
   // 4 corners and 4 sides' midpoints
-  1.0,
-  0.0,
-  0.0,
-  1.0,
-  1.0,
-  1.0,
-  0.0,
-  1.0,
-  0.0,
-  1.0,
-  0.0,
-  1.0,
-  -1.0,
-  1.0,
-  0.0,
-  1.0,
-  -1.0,
-  0.0,
-  0.0,
-  1.0,
-  -1.0,
-  -1.0,
-  0.0,
-  1.0,
-  0.0,
-  -1.0,
-  0.0,
-  1.0,
-  1.0,
-  -1.0,
-  0.0,
-  1.0,
+  1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, -1.0, 1.0, 0.0, 1.0, -1.0, 0.0, 0.0,
+  1.0, -1.0, -1.0, 0.0, 1.0, 0.0, -1.0, 0.0, 1.0, 1.0, -1.0, 0.0, 1.0,
   // for rcross
-  0.5,
-  0.5,
-  0.0,
-  1.0,
-  -0.5,
-  0.5,
-  0.0,
-  1.0,
-  -0.5,
-  -0.5,
-  0.0,
-  1.0,
-  0.5,
-  -0.5,
-  0.0,
-  1.0,
+  0.5, 0.5, 0.0, 1.0, -0.5, 0.5, 0.0, 1.0, -0.5, -0.5, 0.0, 1.0, 0.5, -0.5, 0.0, 1.0,
   // for nova
-  0.0,
-  0.5,
-  0.0,
-  1.0,
-  -0.5,
-  0.0,
-  0.0,
-  1.0
+  0.0, 0.5, 0.0, 1.0, -0.5, 0.0, 0.0, 1.0,
 ]
 // indices is an array of indices, each refer to a point in vertices
 // (will be converted to Uint16Array later)
 var indices = [
   // square
-  2,
-  4,
-  6,
-  2,
-  6,
-  8,
+  2, 4, 6, 2, 6, 8,
   // rcross
-  2,
-  4,
-  10,
-  2,
-  9,
-  10,
-  2,
-  9,
-  12,
-  2,
-  12,
-  8,
-  10,
-  11,
-  12,
+  2, 4, 10, 2, 9, 10, 2, 9, 12, 2, 12, 8, 10, 11, 12,
   // sail
-  7,
-  8,
-  3,
+  7, 8, 3,
   // corner
-  1,
-  2,
-  3,
+  1, 2, 3,
   // nova
-  3,
-  0,
-  14,
-  13,
-  0,
-  1
+  3, 0, 14, 13, 0, 1,
 ]
 
 function makeCircle() {
@@ -182,10 +99,10 @@ function makeCircle() {
   var centerVerInd = 0
   var firstVer = vertices.length / 4
   var firstInd = indices.length
-  var numPoints = Math.ceil(Math.PI * rune_viewport_size / maxArcLength)
+  var numPoints = Math.ceil((Math.PI * rune_viewport_size) / maxArcLength)
   // generate points and store it in the vertex buffer
   for (var i = 0; i < numPoints; i++) {
-    var angle = Math.PI * 2 * i / numPoints
+    var angle = (Math.PI * 2 * i) / numPoints
     vertices.push(Math.cos(angle), Math.sin(angle), 0, 1)
   }
   // generate indices for the triangles and store in the index buffer
@@ -204,7 +121,7 @@ function makeHeart() {
   var root2 = Math.sqrt(2)
   var r = 4 / (2 + 3 * root2)
   var scaleX = 1 / (r * (1 + root2 / 2))
-  var numPoints = Math.ceil(Math.PI / 2 * rune_viewport_size * r / maxArcLength)
+  var numPoints = Math.ceil(((Math.PI / 2) * rune_viewport_size * r) / maxArcLength)
   // right semi-circle
   var rightCenterX = r / root2
   var rightCenterY = 1 - r
@@ -214,7 +131,7 @@ function makeHeart() {
       (Math.cos(angle) * r + rightCenterX) * scaleX,
       Math.sin(angle) * r + rightCenterY,
       0,
-      1
+      1,
     )
   }
   // left semi-circle
@@ -226,7 +143,7 @@ function makeHeart() {
       (Math.cos(angle) * r + leftCenterX) * scaleX,
       Math.sin(angle) * r + leftCenterY,
       0,
-      1
+      1,
     )
   }
   // update index buffer
@@ -244,8 +161,8 @@ function makePentagram() {
   var v1 = Math.sin(Math.PI / 10)
   var v2 = Math.cos(Math.PI / 10)
 
-  var w1 = Math.sin(3 * Math.PI / 10)
-  var w2 = Math.cos(3 * Math.PI / 10)
+  var w1 = Math.sin((3 * Math.PI) / 10)
+  var w2 = Math.cos((3 * Math.PI) / 10)
 
   vertices.push(v2, v1, 0, 1)
   vertices.push(w2, -w1, 0, 1)
@@ -254,7 +171,7 @@ function makePentagram() {
   vertices.push(0, 1, 0, 1)
 
   for (var i = 0; i < 5; i++) {
-    indices.push(0, firstVer + i, firstVer + (i + 2) % 5)
+    indices.push(0, firstVer + i, firstVer + ((i + 2) % 5))
   }
 
   return new PrimaryRune(firstInd, 15)
@@ -269,12 +186,12 @@ function makeRibbon() {
   var unit = 0.1
 
   for (var i = 0; i < theta_max; i += unit) {
-    vertices.push(i / theta_max * Math.cos(i), i / theta_max * Math.sin(i), 0, 1)
+    vertices.push((i / theta_max) * Math.cos(i), (i / theta_max) * Math.sin(i), 0, 1)
     vertices.push(
-      Math.abs(Math.cos(i) * thickness) + i / theta_max * Math.cos(i),
-      Math.abs(Math.sin(i) * thickness) + i / theta_max * Math.sin(i),
+      Math.abs(Math.cos(i) * thickness) + (i / theta_max) * Math.cos(i),
+      Math.abs(Math.sin(i) * thickness) + (i / theta_max) * Math.sin(i),
       0,
-      1
+      1,
     )
   }
 
@@ -289,12 +206,12 @@ function makeRibbon() {
 
 /**
  * primitive Rune in the rune of a full square
-**/
+ **/
 var square = new PrimaryRune(0, 6)
 
 /**
  * primitive Rune in the rune of a blank square
-**/
+ **/
 var blank = new PrimaryRune(0, 0)
 
 /**
@@ -302,46 +219,46 @@ var blank = new PrimaryRune(0, 0)
  * smallsquare inside a large square,
  * each diagonally split into a
  * black and white half
-**/
+ **/
 var rcross = new PrimaryRune(6, 15)
 
 /**
  * primitive Rune in the rune of a sail
-**/
+ **/
 var sail = new PrimaryRune(21, 3)
 
 /**
  * primitive Rune with black triangle,
  * filling upper right corner
-**/
+ **/
 var corner = new PrimaryRune(24, 3)
 
 /**
  * primitive Rune in the rune of two overlapping
  * triangles, residing in the upper half
  * of
-**/
+ **/
 var nova = new PrimaryRune(27, 6)
 
 /**
  * primitive Rune in the rune of a circle
-**/
+ **/
 var circle = makeCircle()
 
 /**
  * primitive Rune in the rune of a heart
-**/
+ **/
 var heart = makeHeart()
 
 /**
  * primitive Rune in the rune of a pentagram
-**/
+ **/
 var pentagram = makePentagram()
 
 /**
  * primitive Rune in the rune of a ribbon
  * winding outwards in an anticlockwise spiral
-**/
+ **/
 var ribbon = makeRibbon()
 
 // convert vertices and indices to typed arrays
@@ -374,7 +291,7 @@ function generateFlattenedRuneList(rune) {
         rune_list[rune.first] = {
           rune: rune,
           matrices: [],
-          colors: []
+          colors: [],
         }
       }
       rune_list[rune.first].matrices.push(matrix)
@@ -405,7 +322,7 @@ function generateFlattenedRuneList(rune) {
   // draw a white square background first
   flattened_rune_list.push({
     rune: square,
-    instanceArray: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1, 1, 1, 1, 1, 1])
+    instanceArray: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1, 1, 1, 1, 1, 1]),
   })
   for (var key in rune_list) {
     if (rune_list.hasOwnProperty(key)) {
@@ -447,12 +364,12 @@ function throwIfNotRune(name, x) {
 
 function show(rune) {
   throwIfNotRune('show', rune)
-  const frame = open_pixmap('frame', rune_viewport_size, rune_viewport_size, true);
+  const frame = open_pixmap('frame', rune_viewport_size, rune_viewport_size, true)
   clear_viewport()
   var flattened_rune_list = generateFlattenedRuneList(rune)
-  drawWithWebGL(flattened_rune_list, drawRune);
-  copy_viewport(gl.canvas, frame);
-  return new ShapeDrawn(frame);
+  drawWithWebGL(flattened_rune_list, drawRune)
+  copy_viewport(gl.canvas, frame)
+  return new ShapeDrawn(frame)
 }
 
 /**
@@ -547,7 +464,6 @@ function scale_independent(ratio_x, ratio_y, rune) {
   return wrapper
 }
 
-
 /**
  * scales a given Rune by a given factor in both x and y direction
  * @param {number} ratio - scaling factor
@@ -558,8 +474,6 @@ function scale(ratio, rune) {
   throwIfNotRune('scale', rune)
   return scale_independent(ratio, ratio, rune)
 }
-
-
 
 /**
  * translates a given Rune by given values in x and y direction
@@ -752,7 +666,7 @@ function make_cross(rune) {
   throwIfNotRune('make_cross', rune)
   return stack(
     beside(quarter_turn_right(rune), rotate(Math.PI, rune)),
-    beside(rune, rotate(Math.PI / 2, rune))
+    beside(rune, rotate(Math.PI / 2, rune)),
   )
 }
 
@@ -779,7 +693,7 @@ function hexToColor(hex) {
     parseInt(result[1], 16) / 255,
     parseInt(result[2], 16) / 255,
     parseInt(result[3], 16) / 255,
-    1
+    1,
   ]
 }
 
@@ -838,7 +752,7 @@ var colorPalette = [
   '#4CAF50',
   '#FFEB3B',
   '#FF9800',
-  '#795548'
+  '#795548',
 ]
 
 /**
@@ -977,7 +891,7 @@ function overlay_frac(frac, rune1, rune2) {
   mat4.scale(
     backMat,
     mat4.translate(backMat, backMat, vec3.fromValues(0, 0, -frac)),
-    vec3.fromValues(1, 1, 1 - frac)
+    vec3.fromValues(1, 1, 1 - frac),
   )
 
   var combined = new Rune()
@@ -1086,48 +1000,48 @@ function stereogram(rune) {
 }
 */
 
-exports.show = show;
-exports.color = color;
-exports.random_color = random_color;
-exports.red = red;
-exports.pink = pink;
-exports.purple = purple;
-exports.indigo = indigo;
-exports.blue = blue;
-exports.green = green;
-exports.yellow = yellow;
-exports.orange = orange;
-exports.brown = brown;
-exports.black = black;
-exports.white = white;
-exports.scale_independent = scale_independent;
-exports.scale = scale;
-exports.translate = translate;
-exports.rotate = rotate;
-exports.stack_frac = stack_frac;
-exports.stack = stack;
-exports.stackn = stackn;
-exports.quarter_turn_right = quarter_turn_right;
-exports.quarter_turn_left = quarter_turn_left;
-exports.turn_upside_down = turn_upside_down;
-exports.beside_frac = beside_frac;
-exports.beside = beside;
-exports.flip_vert = flip_vert;
-exports.flip_horiz = flip_horiz;
-exports.make_cross = make_cross;
-exports.repeat_pattern = repeat_pattern;
-exports.square = square;
-exports.blank = blank;
-exports.rcross = rcross;
-exports.sail = sail;
-exports.corner = corner;
-exports.nova = nova;
-exports.circle = circle;
-exports.heart = heart;
-exports.pentagram = pentagram;
-exports.ribbon = ribbon;
-exports.anaglyph = anaglyph;
-exports.overlay_frac = overlay_frac;
-exports.overlay = overlay;
-exports.hollusion = hollusion;
-exports.picture_mse = picture_mse;
+exports.show = show
+exports.color = color
+exports.random_color = random_color
+exports.red = red
+exports.pink = pink
+exports.purple = purple
+exports.indigo = indigo
+exports.blue = blue
+exports.green = green
+exports.yellow = yellow
+exports.orange = orange
+exports.brown = brown
+exports.black = black
+exports.white = white
+exports.scale_independent = scale_independent
+exports.scale = scale
+exports.translate = translate
+exports.rotate = rotate
+exports.stack_frac = stack_frac
+exports.stack = stack
+exports.stackn = stackn
+exports.quarter_turn_right = quarter_turn_right
+exports.quarter_turn_left = quarter_turn_left
+exports.turn_upside_down = turn_upside_down
+exports.beside_frac = beside_frac
+exports.beside = beside
+exports.flip_vert = flip_vert
+exports.flip_horiz = flip_horiz
+exports.make_cross = make_cross
+exports.repeat_pattern = repeat_pattern
+exports.square = square
+exports.blank = blank
+exports.rcross = rcross
+exports.sail = sail
+exports.corner = corner
+exports.nova = nova
+exports.circle = circle
+exports.heart = heart
+exports.pentagram = pentagram
+exports.ribbon = ribbon
+exports.anaglyph = anaglyph
+exports.overlay_frac = overlay_frac
+exports.overlay = overlay
+exports.hollusion = hollusion
+exports.picture_mse = picture_mse

@@ -27,13 +27,12 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
-;(function(_global) {
+;(function (_global) {
   'use strict'
 
   var shim = {}
   shim.exports = typeof window !== 'undefined' ? window : _global
-
-  ;(function(exports) {
+  ;(function (exports) {
     /* Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -79,7 +78,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      *
      * @param {Type} type Array type, such as Float32Array or Array
      */
-    glMatrix.setMatrixArrayType = function(type) {
+    glMatrix.setMatrixArrayType = function (type) {
       GLMAT_ARRAY_TYPE = type
     }
 
@@ -94,7 +93,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      *
      * @param {Number} Angle in Degrees
      */
-    glMatrix.toRadian = function(a) {
+    glMatrix.toRadian = function (a) {
       return a * degree
     }
     /* Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
@@ -131,7 +130,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      *
      * @returns {vec2} a new 2D vector
      */
-    vec2.create = function() {
+    vec2.create = function () {
       var out = new GLMAT_ARRAY_TYPE(2)
       out[0] = 0
       out[1] = 0
@@ -144,7 +143,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} a vector to clone
      * @returns {vec2} a new 2D vector
      */
-    vec2.clone = function(a) {
+    vec2.clone = function (a) {
       var out = new GLMAT_ARRAY_TYPE(2)
       out[0] = a[0]
       out[1] = a[1]
@@ -158,7 +157,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} y Y component
      * @returns {vec2} a new 2D vector
      */
-    vec2.fromValues = function(x, y) {
+    vec2.fromValues = function (x, y) {
       var out = new GLMAT_ARRAY_TYPE(2)
       out[0] = x
       out[1] = y
@@ -172,7 +171,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} a the source vector
      * @returns {vec2} out
      */
-    vec2.copy = function(out, a) {
+    vec2.copy = function (out, a) {
       out[0] = a[0]
       out[1] = a[1]
       return out
@@ -186,7 +185,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} y Y component
      * @returns {vec2} out
      */
-    vec2.set = function(out, x, y) {
+    vec2.set = function (out, x, y) {
       out[0] = x
       out[1] = y
       return out
@@ -200,7 +199,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} b the second operand
      * @returns {vec2} out
      */
-    vec2.add = function(out, a, b) {
+    vec2.add = function (out, a, b) {
       out[0] = a[0] + b[0]
       out[1] = a[1] + b[1]
       return out
@@ -214,7 +213,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} b the second operand
      * @returns {vec2} out
      */
-    vec2.subtract = function(out, a, b) {
+    vec2.subtract = function (out, a, b) {
       out[0] = a[0] - b[0]
       out[1] = a[1] - b[1]
       return out
@@ -234,7 +233,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} b the second operand
      * @returns {vec2} out
      */
-    vec2.multiply = function(out, a, b) {
+    vec2.multiply = function (out, a, b) {
       out[0] = a[0] * b[0]
       out[1] = a[1] * b[1]
       return out
@@ -254,7 +253,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} b the second operand
      * @returns {vec2} out
      */
-    vec2.divide = function(out, a, b) {
+    vec2.divide = function (out, a, b) {
       out[0] = a[0] / b[0]
       out[1] = a[1] / b[1]
       return out
@@ -274,7 +273,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} b the second operand
      * @returns {vec2} out
      */
-    vec2.min = function(out, a, b) {
+    vec2.min = function (out, a, b) {
       out[0] = Math.min(a[0], b[0])
       out[1] = Math.min(a[1], b[1])
       return out
@@ -288,7 +287,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} b the second operand
      * @returns {vec2} out
      */
-    vec2.max = function(out, a, b) {
+    vec2.max = function (out, a, b) {
       out[0] = Math.max(a[0], b[0])
       out[1] = Math.max(a[1], b[1])
       return out
@@ -302,7 +301,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} b amount to scale the vector by
      * @returns {vec2} out
      */
-    vec2.scale = function(out, a, b) {
+    vec2.scale = function (out, a, b) {
       out[0] = a[0] * b
       out[1] = a[1] * b
       return out
@@ -317,7 +316,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} scale the amount to scale b by before adding
      * @returns {vec2} out
      */
-    vec2.scaleAndAdd = function(out, a, b, scale) {
+    vec2.scaleAndAdd = function (out, a, b, scale) {
       out[0] = a[0] + b[0] * scale
       out[1] = a[1] + b[1] * scale
       return out
@@ -330,7 +329,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} b the second operand
      * @returns {Number} distance between a and b
      */
-    vec2.distance = function(a, b) {
+    vec2.distance = function (a, b) {
       var x = b[0] - a[0],
         y = b[1] - a[1]
       return Math.sqrt(x * x + y * y)
@@ -349,7 +348,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} b the second operand
      * @returns {Number} squared distance between a and b
      */
-    vec2.squaredDistance = function(a, b) {
+    vec2.squaredDistance = function (a, b) {
       var x = b[0] - a[0],
         y = b[1] - a[1]
       return x * x + y * y
@@ -367,7 +366,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} a vector to calculate length of
      * @returns {Number} length of a
      */
-    vec2.length = function(a) {
+    vec2.length = function (a) {
       var x = a[0],
         y = a[1]
       return Math.sqrt(x * x + y * y)
@@ -385,7 +384,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} a vector to calculate squared length of
      * @returns {Number} squared length of a
      */
-    vec2.squaredLength = function(a) {
+    vec2.squaredLength = function (a) {
       var x = a[0],
         y = a[1]
       return x * x + y * y
@@ -404,7 +403,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} a vector to negate
      * @returns {vec2} out
      */
-    vec2.negate = function(out, a) {
+    vec2.negate = function (out, a) {
       out[0] = -a[0]
       out[1] = -a[1]
       return out
@@ -417,7 +416,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} a vector to invert
      * @returns {vec2} out
      */
-    vec2.inverse = function(out, a) {
+    vec2.inverse = function (out, a) {
       out[0] = 1.0 / a[0]
       out[1] = 1.0 / a[1]
       return out
@@ -430,7 +429,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} a vector to normalize
      * @returns {vec2} out
      */
-    vec2.normalize = function(out, a) {
+    vec2.normalize = function (out, a) {
       var x = a[0],
         y = a[1]
       var len = x * x + y * y
@@ -450,7 +449,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} b the second operand
      * @returns {Number} dot product of a and b
      */
-    vec2.dot = function(a, b) {
+    vec2.dot = function (a, b) {
       return a[0] * b[0] + a[1] * b[1]
     }
 
@@ -463,7 +462,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} b the second operand
      * @returns {vec3} out
      */
-    vec2.cross = function(out, a, b) {
+    vec2.cross = function (out, a, b) {
       var z = a[0] * b[1] - a[1] * b[0]
       out[0] = out[1] = 0
       out[2] = z
@@ -479,7 +478,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} t interpolation amount between the two inputs
      * @returns {vec2} out
      */
-    vec2.lerp = function(out, a, b, t) {
+    vec2.lerp = function (out, a, b, t) {
       var ax = a[0],
         ay = a[1]
       out[0] = ax + t * (b[0] - ax)
@@ -494,7 +493,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} [scale] Length of the resulting vector. If ommitted, a unit vector will be returned
      * @returns {vec2} out
      */
-    vec2.random = function(out, scale) {
+    vec2.random = function (out, scale) {
       scale = scale || 1.0
       var r = GLMAT_RANDOM() * 2.0 * Math.PI
       out[0] = Math.cos(r) * scale
@@ -510,7 +509,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2} m matrix to transform with
      * @returns {vec2} out
      */
-    vec2.transformMat2 = function(out, a, m) {
+    vec2.transformMat2 = function (out, a, m) {
       var x = a[0],
         y = a[1]
       out[0] = m[0] * x + m[2] * y
@@ -526,7 +525,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2d} m matrix to transform with
      * @returns {vec2} out
      */
-    vec2.transformMat2d = function(out, a, m) {
+    vec2.transformMat2d = function (out, a, m) {
       var x = a[0],
         y = a[1]
       out[0] = m[0] * x + m[2] * y + m[4]
@@ -543,7 +542,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat3} m matrix to transform with
      * @returns {vec2} out
      */
-    vec2.transformMat3 = function(out, a, m) {
+    vec2.transformMat3 = function (out, a, m) {
       var x = a[0],
         y = a[1]
       out[0] = m[0] * x + m[3] * y + m[6]
@@ -561,7 +560,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat4} m matrix to transform with
      * @returns {vec2} out
      */
-    vec2.transformMat4 = function(out, a, m) {
+    vec2.transformMat4 = function (out, a, m) {
       var x = a[0],
         y = a[1]
       out[0] = m[0] * x + m[4] * y + m[12]
@@ -581,10 +580,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @returns {Array} a
      * @function
      */
-    vec2.forEach = (function() {
+    vec2.forEach = (function () {
       var vec = vec2.create()
 
-      return function(a, stride, offset, count, fn, arg) {
+      return function (a, stride, offset, count, fn, arg) {
         var i, l
         if (!stride) {
           stride = 2
@@ -618,7 +617,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} vec vector to represent as a string
      * @returns {String} string representation of the vector
      */
-    vec2.str = function(a) {
+    vec2.str = function (a) {
       return 'vec2(' + a[0] + ', ' + a[1] + ')'
     }
 
@@ -659,7 +658,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      *
      * @returns {vec3} a new 3D vector
      */
-    vec3.create = function() {
+    vec3.create = function () {
       var out = new GLMAT_ARRAY_TYPE(3)
       out[0] = 0
       out[1] = 0
@@ -673,7 +672,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} a vector to clone
      * @returns {vec3} a new 3D vector
      */
-    vec3.clone = function(a) {
+    vec3.clone = function (a) {
       var out = new GLMAT_ARRAY_TYPE(3)
       out[0] = a[0]
       out[1] = a[1]
@@ -689,7 +688,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} z Z component
      * @returns {vec3} a new 3D vector
      */
-    vec3.fromValues = function(x, y, z) {
+    vec3.fromValues = function (x, y, z) {
       var out = new GLMAT_ARRAY_TYPE(3)
       out[0] = x
       out[1] = y
@@ -704,7 +703,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} a the source vector
      * @returns {vec3} out
      */
-    vec3.copy = function(out, a) {
+    vec3.copy = function (out, a) {
       out[0] = a[0]
       out[1] = a[1]
       out[2] = a[2]
@@ -720,7 +719,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} z Z component
      * @returns {vec3} out
      */
-    vec3.set = function(out, x, y, z) {
+    vec3.set = function (out, x, y, z) {
       out[0] = x
       out[1] = y
       out[2] = z
@@ -735,7 +734,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} b the second operand
      * @returns {vec3} out
      */
-    vec3.add = function(out, a, b) {
+    vec3.add = function (out, a, b) {
       out[0] = a[0] + b[0]
       out[1] = a[1] + b[1]
       out[2] = a[2] + b[2]
@@ -750,7 +749,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} b the second operand
      * @returns {vec3} out
      */
-    vec3.subtract = function(out, a, b) {
+    vec3.subtract = function (out, a, b) {
       out[0] = a[0] - b[0]
       out[1] = a[1] - b[1]
       out[2] = a[2] - b[2]
@@ -771,7 +770,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} b the second operand
      * @returns {vec3} out
      */
-    vec3.multiply = function(out, a, b) {
+    vec3.multiply = function (out, a, b) {
       out[0] = a[0] * b[0]
       out[1] = a[1] * b[1]
       out[2] = a[2] * b[2]
@@ -792,7 +791,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} b the second operand
      * @returns {vec3} out
      */
-    vec3.divide = function(out, a, b) {
+    vec3.divide = function (out, a, b) {
       out[0] = a[0] / b[0]
       out[1] = a[1] / b[1]
       out[2] = a[2] / b[2]
@@ -813,7 +812,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} b the second operand
      * @returns {vec3} out
      */
-    vec3.min = function(out, a, b) {
+    vec3.min = function (out, a, b) {
       out[0] = Math.min(a[0], b[0])
       out[1] = Math.min(a[1], b[1])
       out[2] = Math.min(a[2], b[2])
@@ -828,7 +827,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} b the second operand
      * @returns {vec3} out
      */
-    vec3.max = function(out, a, b) {
+    vec3.max = function (out, a, b) {
       out[0] = Math.max(a[0], b[0])
       out[1] = Math.max(a[1], b[1])
       out[2] = Math.max(a[2], b[2])
@@ -843,7 +842,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} b amount to scale the vector by
      * @returns {vec3} out
      */
-    vec3.scale = function(out, a, b) {
+    vec3.scale = function (out, a, b) {
       out[0] = a[0] * b
       out[1] = a[1] * b
       out[2] = a[2] * b
@@ -859,7 +858,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} scale the amount to scale b by before adding
      * @returns {vec3} out
      */
-    vec3.scaleAndAdd = function(out, a, b, scale) {
+    vec3.scaleAndAdd = function (out, a, b, scale) {
       out[0] = a[0] + b[0] * scale
       out[1] = a[1] + b[1] * scale
       out[2] = a[2] + b[2] * scale
@@ -873,7 +872,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} b the second operand
      * @returns {Number} distance between a and b
      */
-    vec3.distance = function(a, b) {
+    vec3.distance = function (a, b) {
       var x = b[0] - a[0],
         y = b[1] - a[1],
         z = b[2] - a[2]
@@ -893,7 +892,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} b the second operand
      * @returns {Number} squared distance between a and b
      */
-    vec3.squaredDistance = function(a, b) {
+    vec3.squaredDistance = function (a, b) {
       var x = b[0] - a[0],
         y = b[1] - a[1],
         z = b[2] - a[2]
@@ -912,7 +911,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} a vector to calculate length of
      * @returns {Number} length of a
      */
-    vec3.length = function(a) {
+    vec3.length = function (a) {
       var x = a[0],
         y = a[1],
         z = a[2]
@@ -931,7 +930,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} a vector to calculate squared length of
      * @returns {Number} squared length of a
      */
-    vec3.squaredLength = function(a) {
+    vec3.squaredLength = function (a) {
       var x = a[0],
         y = a[1],
         z = a[2]
@@ -951,7 +950,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} a vector to negate
      * @returns {vec3} out
      */
-    vec3.negate = function(out, a) {
+    vec3.negate = function (out, a) {
       out[0] = -a[0]
       out[1] = -a[1]
       out[2] = -a[2]
@@ -965,7 +964,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} a vector to invert
      * @returns {vec3} out
      */
-    vec3.inverse = function(out, a) {
+    vec3.inverse = function (out, a) {
       out[0] = 1.0 / a[0]
       out[1] = 1.0 / a[1]
       out[2] = 1.0 / a[2]
@@ -979,7 +978,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} a vector to normalize
      * @returns {vec3} out
      */
-    vec3.normalize = function(out, a) {
+    vec3.normalize = function (out, a) {
       var x = a[0],
         y = a[1],
         z = a[2]
@@ -1001,7 +1000,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} b the second operand
      * @returns {Number} dot product of a and b
      */
-    vec3.dot = function(a, b) {
+    vec3.dot = function (a, b) {
       return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
     }
 
@@ -1013,7 +1012,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} b the second operand
      * @returns {vec3} out
      */
-    vec3.cross = function(out, a, b) {
+    vec3.cross = function (out, a, b) {
       var ax = a[0],
         ay = a[1],
         az = a[2],
@@ -1036,7 +1035,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} t interpolation amount between the two inputs
      * @returns {vec3} out
      */
-    vec3.lerp = function(out, a, b, t) {
+    vec3.lerp = function (out, a, b, t) {
       var ax = a[0],
         ay = a[1],
         az = a[2]
@@ -1053,7 +1052,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} [scale] Length of the resulting vector. If ommitted, a unit vector will be returned
      * @returns {vec3} out
      */
-    vec3.random = function(out, scale) {
+    vec3.random = function (out, scale) {
       scale = scale || 1.0
 
       var r = GLMAT_RANDOM() * 2.0 * Math.PI
@@ -1075,7 +1074,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat4} m matrix to transform with
      * @returns {vec3} out
      */
-    vec3.transformMat4 = function(out, a, m) {
+    vec3.transformMat4 = function (out, a, m) {
       var x = a[0],
         y = a[1],
         z = a[2],
@@ -1095,7 +1094,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat4} m the 3x3 matrix to transform with
      * @returns {vec3} out
      */
-    vec3.transformMat3 = function(out, a, m) {
+    vec3.transformMat3 = function (out, a, m) {
       var x = a[0],
         y = a[1],
         z = a[2]
@@ -1113,7 +1112,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {quat} q quaternion to transform with
      * @returns {vec3} out
      */
-    vec3.transformQuat = function(out, a, q) {
+    vec3.transformQuat = function (out, a, q) {
       // benchmarks: http://jsperf.com/quaternion-transform-vec3-implementations
 
       var x = a[0],
@@ -1144,7 +1143,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} c The angle of rotation
      * @returns {vec3} out
      */
-    vec3.rotateX = function(out, a, b, c) {
+    vec3.rotateX = function (out, a, b, c) {
       var p = [],
         r = []
       //Translate point to the origin
@@ -1173,7 +1172,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} c The angle of rotation
      * @returns {vec3} out
      */
-    vec3.rotateY = function(out, a, b, c) {
+    vec3.rotateY = function (out, a, b, c) {
       var p = [],
         r = []
       //Translate point to the origin
@@ -1202,7 +1201,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} c The angle of rotation
      * @returns {vec3} out
      */
-    vec3.rotateZ = function(out, a, b, c) {
+    vec3.rotateZ = function (out, a, b, c) {
       var p = [],
         r = []
       //Translate point to the origin
@@ -1235,10 +1234,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @returns {Array} a
      * @function
      */
-    vec3.forEach = (function() {
+    vec3.forEach = (function () {
       var vec = vec3.create()
 
-      return function(a, stride, offset, count, fn, arg) {
+      return function (a, stride, offset, count, fn, arg) {
         var i, l
         if (!stride) {
           stride = 3
@@ -1274,7 +1273,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} b The second operand
      * @returns {Number} The angle in radians
      */
-    vec3.angle = function(a, b) {
+    vec3.angle = function (a, b) {
       var tempA = vec3.fromValues(a[0], a[1], a[2])
       var tempB = vec3.fromValues(b[0], b[1], b[2])
 
@@ -1296,7 +1295,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} vec vector to represent as a string
      * @returns {String} string representation of the vector
      */
-    vec3.str = function(a) {
+    vec3.str = function (a) {
       return 'vec3(' + a[0] + ', ' + a[1] + ', ' + a[2] + ')'
     }
 
@@ -1337,7 +1336,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      *
      * @returns {vec4} a new 4D vector
      */
-    vec4.create = function() {
+    vec4.create = function () {
       var out = new GLMAT_ARRAY_TYPE(4)
       out[0] = 0
       out[1] = 0
@@ -1352,7 +1351,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} a vector to clone
      * @returns {vec4} a new 4D vector
      */
-    vec4.clone = function(a) {
+    vec4.clone = function (a) {
       var out = new GLMAT_ARRAY_TYPE(4)
       out[0] = a[0]
       out[1] = a[1]
@@ -1370,7 +1369,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} w W component
      * @returns {vec4} a new 4D vector
      */
-    vec4.fromValues = function(x, y, z, w) {
+    vec4.fromValues = function (x, y, z, w) {
       var out = new GLMAT_ARRAY_TYPE(4)
       out[0] = x
       out[1] = y
@@ -1386,7 +1385,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} a the source vector
      * @returns {vec4} out
      */
-    vec4.copy = function(out, a) {
+    vec4.copy = function (out, a) {
       out[0] = a[0]
       out[1] = a[1]
       out[2] = a[2]
@@ -1404,7 +1403,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} w W component
      * @returns {vec4} out
      */
-    vec4.set = function(out, x, y, z, w) {
+    vec4.set = function (out, x, y, z, w) {
       out[0] = x
       out[1] = y
       out[2] = z
@@ -1420,7 +1419,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} b the second operand
      * @returns {vec4} out
      */
-    vec4.add = function(out, a, b) {
+    vec4.add = function (out, a, b) {
       out[0] = a[0] + b[0]
       out[1] = a[1] + b[1]
       out[2] = a[2] + b[2]
@@ -1436,7 +1435,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} b the second operand
      * @returns {vec4} out
      */
-    vec4.subtract = function(out, a, b) {
+    vec4.subtract = function (out, a, b) {
       out[0] = a[0] - b[0]
       out[1] = a[1] - b[1]
       out[2] = a[2] - b[2]
@@ -1458,7 +1457,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} b the second operand
      * @returns {vec4} out
      */
-    vec4.multiply = function(out, a, b) {
+    vec4.multiply = function (out, a, b) {
       out[0] = a[0] * b[0]
       out[1] = a[1] * b[1]
       out[2] = a[2] * b[2]
@@ -1480,7 +1479,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} b the second operand
      * @returns {vec4} out
      */
-    vec4.divide = function(out, a, b) {
+    vec4.divide = function (out, a, b) {
       out[0] = a[0] / b[0]
       out[1] = a[1] / b[1]
       out[2] = a[2] / b[2]
@@ -1502,7 +1501,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} b the second operand
      * @returns {vec4} out
      */
-    vec4.min = function(out, a, b) {
+    vec4.min = function (out, a, b) {
       out[0] = Math.min(a[0], b[0])
       out[1] = Math.min(a[1], b[1])
       out[2] = Math.min(a[2], b[2])
@@ -1518,7 +1517,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} b the second operand
      * @returns {vec4} out
      */
-    vec4.max = function(out, a, b) {
+    vec4.max = function (out, a, b) {
       out[0] = Math.max(a[0], b[0])
       out[1] = Math.max(a[1], b[1])
       out[2] = Math.max(a[2], b[2])
@@ -1534,7 +1533,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} b amount to scale the vector by
      * @returns {vec4} out
      */
-    vec4.scale = function(out, a, b) {
+    vec4.scale = function (out, a, b) {
       out[0] = a[0] * b
       out[1] = a[1] * b
       out[2] = a[2] * b
@@ -1551,7 +1550,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} scale the amount to scale b by before adding
      * @returns {vec4} out
      */
-    vec4.scaleAndAdd = function(out, a, b, scale) {
+    vec4.scaleAndAdd = function (out, a, b, scale) {
       out[0] = a[0] + b[0] * scale
       out[1] = a[1] + b[1] * scale
       out[2] = a[2] + b[2] * scale
@@ -1566,7 +1565,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} b the second operand
      * @returns {Number} distance between a and b
      */
-    vec4.distance = function(a, b) {
+    vec4.distance = function (a, b) {
       var x = b[0] - a[0],
         y = b[1] - a[1],
         z = b[2] - a[2],
@@ -1587,7 +1586,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} b the second operand
      * @returns {Number} squared distance between a and b
      */
-    vec4.squaredDistance = function(a, b) {
+    vec4.squaredDistance = function (a, b) {
       var x = b[0] - a[0],
         y = b[1] - a[1],
         z = b[2] - a[2],
@@ -1607,7 +1606,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} a vector to calculate length of
      * @returns {Number} length of a
      */
-    vec4.length = function(a) {
+    vec4.length = function (a) {
       var x = a[0],
         y = a[1],
         z = a[2],
@@ -1627,7 +1626,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} a vector to calculate squared length of
      * @returns {Number} squared length of a
      */
-    vec4.squaredLength = function(a) {
+    vec4.squaredLength = function (a) {
       var x = a[0],
         y = a[1],
         z = a[2],
@@ -1648,7 +1647,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} a vector to negate
      * @returns {vec4} out
      */
-    vec4.negate = function(out, a) {
+    vec4.negate = function (out, a) {
       out[0] = -a[0]
       out[1] = -a[1]
       out[2] = -a[2]
@@ -1663,7 +1662,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} a vector to invert
      * @returns {vec4} out
      */
-    vec4.inverse = function(out, a) {
+    vec4.inverse = function (out, a) {
       out[0] = 1.0 / a[0]
       out[1] = 1.0 / a[1]
       out[2] = 1.0 / a[2]
@@ -1678,7 +1677,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} a vector to normalize
      * @returns {vec4} out
      */
-    vec4.normalize = function(out, a) {
+    vec4.normalize = function (out, a) {
       var x = a[0],
         y = a[1],
         z = a[2],
@@ -1701,7 +1700,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} b the second operand
      * @returns {Number} dot product of a and b
      */
-    vec4.dot = function(a, b) {
+    vec4.dot = function (a, b) {
       return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]
     }
 
@@ -1714,7 +1713,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} t interpolation amount between the two inputs
      * @returns {vec4} out
      */
-    vec4.lerp = function(out, a, b, t) {
+    vec4.lerp = function (out, a, b, t) {
       var ax = a[0],
         ay = a[1],
         az = a[2],
@@ -1733,7 +1732,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} [scale] Length of the resulting vector. If ommitted, a unit vector will be returned
      * @returns {vec4} out
      */
-    vec4.random = function(out, scale) {
+    vec4.random = function (out, scale) {
       scale = scale || 1.0
 
       //TODO: This is a pretty awful way of doing this. Find something better.
@@ -1754,7 +1753,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat4} m matrix to transform with
      * @returns {vec4} out
      */
-    vec4.transformMat4 = function(out, a, m) {
+    vec4.transformMat4 = function (out, a, m) {
       var x = a[0],
         y = a[1],
         z = a[2],
@@ -1774,7 +1773,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {quat} q quaternion to transform with
      * @returns {vec4} out
      */
-    vec4.transformQuat = function(out, a, q) {
+    vec4.transformQuat = function (out, a, q) {
       var x = a[0],
         y = a[1],
         z = a[2],
@@ -1807,10 +1806,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @returns {Array} a
      * @function
      */
-    vec4.forEach = (function() {
+    vec4.forEach = (function () {
       var vec = vec4.create()
 
-      return function(a, stride, offset, count, fn, arg) {
+      return function (a, stride, offset, count, fn, arg) {
         var i, l
         if (!stride) {
           stride = 4
@@ -1848,7 +1847,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec4} vec vector to represent as a string
      * @returns {String} string representation of the vector
      */
-    vec4.str = function(a) {
+    vec4.str = function (a) {
       return 'vec4(' + a[0] + ', ' + a[1] + ', ' + a[2] + ', ' + a[3] + ')'
     }
 
@@ -1889,7 +1888,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      *
      * @returns {mat2} a new 2x2 matrix
      */
-    mat2.create = function() {
+    mat2.create = function () {
       var out = new GLMAT_ARRAY_TYPE(4)
       out[0] = 1
       out[1] = 0
@@ -1904,7 +1903,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2} a matrix to clone
      * @returns {mat2} a new 2x2 matrix
      */
-    mat2.clone = function(a) {
+    mat2.clone = function (a) {
       var out = new GLMAT_ARRAY_TYPE(4)
       out[0] = a[0]
       out[1] = a[1]
@@ -1920,7 +1919,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2} a the source matrix
      * @returns {mat2} out
      */
-    mat2.copy = function(out, a) {
+    mat2.copy = function (out, a) {
       out[0] = a[0]
       out[1] = a[1]
       out[2] = a[2]
@@ -1934,7 +1933,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2} out the receiving matrix
      * @returns {mat2} out
      */
-    mat2.identity = function(out) {
+    mat2.identity = function (out) {
       out[0] = 1
       out[1] = 0
       out[2] = 0
@@ -1949,7 +1948,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2} a the source matrix
      * @returns {mat2} out
      */
-    mat2.transpose = function(out, a) {
+    mat2.transpose = function (out, a) {
       // If we are transposing ourselves we can skip a few steps but have to cache some values
       if (out === a) {
         var a1 = a[1]
@@ -1972,7 +1971,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2} a the source matrix
      * @returns {mat2} out
      */
-    mat2.invert = function(out, a) {
+    mat2.invert = function (out, a) {
       var a0 = a[0],
         a1 = a[1],
         a2 = a[2],
@@ -2000,7 +1999,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2} a the source matrix
      * @returns {mat2} out
      */
-    mat2.adjoint = function(out, a) {
+    mat2.adjoint = function (out, a) {
       // Caching this value is nessecary if out == a
       var a0 = a[0]
       out[0] = a[3]
@@ -2017,7 +2016,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2} a the source matrix
      * @returns {Number} determinant of a
      */
-    mat2.determinant = function(a) {
+    mat2.determinant = function (a) {
       return a[0] * a[3] - a[2] * a[1]
     }
 
@@ -2029,7 +2028,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2} b the second operand
      * @returns {mat2} out
      */
-    mat2.multiply = function(out, a, b) {
+    mat2.multiply = function (out, a, b) {
       var a0 = a[0],
         a1 = a[1],
         a2 = a[2],
@@ -2059,7 +2058,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} rad the angle to rotate the matrix by
      * @returns {mat2} out
      */
-    mat2.rotate = function(out, a, rad) {
+    mat2.rotate = function (out, a, rad) {
       var a0 = a[0],
         a1 = a[1],
         a2 = a[2],
@@ -2081,7 +2080,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} v the vec2 to scale the matrix by
      * @returns {mat2} out
      **/
-    mat2.scale = function(out, a, v) {
+    mat2.scale = function (out, a, v) {
       var a0 = a[0],
         a1 = a[1],
         a2 = a[2],
@@ -2101,7 +2100,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2} mat matrix to represent as a string
      * @returns {String} string representation of the matrix
      */
-    mat2.str = function(a) {
+    mat2.str = function (a) {
       return 'mat2(' + a[0] + ', ' + a[1] + ', ' + a[2] + ', ' + a[3] + ')'
     }
 
@@ -2111,9 +2110,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2} a the matrix to calculate Frobenius norm of
      * @returns {Number} Frobenius norm
      */
-    mat2.frob = function(a) {
+    mat2.frob = function (a) {
       return Math.sqrt(
-        Math.pow(a[0], 2) + Math.pow(a[1], 2) + Math.pow(a[2], 2) + Math.pow(a[3], 2)
+        Math.pow(a[0], 2) + Math.pow(a[1], 2) + Math.pow(a[2], 2) + Math.pow(a[3], 2),
       )
     }
 
@@ -2125,7 +2124,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2} a the input matrix to factorize
      */
 
-    mat2.LDU = function(L, D, U, a) {
+    mat2.LDU = function (L, D, U, a) {
       L[2] = a[2] / a[0]
       U[0] = a[0]
       U[1] = a[1]
@@ -2184,7 +2183,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      *
      * @returns {mat2d} a new 2x3 matrix
      */
-    mat2d.create = function() {
+    mat2d.create = function () {
       var out = new GLMAT_ARRAY_TYPE(6)
       out[0] = 1
       out[1] = 0
@@ -2201,7 +2200,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2d} a matrix to clone
      * @returns {mat2d} a new 2x3 matrix
      */
-    mat2d.clone = function(a) {
+    mat2d.clone = function (a) {
       var out = new GLMAT_ARRAY_TYPE(6)
       out[0] = a[0]
       out[1] = a[1]
@@ -2219,7 +2218,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2d} a the source matrix
      * @returns {mat2d} out
      */
-    mat2d.copy = function(out, a) {
+    mat2d.copy = function (out, a) {
       out[0] = a[0]
       out[1] = a[1]
       out[2] = a[2]
@@ -2235,7 +2234,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2d} out the receiving matrix
      * @returns {mat2d} out
      */
-    mat2d.identity = function(out) {
+    mat2d.identity = function (out) {
       out[0] = 1
       out[1] = 0
       out[2] = 0
@@ -2252,7 +2251,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2d} a the source matrix
      * @returns {mat2d} out
      */
-    mat2d.invert = function(out, a) {
+    mat2d.invert = function (out, a) {
       var aa = a[0],
         ab = a[1],
         ac = a[2],
@@ -2281,7 +2280,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2d} a the source matrix
      * @returns {Number} determinant of a
      */
-    mat2d.determinant = function(a) {
+    mat2d.determinant = function (a) {
       return a[0] * a[3] - a[1] * a[2]
     }
 
@@ -2293,7 +2292,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2d} b the second operand
      * @returns {mat2d} out
      */
-    mat2d.multiply = function(out, a, b) {
+    mat2d.multiply = function (out, a, b) {
       var a0 = a[0],
         a1 = a[1],
         a2 = a[2],
@@ -2329,7 +2328,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} rad the angle to rotate the matrix by
      * @returns {mat2d} out
      */
-    mat2d.rotate = function(out, a, rad) {
+    mat2d.rotate = function (out, a, rad) {
       var a0 = a[0],
         a1 = a[1],
         a2 = a[2],
@@ -2355,7 +2354,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} v the vec2 to scale the matrix by
      * @returns {mat2d} out
      **/
-    mat2d.scale = function(out, a, v) {
+    mat2d.scale = function (out, a, v) {
       var a0 = a[0],
         a1 = a[1],
         a2 = a[2],
@@ -2381,7 +2380,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} v the vec2 to translate the matrix by
      * @returns {mat2d} out
      **/
-    mat2d.translate = function(out, a, v) {
+    mat2d.translate = function (out, a, v) {
       var a0 = a[0],
         a1 = a[1],
         a2 = a[2],
@@ -2405,7 +2404,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2d} a matrix to represent as a string
      * @returns {String} string representation of the matrix
      */
-    mat2d.str = function(a) {
+    mat2d.str = function (a) {
       return (
         'mat2d(' + a[0] + ', ' + a[1] + ', ' + a[2] + ', ' + a[3] + ', ' + a[4] + ', ' + a[5] + ')'
       )
@@ -2417,7 +2416,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2d} a the matrix to calculate Frobenius norm of
      * @returns {Number} Frobenius norm
      */
-    mat2d.frob = function(a) {
+    mat2d.frob = function (a) {
       return Math.sqrt(
         Math.pow(a[0], 2) +
           Math.pow(a[1], 2) +
@@ -2425,7 +2424,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
           Math.pow(a[3], 2) +
           Math.pow(a[4], 2) +
           Math.pow(a[5], 2) +
-          1
+          1,
       )
     }
 
@@ -2466,7 +2465,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      *
      * @returns {mat3} a new 3x3 matrix
      */
-    mat3.create = function() {
+    mat3.create = function () {
       var out = new GLMAT_ARRAY_TYPE(9)
       out[0] = 1
       out[1] = 0
@@ -2487,7 +2486,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat4} a   the source 4x4 matrix
      * @returns {mat3} out
      */
-    mat3.fromMat4 = function(out, a) {
+    mat3.fromMat4 = function (out, a) {
       out[0] = a[0]
       out[1] = a[1]
       out[2] = a[2]
@@ -2506,7 +2505,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat3} a matrix to clone
      * @returns {mat3} a new 3x3 matrix
      */
-    mat3.clone = function(a) {
+    mat3.clone = function (a) {
       var out = new GLMAT_ARRAY_TYPE(9)
       out[0] = a[0]
       out[1] = a[1]
@@ -2527,7 +2526,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat3} a the source matrix
      * @returns {mat3} out
      */
-    mat3.copy = function(out, a) {
+    mat3.copy = function (out, a) {
       out[0] = a[0]
       out[1] = a[1]
       out[2] = a[2]
@@ -2546,7 +2545,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat3} out the receiving matrix
      * @returns {mat3} out
      */
-    mat3.identity = function(out) {
+    mat3.identity = function (out) {
       out[0] = 1
       out[1] = 0
       out[2] = 0
@@ -2566,7 +2565,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat3} a the source matrix
      * @returns {mat3} out
      */
-    mat3.transpose = function(out, a) {
+    mat3.transpose = function (out, a) {
       // If we are transposing ourselves we can skip a few steps but have to cache some values
       if (out === a) {
         var a01 = a[1],
@@ -2600,7 +2599,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat3} a the source matrix
      * @returns {mat3} out
      */
-    mat3.invert = function(out, a) {
+    mat3.invert = function (out, a) {
       var a00 = a[0],
         a01 = a[1],
         a02 = a[2],
@@ -2640,7 +2639,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat3} a the source matrix
      * @returns {mat3} out
      */
-    mat3.adjoint = function(out, a) {
+    mat3.adjoint = function (out, a) {
       var a00 = a[0],
         a01 = a[1],
         a02 = a[2],
@@ -2669,7 +2668,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat3} a the source matrix
      * @returns {Number} determinant of a
      */
-    mat3.determinant = function(a) {
+    mat3.determinant = function (a) {
       var a00 = a[0],
         a01 = a[1],
         a02 = a[2],
@@ -2695,7 +2694,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat3} b the second operand
      * @returns {mat3} out
      */
-    mat3.multiply = function(out, a, b) {
+    mat3.multiply = function (out, a, b) {
       var a00 = a[0],
         a01 = a[1],
         a02 = a[2],
@@ -2743,7 +2742,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} v vector to translate by
      * @returns {mat3} out
      */
-    mat3.translate = function(out, a, v) {
+    mat3.translate = function (out, a, v) {
       var a00 = a[0],
         a01 = a[1],
         a02 = a[2],
@@ -2778,7 +2777,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} rad the angle to rotate the matrix by
      * @returns {mat3} out
      */
-    mat3.rotate = function(out, a, rad) {
+    mat3.rotate = function (out, a, rad) {
       var a00 = a[0],
         a01 = a[1],
         a02 = a[2],
@@ -2813,7 +2812,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec2} v the vec2 to scale the matrix by
      * @returns {mat3} out
      **/
-    mat3.scale = function(out, a, v) {
+    mat3.scale = function (out, a, v) {
       var x = v[0],
         y = v[1]
 
@@ -2838,7 +2837,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat2d} a the matrix to copy
      * @returns {mat3} out
      **/
-    mat3.fromMat2d = function(out, a) {
+    mat3.fromMat2d = function (out, a) {
       out[0] = a[0]
       out[1] = a[1]
       out[2] = 0
@@ -2861,7 +2860,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      *
      * @returns {mat3} out
      */
-    mat3.fromQuat = function(out, q) {
+    mat3.fromQuat = function (out, q) {
       var x = q[0],
         y = q[1],
         z = q[2],
@@ -2902,7 +2901,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      *
      * @returns {mat3} out
      */
-    mat3.normalFromMat4 = function(out, a) {
+    mat3.normalFromMat4 = function (out, a) {
       var a00 = a[0],
         a01 = a[1],
         a02 = a[2],
@@ -2960,7 +2959,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat3} mat matrix to represent as a string
      * @returns {String} string representation of the matrix
      */
-    mat3.str = function(a) {
+    mat3.str = function (a) {
       return (
         'mat3(' +
         a[0] +
@@ -2990,7 +2989,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat3} a the matrix to calculate Frobenius norm of
      * @returns {Number} Frobenius norm
      */
-    mat3.frob = function(a) {
+    mat3.frob = function (a) {
       return Math.sqrt(
         Math.pow(a[0], 2) +
           Math.pow(a[1], 2) +
@@ -3000,7 +2999,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
           Math.pow(a[5], 2) +
           Math.pow(a[6], 2) +
           Math.pow(a[7], 2) +
-          Math.pow(a[8], 2)
+          Math.pow(a[8], 2),
       )
     }
 
@@ -3041,7 +3040,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      *
      * @returns {mat4} a new 4x4 matrix
      */
-    mat4.create = function() {
+    mat4.create = function () {
       var out = new GLMAT_ARRAY_TYPE(16)
       out[0] = 1
       out[1] = 0
@@ -3068,7 +3067,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat4} a matrix to clone
      * @returns {mat4} a new 4x4 matrix
      */
-    mat4.clone = function(a) {
+    mat4.clone = function (a) {
       var out = new GLMAT_ARRAY_TYPE(16)
       out[0] = a[0]
       out[1] = a[1]
@@ -3096,7 +3095,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat4} a the source matrix
      * @returns {mat4} out
      */
-    mat4.copy = function(out, a) {
+    mat4.copy = function (out, a) {
       out[0] = a[0]
       out[1] = a[1]
       out[2] = a[2]
@@ -3122,7 +3121,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat4} out the receiving matrix
      * @returns {mat4} out
      */
-    mat4.identity = function(out) {
+    mat4.identity = function (out) {
       out[0] = 1
       out[1] = 0
       out[2] = 0
@@ -3149,7 +3148,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat4} a the source matrix
      * @returns {mat4} out
      */
-    mat4.transpose = function(out, a) {
+    mat4.transpose = function (out, a) {
       // If we are transposing ourselves we can skip a few steps but have to cache some values
       if (out === a) {
         var a01 = a[1],
@@ -3200,7 +3199,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat4} a the source matrix
      * @returns {mat4} out
      */
-    mat4.invert = function(out, a) {
+    mat4.invert = function (out, a) {
       var a00 = a[0],
         a01 = a[1],
         a02 = a[2],
@@ -3264,7 +3263,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat4} a the source matrix
      * @returns {mat4} out
      */
-    mat4.adjoint = function(out, a) {
+    mat4.adjoint = function (out, a) {
       var a00 = a[0],
         a01 = a[1],
         a02 = a[2],
@@ -3363,7 +3362,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat4} a the source matrix
      * @returns {Number} determinant of a
      */
-    mat4.determinant = function(a) {
+    mat4.determinant = function (a) {
       var a00 = a[0],
         a01 = a[1],
         a02 = a[2],
@@ -3405,7 +3404,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat4} b the second operand
      * @returns {mat4} out
      */
-    mat4.multiply = function(out, a, b) {
+    mat4.multiply = function (out, a, b) {
       var a00 = a[0],
         a01 = a[1],
         a02 = a[2],
@@ -3476,7 +3475,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} v vector to translate by
      * @returns {mat4} out
      */
-    mat4.translate = function(out, a, v) {
+    mat4.translate = function (out, a, v) {
       var x = v[0],
         y = v[1],
         z = v[2],
@@ -3542,7 +3541,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} v the vec3 to scale the matrix by
      * @returns {mat4} out
      **/
-    mat4.scale = function(out, a, v) {
+    mat4.scale = function (out, a, v) {
       var x = v[0],
         y = v[1],
         z = v[2]
@@ -3575,7 +3574,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} axis the axis to rotate around
      * @returns {mat4} out
      */
-    mat4.rotate = function(out, a, rad, axis) {
+    mat4.rotate = function (out, a, rad, axis) {
       var x = axis[0],
         y = axis[1],
         z = axis[2],
@@ -3674,7 +3673,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} rad the angle to rotate the matrix by
      * @returns {mat4} out
      */
-    mat4.rotateX = function(out, a, rad) {
+    mat4.rotateX = function (out, a, rad) {
       var s = Math.sin(rad),
         c = Math.cos(rad),
         a10 = a[4],
@@ -3718,7 +3717,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} rad the angle to rotate the matrix by
      * @returns {mat4} out
      */
-    mat4.rotateY = function(out, a, rad) {
+    mat4.rotateY = function (out, a, rad) {
       var s = Math.sin(rad),
         c = Math.cos(rad),
         a00 = a[0],
@@ -3762,7 +3761,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} rad the angle to rotate the matrix by
      * @returns {mat4} out
      */
-    mat4.rotateZ = function(out, a, rad) {
+    mat4.rotateZ = function (out, a, rad) {
       var s = Math.sin(rad),
         c = Math.cos(rad),
         a00 = a[0],
@@ -3813,7 +3812,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} v Translation vector
      * @returns {mat4} out
      */
-    mat4.fromRotationTranslation = function(out, q, v) {
+    mat4.fromRotationTranslation = function (out, q, v) {
       // Quaternion math
       var x = q[0],
         y = q[1],
@@ -3852,7 +3851,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
       return out
     }
 
-    mat4.fromQuat = function(out, q) {
+    mat4.fromQuat = function (out, q) {
       var x = q[0],
         y = q[1],
         z = q[2],
@@ -3905,7 +3904,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} far Far bound of the frustum
      * @returns {mat4} out
      */
-    mat4.frustum = function(out, left, right, bottom, top, near, far) {
+    mat4.frustum = function (out, left, right, bottom, top, near, far) {
       var rl = 1 / (right - left),
         tb = 1 / (top - bottom),
         nf = 1 / (near - far)
@@ -3938,7 +3937,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {number} far Far bound of the frustum
      * @returns {mat4} out
      */
-    mat4.perspective = function(out, fovy, aspect, near, far) {
+    mat4.perspective = function (out, fovy, aspect, near, far) {
       var f = 1.0 / Math.tan(fovy / 2),
         nf = 1 / (near - far)
       out[0] = f / aspect
@@ -3972,7 +3971,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {number} far Far bound of the frustum
      * @returns {mat4} out
      */
-    mat4.ortho = function(out, left, right, bottom, top, near, far) {
+    mat4.ortho = function (out, left, right, bottom, top, near, far) {
       var lr = 1 / (left - right),
         bt = 1 / (bottom - top),
         nf = 1 / (near - far)
@@ -4004,7 +4003,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} up vec3 pointing up
      * @returns {mat4} out
      */
-    mat4.lookAt = function(out, eye, center, up) {
+    mat4.lookAt = function (out, eye, center, up) {
       var x0,
         x1,
         x2,
@@ -4099,7 +4098,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat4} mat matrix to represent as a string
      * @returns {String} string representation of the matrix
      */
-    mat4.str = function(a) {
+    mat4.str = function (a) {
       return (
         'mat4(' +
         a[0] +
@@ -4143,7 +4142,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {mat4} a the matrix to calculate Frobenius norm of
      * @returns {Number} Frobenius norm
      */
-    mat4.frob = function(a) {
+    mat4.frob = function (a) {
       return Math.sqrt(
         Math.pow(a[0], 2) +
           Math.pow(a[1], 2) +
@@ -4160,7 +4159,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
           Math.pow(a[12], 2) +
           Math.pow(a[13], 2) +
           Math.pow(a[14], 2) +
-          Math.pow(a[15], 2)
+          Math.pow(a[15], 2),
       )
     }
 
@@ -4201,7 +4200,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      *
      * @returns {quat} a new quaternion
      */
-    quat.create = function() {
+    quat.create = function () {
       var out = new GLMAT_ARRAY_TYPE(4)
       out[0] = 0
       out[1] = 0
@@ -4221,12 +4220,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} b the destination vector
      * @returns {quat} out
      */
-    quat.rotationTo = (function() {
+    quat.rotationTo = (function () {
       var tmpvec3 = vec3.create()
       var xUnitVec3 = vec3.fromValues(1, 0, 0)
       var yUnitVec3 = vec3.fromValues(0, 1, 0)
 
-      return function(out, a, b) {
+      return function (out, a, b) {
         var dot = vec3.dot(a, b)
         if (dot < -0.999999) {
           vec3.cross(tmpvec3, xUnitVec3, a)
@@ -4261,10 +4260,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {vec3} up    the vector representing the local "up" direction
      * @returns {quat} out
      */
-    quat.setAxes = (function() {
+    quat.setAxes = (function () {
       var matr = mat3.create()
 
-      return function(out, view, right, up) {
+      return function (out, view, right, up) {
         matr[0] = right[0]
         matr[3] = right[1]
         matr[6] = right[2]
@@ -4331,7 +4330,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {quat} out the receiving quaternion
      * @returns {quat} out
      */
-    quat.identity = function(out) {
+    quat.identity = function (out) {
       out[0] = 0
       out[1] = 0
       out[2] = 0
@@ -4348,7 +4347,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} rad the angle in radians
      * @returns {quat} out
      **/
-    quat.setAxisAngle = function(out, axis, rad) {
+    quat.setAxisAngle = function (out, axis, rad) {
       rad = rad * 0.5
       var s = Math.sin(rad)
       out[0] = s * axis[0]
@@ -4377,7 +4376,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {quat} b the second operand
      * @returns {quat} out
      */
-    quat.multiply = function(out, a, b) {
+    quat.multiply = function (out, a, b) {
       var ax = a[0],
         ay = a[1],
         az = a[2],
@@ -4419,7 +4418,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {number} rad angle (in radians) to rotate
      * @returns {quat} out
      */
-    quat.rotateX = function(out, a, rad) {
+    quat.rotateX = function (out, a, rad) {
       rad *= 0.5
 
       var ax = a[0],
@@ -4444,7 +4443,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {number} rad angle (in radians) to rotate
      * @returns {quat} out
      */
-    quat.rotateY = function(out, a, rad) {
+    quat.rotateY = function (out, a, rad) {
       rad *= 0.5
 
       var ax = a[0],
@@ -4469,7 +4468,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {number} rad angle (in radians) to rotate
      * @returns {quat} out
      */
-    quat.rotateZ = function(out, a, rad) {
+    quat.rotateZ = function (out, a, rad) {
       rad *= 0.5
 
       var ax = a[0],
@@ -4495,7 +4494,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {quat} a quat to calculate W component of
      * @returns {quat} out
      */
-    quat.calculateW = function(out, a) {
+    quat.calculateW = function (out, a) {
       var x = a[0],
         y = a[1],
         z = a[2]
@@ -4538,7 +4537,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {Number} t interpolation amount between the two inputs
      * @returns {quat} out
      */
-    quat.slerp = function(out, a, b, t) {
+    quat.slerp = function (out, a, b, t) {
       // benchmarks:
       //    http://jsperf.com/quaternion-slerp-implementations
 
@@ -4592,7 +4591,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {quat} a quat to calculate inverse of
      * @returns {quat} out
      */
-    quat.invert = function(out, a) {
+    quat.invert = function (out, a) {
       var a0 = a[0],
         a1 = a[1],
         a2 = a[2],
@@ -4617,7 +4616,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {quat} a quat to calculate conjugate of
      * @returns {quat} out
      */
-    quat.conjugate = function(out, a) {
+    quat.conjugate = function (out, a) {
       out[0] = -a[0]
       out[1] = -a[1]
       out[2] = -a[2]
@@ -4676,7 +4675,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @returns {quat} out
      * @function
      */
-    quat.fromMat3 = function(out, m) {
+    quat.fromMat3 = function (out, m) {
       // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
       // article "Quaternion Calculus and Fast Animation".
       var fTrace = m[0] + m[4] + m[8]
@@ -4715,7 +4714,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
      * @param {quat} vec vector to represent as a string
      * @returns {String} string representation of the vector
      */
-    quat.str = function(a) {
+    quat.str = function (a) {
       return 'quat(' + a[0] + ', ' + a[1] + ', ' + a[2] + ', ' + a[3] + ')'
     }
 

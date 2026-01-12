@@ -13,10 +13,10 @@ const makeAwsEvent = awsEventFactory({
       'stack',
       'show',
       'picture_mse',
-      'getReadyWebGLForCanvas'
-    ]
+      'getReadyWebGLForCanvas',
+    ],
   },
-  globals: []
+  globals: [],
 })
 
 test('rune correct', async () => {
@@ -31,35 +31,35 @@ test('rune correct', async () => {
 picture_mse(show(square), show(square)) < 0.01;
 `,
           answer: 'true',
-          score: 1
+          score: 1,
         },
         {
           program: `
 picture_mse(show(stack(square, square)), show(beside(square, square))) < 0.01;
 `,
           answer: 'true',
-          score: 1
+          score: 1,
         },
         {
           program: `
 picture_mse(show(square), show(beside(square, square))) < 0.01;
 `,
           answer: 'true',
-          score: 1
+          score: 1,
         },
         {
           program: `
 picture_mse(show(heart), show(beside(square, square))) < 0.01;
 `,
           answer: 'false',
-          score: 1
+          score: 1,
         },
         {
           program: `
 picture_mse(show(heart), show(nova)) < 0.01;
 `,
           answer: 'false',
-          score: 1
+          score: 1,
         },
         {
           program: `
@@ -76,10 +76,10 @@ picture_mse(show(steps(rcross, sail, corner, nova)),
             show(mosaic(rcross, sail, corner, nova))) > 0;
 `,
           answer: 'true',
-          score: 1
-        }
-      ]
-    })
+          score: 1,
+        },
+      ],
+    }),
   )
   expect(results).toMatchInlineSnapshot(`
     Object {

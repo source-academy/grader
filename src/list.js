@@ -133,7 +133,7 @@ function map(f, xs) {
 function build_list(n, fun) {
   if (typeof n !== 'number' || n < 0 || Math.floor(n) !== n) {
     throw new Error(
-      'build_list(n, fun) expects a positive integer as ' + 'argument n, but encountered ' + n
+      'build_list(n, fun) expects a positive integer as ' + 'argument n, but encountered ' + n,
     )
   }
 
@@ -281,12 +281,12 @@ function filter(pred, xs) {
 function enum_list(start, end) {
   if (typeof start !== 'number') {
     throw new Error(
-      'enum_list(start, end) expects a number as argument start, but encountered ' + start
+      'enum_list(start, end) expects a number as argument start, but encountered ' + start,
     )
   }
   if (typeof end !== 'number') {
     throw new Error(
-      'enum_list(start, end) expects a number as argument start, but encountered ' + end
+      'enum_list(start, end) expects a number as argument start, but encountered ' + end,
     )
   }
   if (start > end) {
@@ -300,7 +300,7 @@ function enum_list(start, end) {
 function list_ref(xs, n) {
   if (typeof n !== 'number' || n < 0 || Math.floor(n) !== n) {
     throw new Error(
-      'list_ref(xs, n) expects a positive integer as argument n, but encountered ' + n
+      'list_ref(xs, n) expects a positive integer as argument n, but encountered ' + n,
     )
   }
   for (; n > 0; --n) {
@@ -349,30 +349,30 @@ function set_tail(xs, x) {
   }
 }
 
-exports.array_test = array_test;
-exports.pair = pair;
-exports.is_pair = is_pair;
-exports.head = head;
-exports.tail = tail;
-exports.is_null = is_null;
-exports.is_list = is_list;
-exports.list = list;
-exports.list_to_vector = list_to_vector;
-exports.vector_to_list = vector_to_list;
-exports.length = length;
-exports.map = map;
-exports.build_list = build_list;
-exports.for_each = for_each;
-exports.reverse = reverse;
-exports.append = append;
-exports.member = member;
-exports.remove = remove;
-exports.remove_all = remove_all;
-exports.equal = equal;
-exports.assoc = assoc;
-exports.filter = filter;
-exports.enum_list = enum_list;
-exports.list_ref = list_ref;
-exports.accumulate = accumulate;
-exports.set_head = set_head;
-exports.set_tail = set_tail;
+exports.array_test = array_test
+exports.pair = pair
+exports.is_pair = is_pair
+exports.head = head
+exports.tail = tail
+exports.is_null = is_null
+exports.is_list = is_list
+exports.list = list
+exports.list_to_vector = list_to_vector
+exports.vector_to_list = vector_to_list
+exports.length = length
+exports.map = map
+exports.build_list = build_list
+exports.for_each = for_each
+exports.reverse = reverse
+exports.append = append
+exports.member = member
+exports.remove = remove
+exports.remove_all = remove_all
+exports.equal = equal
+exports.assoc = assoc
+exports.filter = filter
+exports.enum_list = enum_list
+exports.list_ref = list_ref
+exports.accumulate = accumulate
+exports.set_head = set_head
+exports.set_tail = set_tail
