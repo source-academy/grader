@@ -9,7 +9,7 @@ jobs:
   xvfb:
     name: Build Xvfb
     runs-on: ubuntu-latest
-    container: amazon/aws-lambda-nodejs:22
+    container: amazon/aws-lambda-nodejs:24
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
