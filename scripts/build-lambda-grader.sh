@@ -8,7 +8,6 @@ rm -rf build grader.zip node_modules
 JOBS=$(nproc) yarn install --immutable
 yarn run tsc
 rm -rf node_modules build/__tests__
-JOBS=$(nproc) yarn install --production --immutable
 cp -r node_modules/ build
 
 tar jcf build.tar.bz2 build
