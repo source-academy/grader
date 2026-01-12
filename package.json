@@ -2,7 +2,7 @@
   "name": "grader",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
