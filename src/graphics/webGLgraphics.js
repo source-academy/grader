@@ -43,7 +43,7 @@ shaders['2d-vertex-shader'] = [
   // correct the right/left handed thing
   '    gl_Position.z = -gl_Position.z;',
   '    v_color = a_color;',
-  '}'
+  '}',
 ].join('\n')
 
 shaders['2d-fragment-shader'] = [
@@ -53,7 +53,7 @@ shaders['2d-fragment-shader'] = [
 
   'void main() {',
   '    gl_FragColor = v_color;',
-  '}'
+  '}',
 ].join('\n')
 
 shaders['3d-vertex-shader'] = [
@@ -77,7 +77,7 @@ shaders['3d-vertex-shader'] = [
   '    float color_factor = final_pos.z;',
   '    v_color += color_factor * (1.0 - v_color);',
   '    v_color.a = 1.0;',
-  '}'
+  '}',
 ].join('\n')
 
 shaders['3d-fragment-shader'] = [
@@ -87,7 +87,7 @@ shaders['3d-fragment-shader'] = [
 
   'void main() {',
   '    gl_FragColor = v_color;',
-  '}'
+  '}',
 ].join('\n')
 
 shaders['anaglyph-vertex-shader'] = [
@@ -119,7 +119,7 @@ shaders['anaglyph-vertex-shader'] = [
   // v_color = 1.0 - v_color;
   '    v_color = u_colorFilter * v_color + 1.0 - u_colorFilter;',
   '    v_color.a = 1.0;',
-  '}'
+  '}',
 ].join('\n')
 
 shaders['anaglyph-fragment-shader'] = [
@@ -129,7 +129,7 @@ shaders['anaglyph-fragment-shader'] = [
 
   'void main() {',
   '    gl_FragColor = v_color;',
-  '}'
+  '}',
 ].join('\n')
 
 shaders['combine-vertex-shader'] = [
@@ -141,7 +141,7 @@ shaders['combine-vertex-shader'] = [
   '    gl_Position = a_position;',
   '    v_texturePosition.x = (a_position.x + 1.0) / 2.0;',
   '    v_texturePosition.y = (a_position.y + 1.0) / 2.0;',
-  '}'
+  '}',
 ].join('\n')
 
 shaders['combine-fragment-shader'] = [
@@ -156,7 +156,7 @@ shaders['combine-fragment-shader'] = [
   '    gl_FragColor = texture2D(u_sampler_red, v_texturePosition)',
   '            + texture2D(u_sampler_cyan, v_texturePosition) - 1.0;',
   '    gl_FragColor.a = 1.0;',
-  '}'
+  '}',
 ].join('\n')
 
 shaders['copy-vertex-shader'] = [
@@ -168,7 +168,7 @@ shaders['copy-vertex-shader'] = [
   '    gl_Position = a_position;',
   '    v_texturePosition.x = (a_position.x + 1.0) / 2.0;',
   '    v_texturePosition.y = 1.0 - (a_position.y + 1.0) / 2.0;',
-  '}'
+  '}',
 ].join('\n')
 
 shaders['copy-fragment-shader'] = [
@@ -180,7 +180,7 @@ shaders['copy-fragment-shader'] = [
 
   'void main() {',
   '    gl_FragColor = texture2D(u_sampler_image, v_texturePosition);',
-  '}'
+  '}',
 ].join('\n')
 
 shaders['curve-vertex-shader'] = [
@@ -190,7 +190,7 @@ shaders['curve-vertex-shader'] = [
   'void main() {',
   '    gl_PointSize = 2.0;',
   '    gl_Position = u_transformMatrix * vec4(a_position, 0, 1);',
-  '}'
+  '}',
 ].join('\n')
 
 shaders['curve-fragment-shader'] = [
@@ -198,7 +198,7 @@ shaders['curve-fragment-shader'] = [
 
   'void main() {',
   '    gl_FragColor = vec4(0, 0, 0, 1);',
-  '}'
+  '}',
 ].join('\n')
 
 //-------------------------Constants-------------------------
@@ -214,7 +214,7 @@ var normalShaderProgram // the default shader program
 var vertexBuffer
 var vertexPositionAttribute // location of a_position
 var colorAttribute // location of a_color
-var canvas = canvas || createCanvas(); // the <canvas> object that is used to display webGL output
+var canvas = canvas || createCanvas() // the <canvas> object that is used to display webGL output
 
 // rune 2d and 3d
 var instance_ext // ANGLE_instanced_arrays extension
@@ -271,7 +271,7 @@ function open_pixmap(name, horiz, vert, aa_off) {
  */
 function createCanvas() {
   const canvas = nodecanvaswebgl.createCanvas(512, 512)
-  return canvas;
+  return canvas
 }
 
 function getReadyStringifyForRunes(stringify_) {
@@ -292,7 +292,7 @@ function getReadyStringifyForRunes(stringify_) {
 function getReadyWebGLForCanvas(mode) {
   // Get the rendering context for WebGL
   if (!canvas) {
-    canvas = createCanvas();
+    canvas = createCanvas()
   }
   gl = initWebGL(canvas)
   if (gl) {
@@ -353,8 +353,8 @@ function getReadyWebGL(mode, name, horiz, vert, aa_off) {
 
     // rune-specific operations
     if (mode === '2d' || mode === '3d') {
-        initRuneCommon()
-        initRune3d()
+      initRuneCommon()
+      initRune3d()
     }
 
     if (mode === 'curve') {
@@ -423,7 +423,7 @@ function initFramebufferObject() {
   var framebuffer, texture, depthBuffer
 
   // Define the error handling function
-  var error = function() {
+  var error = function () {
     if (framebuffer) gl.deleteFramebuffer(framebuffer)
     if (texture) gl.deleteTexture(texture)
     if (depthBuffer) gl.deleteRenderbuffer(depthBuffer)
@@ -453,7 +453,7 @@ function initFramebufferObject() {
     0,
     gl.RGBA,
     gl.UNSIGNED_BYTE,
-    texture
+    texture,
   )
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
   framebuffer.texture = texture
@@ -471,7 +471,7 @@ function initFramebufferObject() {
     gl.RENDERBUFFER,
     gl.DEPTH_COMPONENT16,
     gl.drawingBufferWidth,
-    gl.drawingBufferHeight
+    gl.drawingBufferHeight,
   )
 
   // set the texture object to the framebuffer object
@@ -600,7 +600,7 @@ function drawRune(first, indexCount, instanceArray) {
     indexCount,
     gl.UNSIGNED_SHORT,
     first * indexSize,
-    instanceCount
+    instanceCount,
   )
 
   // delete the instance buffer
@@ -648,14 +648,14 @@ function initRune3d() {
     leftCameraMatrix,
     vec3.fromValues(-halfEyeDistance, 0, 0),
     vec3.fromValues(0, 0, -0.4),
-    vec3.fromValues(0, 1, 0)
+    vec3.fromValues(0, 1, 0),
   )
   rightCameraMatrix = mat4.create()
   mat4.lookAt(
     rightCameraMatrix,
     vec3.fromValues(halfEyeDistance, 0, 0),
     vec3.fromValues(0, 0, -0.4),
-    vec3.fromValues(0, 1, 0)
+    vec3.fromValues(0, 1, 0),
   )
   // set up frame buffers
   if (
@@ -710,7 +710,7 @@ function draw3D(first, indexCount, instanceArray, cameraMatrix, colorFilter, fra
     indexCount,
     gl.UNSIGNED_SHORT,
     first * indexSize,
-    instanceCount
+    instanceCount,
   )
 
   gl.deleteBuffer(instanceBuffer)
@@ -807,7 +807,7 @@ function drawCurve(drawMode, curvePosArray) {
 }
 
 function ShapeDrawn(canvas) {
-  this.$canvas = canvas;
+  this.$canvas = canvas
 }
 
 /**

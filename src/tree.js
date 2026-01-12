@@ -3,7 +3,7 @@
 
 // Author: Joel Lee
 
-const list = require('./list.js');
+const list = require('./list.js')
 
 // make_empty_binary_tree returns an empty list
 function make_empty_binary_tree() {
@@ -14,7 +14,9 @@ function make_empty_binary_tree() {
 function is_binary_tree(t) {
   return (
     is_empty_binary_tree(t) ||
-    (list.length(t) === 3 && is_binary_tree(left_subtree_of(t)) && is_binary_tree(right_subtree_of(t)))
+    (list.length(t) === 3 &&
+      is_binary_tree(left_subtree_of(t)) &&
+      is_binary_tree(right_subtree_of(t)))
   )
 }
 
@@ -49,10 +51,10 @@ function right_subtree_of(t) {
   return list.list_ref(t, 2)
 }
 
-exports.make_empty_binary_tree = make_empty_binary_tree;
-exports.is_binary_tree = is_binary_tree;
-exports.make_binary_tree_node = make_binary_tree_node;
-exports.is_empty_binary_tree = is_empty_binary_tree;
-exports.left_subtree_of = left_subtree_of;
-exports.value_of = value_of;
-exports.right_subtree_of = right_subtree_of;
+exports.make_empty_binary_tree = make_empty_binary_tree
+exports.is_binary_tree = is_binary_tree
+exports.make_binary_tree_node = make_binary_tree_node
+exports.is_empty_binary_tree = is_empty_binary_tree
+exports.left_subtree_of = left_subtree_of
+exports.value_of = value_of
+exports.right_subtree_of = right_subtree_of
