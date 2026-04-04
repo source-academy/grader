@@ -13,7 +13,7 @@
   "dependencies": {
     "fast-levenshtein": "^3.0.0",
     "js-slang": "^1.0.88",
-    "lodash": "4.17.23",
+    "lodash": "4.18.1",
     "node-canvas-webgl": "^0.3.0"
   },
   "devDependencies": {
