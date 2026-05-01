@@ -12,7 +12,7 @@
   "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610",
   "dependencies": {
     "fast-levenshtein": "^3.0.0",
-    "js-slang": "^1.0.88",
+    "js-slang": "^1.0.92",
     "lodash": "4.18.1",
     "node-canvas-webgl": "^0.3.0"
   },
