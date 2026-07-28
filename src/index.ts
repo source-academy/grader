@@ -7,6 +7,7 @@ import {
 import { Context, Frame, SourceError, Value, Variant } from 'js-slang/dist/types'
 import { stringify } from 'js-slang/dist/utils/stringify'
 
+import { runAllConductor } from './conductor'
 import { loadCurves, loadRunes } from './graphicsLoader'
 import { setupLambdaXvfb } from './setupXvfb'
 
@@ -16,11 +17,13 @@ Object.assign(externals, require('./tree.js'))
 const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT!, 10) : 3000 // in milliseconds
 
 /**
+ * The legacy Source-dialect library.
  * @property globals - an array of two element string arrays. The first element
  *   of this latter array is the identifier for the global var, and the second
  *   element is its javascript value (to be eval'd).
  */
-export type Library = {
+export type LegacyLibrary = {
+  format?: 'legacy'
   chapter: number
   external: {
     name: 'NONE' | 'RUNES' | 'CURVES' | 'SOUNDS' | 'BINARYTREES' | 'PIXNFLIX'
@@ -28,6 +31,18 @@ export type Library = {
   }
   globals: Array<string[]>
 }
+
+/**
+ * A conductor library: a language-agnostic `(language, evaluator)` pair
+ * resolved to an external runtime. It carries none of the legacy fields.
+ */
+export type ConductorLibrary = {
+  format: 'conductor'
+  language: string
+  evaluator: string
+}
+
+export type Library = LegacyLibrary | ConductorLibrary
 
 export type Testcase = {
   program: string
@@ -50,7 +65,7 @@ export type AwsEvent = {
  * Set of properties of a unit test
  */
 export type UnitTest = {
-  library: Library
+  library: LegacyLibrary
   prependProgram: string
   studentProgram: string
   postpendProgram: string
@@ -62,7 +77,7 @@ export type UnitTest = {
  * @property totalScore - the total score of the student program
  * @property results - the array of Output types
  */
-type Summary = {
+export type Summary = {
   totalScore: number
   maxScore: number
   results: Output[]
@@ -74,25 +89,25 @@ type Summary = {
  *  OutputFail - program raises no errors but answer is wrong
  *  OutputError - program raises an error
  */
-type Output = OutputPass | OutputFail | OutputError
+export type Output = OutputPass | OutputFail | OutputError
 
-type OutputPass = {
+export type OutputPass = {
   resultType: 'pass'
   score: number
 }
 
-type OutputFail = {
+export type OutputFail = {
   resultType: 'fail'
   expected: string
   actual: string
 }
 
-type OutputError = {
+export type OutputError = {
   resultType: 'error'
   errors: Array<ErrorFromSource | ErrorFromTimeout>
 }
 
-type ErrorFromSource = {
+export type ErrorFromSource = {
   errorType: 'runtime' | 'syntax'
   line: number
   location: 'prepend' | 'student' | 'postpend' | 'testcase' | 'unknown'
@@ -100,7 +115,7 @@ type ErrorFromSource = {
   errorExplanation: string
 }
 
-type ErrorFromTimeout = {
+export type ErrorFromTimeout = {
   errorType: 'timeout'
 }
 
@@ -120,8 +135,16 @@ type TimeoutResult = {
  * @param event the AwsEvent from the Backend
  */
 export const runAll = async (event: AwsEvent): Promise<Summary> => {
-  if (event.library && event.library.external) {
-    switch (event.library.external.name) {
+  // Conductor questions are graded by an external runtime, not js-slang. Branch
+  // before any legacy field (external/globals/chapter) is touched.
+  if (event.library && event.library.format === 'conductor') {
+    return runAllConductor(event)
+  }
+
+  const library = event.library as LegacyLibrary
+
+  if (library && library.external) {
+    switch (library.external.name) {
       case 'RUNES': {
         await setupLambdaXvfb()
         Object.assign(externals, await loadRunes())
@@ -138,10 +161,10 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
     }
   }
 
-  evaluateGlobals(event.library.globals)
+  evaluateGlobals(library.globals)
   const promises: Promise<Output>[] = event.testcases.map((testcase: Testcase) =>
     run({
-      library: event.library,
+      library,
       prependProgram: event.prependProgram || '',
       studentProgram: event.studentProgram,
       postpendProgram: event.postpendProgram || '',

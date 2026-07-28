@@ -821,6 +821,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sourceacademy/conductor@npm:^0.7.1":
+  version: 0.7.2
+  resolution: "@sourceacademy/conductor@npm:0.7.2"
+  checksum: 10c0/84cff73c8c67a5884c9a06774f514b2dc4275e14ee282c7eee4fd32618857f63cdc2a736c4e5d2b6501b7b39d6c9e2f7192af1dbbc8ec1542721c08252c1f022
+  languageName: node
+  linkType: hard
+
+"@sourceacademy/language-directory@https://github.com/source-academy/language-directory.git#0.0.13":
+  version: 0.0.13
+  resolution: "@sourceacademy/language-directory@https://github.com/source-academy/language-directory.git#commit=21808f59da7dc04637758e2377d0fce2cbb1299a"
+  checksum: 10c0/f98c279b96254497ee3454eab8e664b2fd725e4a9ad728d1fbc60767bf490d22c692d0d1ad2e90c8cf18d0dc579d5f1ab819ab7766b573730f9e28b081cfe961
+  languageName: node
+  linkType: hard
+
 "@ts-morph/bootstrap@npm:^0.18.0":
   version: 0.18.0
   resolution: "@ts-morph/bootstrap@npm:0.18.0"
@@ -2175,6 +2189,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "grader@workspace:."
   dependencies:
+    "@sourceacademy/conductor": "npm:^0.7.1"
+    "@sourceacademy/language-directory": "https://github.com/source-academy/language-directory.git#0.0.13"
     "@types/jest": "npm:^28.1.6"
     "@types/node": "npm:^25.0.3"
     coveralls: "npm:^3.1.1"
