@@ -5,6 +5,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "tsc",
+    "build:py2js": "scripts/build-py2js-bundle.sh",
     "typecheck": "tsc --noEmit",
     "test": "cross-env TIMEOUT=2000 jest --env=node",
     "test-coveralls": "scripts/ci.sh",
@@ -19,12 +20,18 @@
     "node-canvas-webgl": "^0.3.0"
   },
   "devDependencies": {
+    "@sourceacademy/conductor": "^0.8.0",
+    "@sourceacademy/runner-module-loader": "^0.1.0",
     "@types/jest": "^28.1.6",
-    "@types/node": "^26.1.1",
+    "@types/node": "^26.2.0",
     "coveralls": "^3.1.1",
     "cross-env": "^10.1.0",
     "cross-zip-cli": "^1.0.0",
+    "esbuild": "^0.25.0",
     "jest": "^28.1.3",
+    "mathjs": "^15.2.0",
+    "moo": "^0.5.2",
+    "nearley": "^2.20.1",
     "prettier": "^3.7.4",
     "ts-jest": "^28.0.7",
     "typescript": "^6.0.3"
@@ -35,7 +42,7 @@
   },
   "jest": {
     "collectCoverageFrom": [
-      "src/index.ts"
+      "src/*.ts"
     ],
     "moduleFileExtensions": [
       "ts",
