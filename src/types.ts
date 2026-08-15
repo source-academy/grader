@@ -3,9 +3,11 @@
 // Absent language => 'Source', preserving the original js-slang behaviour.
 export type Language = 'Source' | 'Python'
 
-// Only the Source grader reads `library`; the Python grader ignores it.
 export type Library = {
   chapter: number
+  // `external` and `globals` are source-only. RUNES/CURVES/etc. are js-slang graphics modules 
+  // graded by rendering to headless WebGL and comparing pixels (picture_mse) - there is
+  // no Python equivalent for now, so the Python grader ignores this.
   external: {
     name: 'NONE' | 'RUNES' | 'CURVES' | 'SOUNDS' | 'BINARYTREES' | 'PIXNFLIX'
     symbols: string[]

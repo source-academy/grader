@@ -6,8 +6,7 @@ import { AwsEvent, Output, Summary, Testcase } from './types'
 
 const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT, 10) : 3000
 
-// Every question is graded at Python chapter 4, matching the browser Autograder tab.
-const PYTHON_VARIANT = 4
+const DEFAULT_PYTHON_VARIANT = 4
 
 export type PythonRunError = {
   errorType: 'runtime' | 'syntax'
@@ -97,12 +96,15 @@ const WORKER_SOURCE = `
 
 type WorkerMessage = { lines: string[] } | { error: PythonRunError }
 
-export function workerRunner(bundlePath: string): PythonProgramRunner {
+export function workerRunner(
+  bundlePath: string,
+  variant: number = DEFAULT_PYTHON_VARIANT,
+): PythonProgramRunner {
   return (program, timeoutMs) =>
     new Promise<PythonRunResult>(resolve => {
       const worker = new Worker(WORKER_SOURCE, {
         eval: true,
-        workerData: { bundlePath, code: program, variant: PYTHON_VARIANT },
+        workerData: { bundlePath, code: program, variant },
       })
       let settled = false
       const finish = (result: PythonRunResult) => {
@@ -141,7 +143,8 @@ export function resolveBundlePath(): string {
 
 // Grades a Python event and returns the Summary the backend expects.
 export const runAll = async (event: AwsEvent, deps: PythonDeps = {}): Promise<Summary> => {
-  const runProgram = (deps.createRunner ?? (() => workerRunner(resolveBundlePath())))()
+  const runProgram = (deps.createRunner ??
+    (() => workerRunner(resolveBundlePath(), event.library.chapter)))()
 
   // Sequential: one evaluator worker resident at a time.
   const results: Output[] = []
