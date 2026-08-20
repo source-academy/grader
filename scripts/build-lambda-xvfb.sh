@@ -13,7 +13,6 @@ dnf install -y \
   mesa-libEGL-devel.x86_64 \
   openssl-devel.x86_64 \
   xorg-x11-xtrans-devel.noarch \
-  libXfont-devel.x86_64 \
   libXfont2-devel.x86_64 \
   libxkbfile-devel.x86_64 \
   libpciaccess-devel.x86_64 \
