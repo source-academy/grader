@@ -79,7 +79,7 @@ popd
 cd /opt
 
 strip bin/*
-find -name '*.so' -type f -print0 | xargs -0 strip
+find -name '*.so' -type f -print0 | xargs -0 --no-run-if-empty strip
 
 BINS_TO_LDD="bin/Xvfb bin/xkbcomp /usr/lib64/libGLX_mesa.so.0 /usr/lib64/libGLX_system.so.0 /usr/lib64/dri/swrast_dri.so /usr/lib64/dri/kms_swrast_dri.so"
 
