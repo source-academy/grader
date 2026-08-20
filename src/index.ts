@@ -4,7 +4,9 @@ import {
   ensureGlobalEnvironmentExist,
   importBuiltins,
 } from 'js-slang/dist/createContext'
-import { Context, Frame, SourceError, Value, Variant } from 'js-slang/dist/types'
+import type { SourceError } from 'js-slang/dist/errors/base'
+import { Variant } from 'js-slang/dist/langs'
+import { Context, Frame, Value} from 'js-slang/dist/types'
 import { stringify } from 'js-slang/dist/utils/stringify'
 
 import { loadCurves, loadRunes } from './graphicsLoader'
