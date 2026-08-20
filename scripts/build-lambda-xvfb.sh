@@ -4,6 +4,9 @@ set -euxo pipefail
 
 SCRIPT_DIR="$(dirname "$(realpath -s "${BASH_SOURCE[0]}")")"
 
+# Build toolchain — not present in the minimal AL2023 Lambda base image
+dnf install -y gcc make bison flex libxslt gettext
+
 dnf install -y \
   libX11-devel.x86_64 \
   pixman-devel.x86_64 \
