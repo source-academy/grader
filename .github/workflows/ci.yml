@@ -73,8 +73,15 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
+      - name: Install Xvfb and software GL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libgl1-mesa-dri
+
       - name: Run tests
-        run: yarn test
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1024x768x24 -ac" yarn test
+        env:
+          LIBGL_ALWAYS_SOFTWARE: "1"
 
       - name: Upload coverage to Coveralls
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
