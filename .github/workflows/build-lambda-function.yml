@@ -33,7 +33,7 @@ jobs:
     container: amazon/aws-lambda-nodejs:24-x86_64
     steps:
       - name: install git and tar
-        run: yum install -y git tar bzip2 zip
+        run: dnf install -y git tar bzip2 zip
       - name: Checkout code
         uses: actions/checkout@v6
       - uses: actions/download-artifact@v4

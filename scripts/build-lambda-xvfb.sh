@@ -4,7 +4,7 @@ set -euxo pipefail
 
 SCRIPT_DIR="$(dirname "$(realpath -s "${BASH_SOURCE[0]}")")"
 
-yum install -y \
+dnf install -y \
   libX11-devel.x86_64 \
   pixman-devel.x86_64 \
   libdrm-devel.x86_64 \
