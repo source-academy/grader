@@ -30,7 +30,7 @@ jobs:
     name: Build native modules
     needs: tsc
     runs-on: ubuntu-latest
-    container: amazon/aws-lambda-nodejs:24
+    container: amazon/aws-lambda-nodejs:24-x86_64
     steps:
       - name: install git and tar
         run: yum install -y git tar bzip2 zip
