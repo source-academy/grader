@@ -46,7 +46,7 @@ jobs:
           name: graderzip
           path: grader.zip
           if-no-files-found: error
-      - uses: geekyeggo/delete-artifact@v2
+      - uses: geekyeggo/delete-artifact@v6
         with:
           failOnError: false
           name: build-lambda
