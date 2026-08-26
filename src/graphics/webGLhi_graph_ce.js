@@ -1,7 +1,7 @@
 // USEFUL, SIMPLE, GENERAL PROCEDURES
 
 function compose(f, g) {
-  return function(x) {
+  return function (x) {
     return f(g(x))
   }
 }
@@ -39,7 +39,7 @@ function unit_line(t) {
 }
 
 function unit_line_at(y) {
-  return function(t) {
+  return function (t) {
     return make_point(t, y)
   }
 }
@@ -58,13 +58,13 @@ function arc(t) {
 // SOME CURVE-TRANSFORMS
 
 function invert(curve) {
-  return function(t) {
+  return function (t) {
     return curve(1 - t)
   }
 }
 
 function rotate_pi_over_2(curve) {
-  return function(t) {
+  return function (t) {
     var ct = curve(t)
     return make_point(-y_of(ct), x_of(ct))
   }
@@ -75,8 +75,8 @@ function rotate_pi_over_2(curve) {
 // TRANSLATE is of type (JS-Num, JS-Num --> Curve-Transform)
 
 function translate(x0, y0) {
-  return function(curve) {
-    return function(t) {
+  return function (curve) {
+    return function (t) {
       var ct = curve(t)
       return make_point(x0 + x_of(ct), y0 + y_of(ct))
     }
@@ -88,8 +88,8 @@ function translate(x0, y0) {
 function rotate_around_origin(theta) {
   var cth = Math.cos(theta)
   var sth = Math.sin(theta)
-  return function(curve) {
-    return function(t) {
+  return function (curve) {
+    return function (t) {
       var ct = curve(t)
       var x = x_of(ct)
       var y = y_of(ct)
@@ -100,8 +100,8 @@ function rotate_around_origin(theta) {
 
 function deriv_t(n) {
   var delta_t = 1 / n
-  return function(curve) {
-    return function(t) {
+  return function (curve) {
+    return function (t) {
       var ct = curve(t)
       var ctdelta = curve(t + delta_t)
       return make_point((x_of(ctdelta) - x_of(ct)) / delta_t, (y_of(ctdelta) - y_of(ct)) / delta_t)
@@ -110,8 +110,8 @@ function deriv_t(n) {
 }
 
 function scale_x_y(a, b) {
-  return function(curve) {
-    return function(t) {
+  return function (curve) {
+    return function (t) {
       var ct = curve(t)
       return make_point(a * x_of(ct), b * y_of(ct))
     }
@@ -150,8 +150,8 @@ function squeeze_full_view(xlo, xhi, ylo, yhi) {
     throw 'attempt to squeeze window to zero'
   } else {
     return compose(
-      scale_x_y(0.99 * 1 / width, 0.99 * 1 / height),
-      translate(-(xlo - 0.01), -(ylo - 0.01))
+      scale_x_y((0.99 * 1) / width, (0.99 * 1) / height),
+      translate(-(xlo - 0.01), -(ylo - 0.01)),
     )
   }
 }
@@ -164,12 +164,12 @@ function full_view_proportional(xlo, xhi, ylo, yhi) {
   if (width === 0 || height === 0) {
     throw 'attempt to squeeze window to zero'
   } else {
-    var scale_factor = Math.min(0.9 * 1 / width, 0.9 * 1 / height)
-    var new_mid_x = scale_factor * (xlo + xhi) / 2
-    var new_mid_y = scale_factor * (ylo + yhi) / 2
+    var scale_factor = Math.min((0.9 * 1) / width, (0.9 * 1) / height)
+    var new_mid_x = (scale_factor * (xlo + xhi)) / 2
+    var new_mid_y = (scale_factor * (ylo + yhi)) / 2
     return compose(
       translate(0.5 - new_mid_x, 0.5 - new_mid_y),
-      scale_x_y(scale_factor, scale_factor)
+      scale_x_y(scale_factor, scale_factor),
     )
   }
 }
@@ -196,7 +196,7 @@ function put_in_standard_position(curve) {
 // CONNECT-RIGIDLY makes a curve consisting of curve1 followed by curve2.
 
 function connect_rigidly(curve1, curve2) {
-  return function(t) {
+  return function (t) {
     if (t < 1 / 2) {
       return curve1(2 * t)
     } else {
@@ -215,8 +215,8 @@ function connect_ends(curve1, curve2) {
     curve1,
     translate(
       x_of(end_point_of_curve1) - x_of(start_point_of_curve2),
-      y_of(end_point_of_curve1) - y_of(start_point_of_curve2)
-    )(curve2)
+      y_of(end_point_of_curve1) - y_of(start_point_of_curve2),
+    )(curve2),
   )
 }
 
@@ -230,7 +230,7 @@ function gosperize(curve) {
   var scaled_curve = scale_x_y(Math.sqrt(2) / 2, Math.sqrt(2) / 2)(curve)
   return connect_rigidly(
     rotate_around_origin(Math.PI / 4)(scaled_curve),
-    translate(0.5, 0.5)(rotate_around_origin(-Math.PI / 4)(scaled_curve))
+    translate(0.5, 0.5)(rotate_around_origin(-Math.PI / 4)(scaled_curve)),
   )
 }
 
@@ -255,12 +255,12 @@ function param_gosper(level, angle_at) {
 }
 
 function param_gosperize(theta) {
-  return function(curve) {
+  return function (curve) {
     var scale_factor = 1 / Math.cos(theta) / 2
     var scaled_curve = scale(scale_factor)(curve)
     return connect_rigidly(
       rotate_around_origin(theta)(scaled_curve),
-      translate(0.5, Math.sin(theta) * scale_factor)(rotate_around_origin(-theta)(scaled_curve))
+      translate(0.5, Math.sin(theta) * scale_factor)(rotate_around_origin(-theta)(scaled_curve)),
     )
   }
 }
@@ -282,8 +282,8 @@ function mingyu_rotate(theta) {
   // rotates around origin, but less efficiently
   var cth = Math.cos(theta)
   var sth = Math.sin(theta)
-  return function(curve) {
-    return function(t) {
+  return function (curve) {
+    return function (t) {
       var x = x_of(curve(t)) // Mingyu writes (curve t)
       var y = y_of(curve(t)) // twice
       return make_point(cth * x - sth * y, sth * x + cth * y)
@@ -321,5 +321,5 @@ Object.assign(exports, {
   param_gosper,
   param_gosperize,
   zc_dragonize,
-  mingyu_rotate
+  mingyu_rotate,
 })

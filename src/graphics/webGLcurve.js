@@ -1,6 +1,6 @@
 function generateCurve(scaleMode, drawMode, numPoints, func, isFullView) {
   const viewport_size = 600
-  const frame = open_pixmap('frame', viewport_size, viewport_size, true);
+  const frame = open_pixmap('frame', viewport_size, viewport_size, true)
   var curvePosArray = []
   var transMat = mat4.create()
   // initialize the min/max to extreme values
@@ -49,16 +49,16 @@ function generateCurve(scaleMode, drawMode, numPoints, func, isFullView) {
   if (scaleMode == 'fit') {
     var center = [(min_x + max_x) / 2, (min_y + max_y) / 2]
     var scale = Math.max(max_x - min_x, max_y - min_y)
-    scale = scale === 0 ? 1 : scale;
+    scale = scale === 0 ? 1 : scale
     mat4.scale(transMat, transMat, vec3.fromValues(2 / scale, 2 / scale, 0))
-                                     // use 2 because the value is in [-1, 1]
+    // use 2 because the value is in [-1, 1]
     mat4.translate(transMat, transMat, vec3.fromValues(-center[0], -center[1], 0))
   } else if (scaleMode == 'stretch') {
     var center = [(min_x + max_x) / 2, (min_y + max_y) / 2]
-    var x_scale = max_x === min_x ? 1 : (max_x - min_x)
-    var y_scale = max_y === min_y ? 1 : (max_y - min_y)
+    var x_scale = max_x === min_x ? 1 : max_x - min_x
+    var y_scale = max_y === min_y ? 1 : max_y - min_y
     mat4.scale(transMat, transMat, vec3.fromValues(2 / x_scale, 2 / y_scale, 0))
-                                    // use 2 because the value is in [-1, 1]
+    // use 2 because the value is in [-1, 1]
     mat4.translate(transMat, transMat, vec3.fromValues(-center[0], -center[1], 0))
   } else {
     // do nothing for normal situations
@@ -66,8 +66,8 @@ function generateCurve(scaleMode, drawMode, numPoints, func, isFullView) {
   clear_viewport()
   gl.uniformMatrix4fv(u_transformMatrix, false, transMat)
   drawCurve(drawMode, curvePosArray)
-  copy_viewport(gl.canvas, frame);
-  return new ShapeDrawn(frame);
+  copy_viewport(gl.canvas, frame)
+  return new ShapeDrawn(frame)
 }
 
 /**
@@ -84,7 +84,7 @@ function generateCurve(scaleMode, drawMode, numPoints, func, isFullView) {
  * @return {function} function of type Curve → Drawing
  */
 function draw_connected(num) {
-  return function(func) {
+  return function (func) {
     return generateCurve('none', 'lines', num, func)
   }
 }
@@ -103,8 +103,7 @@ function draw_connected(num) {
  * @return {function} function of type Curve → Drawing
  */
 function draw_points_on(num) {
-  return curve =>
-	generateCurve('none', 'points', num, curve)
+  return curve => generateCurve('none', 'points', num, curve)
 }
 
 /**
@@ -121,7 +120,7 @@ function draw_points_on(num) {
  * @return {function} function of type Curve → Drawing
  */
 function draw_points_squeezed_to_window(num) {
-  return function(func) {
+  return function (func) {
     return generateCurve('fit', 'points', num, func)
   }
 }
@@ -141,7 +140,7 @@ function draw_points_squeezed_to_window(num) {
  * @return {function} function of type Curve → Drawing
  */
 function draw_connected_squeezed_to_window(num) {
-  return function(func) {
+  return function (func) {
     return generateCurve('fit', 'lines', num, func)
   }
 }
@@ -161,7 +160,7 @@ function draw_connected_squeezed_to_window(num) {
  * @return {function} function of type Curve → Drawing
  */
 function draw_connected_full_view(num) {
-  return function(func) {
+  return function (func) {
     return generateCurve('stretch', 'lines', num, func, true)
   }
 }
@@ -180,7 +179,7 @@ function draw_connected_full_view(num) {
  * @return {function} function of type Curve → Drawing
  */
 function draw_connected_full_view_proportional(num) {
-  return function(func) {
+  return function (func) {
     return generateCurve('fit', 'lines', num, func, true)
   }
 }
@@ -222,5 +221,5 @@ Object.assign(exports, {
   draw_connected_full_view_proportional,
   make_point,
   x_of,
-  y_of
+  y_of,
 })

@@ -1,14 +1,14 @@
 import { awsEventFactory } from './helpers'
 import { runAll } from '../index'
-import { Grader, Student } from './types';
+import { Grader, Student } from './types'
 
 const makeAwsEvent = awsEventFactory({
   chapter: 3,
   external: {
     name: 'NONE',
-    symbols: []
+    symbols: [],
   },
-  globals: []
+  globals: [],
 })
 
 /*
@@ -23,8 +23,7 @@ const makeAwsEvent = awsEventFactory({
   Testcase program: correct.
 */
 
-const validStudentCorrect =
-  `
+const validStudentCorrect = `
   function is_odd(n) {
     return n % 2 === 1;
   }
@@ -32,13 +31,11 @@ const validStudentCorrect =
   const odd_stream = stream_filter(is_odd, enum_stream(1, 50));
   `
 
-const validStudentWrong =
-  `
+const validStudentWrong = `
   const odd_stream = stream_filter(n => n % 2 === 1, list_to_stream(list(1, 2, 3)));
   `
 
-const validStudentPartial =
-  `
+const validStudentPartial = `
   function is_odd(n) {
     return n % 2 === 1;
   }
@@ -46,8 +43,7 @@ const validStudentPartial =
   const odd_stream = stream_filter(is_odd, stream_append(enum_stream(1, 3), enum_stream(4, 5)));
   `
 
-const invalidStudentRuntime =
-  `
+const invalidStudentRuntime = `
   function is_odd(n) {
     return n % 2 === 1;
   }
@@ -59,13 +55,13 @@ const invalidStudentRuntime =
 export const student: Student = {
   invalid: {
     runtime: invalidStudentRuntime,
-    syntax: "a",
+    syntax: 'a',
   },
   valid: {
     correct: validStudentCorrect,
     wrong: validStudentWrong,
-    partial: validStudentPartial
-  }
+    partial: validStudentPartial,
+  },
 }
 
 const validGrader = [
@@ -77,8 +73,8 @@ const validGrader = [
   }
   stream_testcase_a();
   `,
-    answer: "true",
-    score: 1
+    answer: 'true',
+    score: 1,
   },
   {
     program: `
@@ -88,8 +84,8 @@ const validGrader = [
   }
   stream_testcase_b();
   `,
-    answer: "true",
-    score: 1
+    answer: 'true',
+    score: 1,
   },
   {
     program: `
@@ -99,8 +95,8 @@ const validGrader = [
   }
   stream_testcase_c();
   `,
-    answer: "true",
-    score: 1
+    answer: 'true',
+    score: 1,
   },
   /* 
     TODO: Reimplement testcase once is_stream issue is resolved 
@@ -118,133 +114,141 @@ const validGrader = [
 ]
 
 export const grader: Grader = {
-  validPrepend: "",
+  validPrepend: '',
   validPostpend: `function stream_take_max(str, n) {
     return is_null(str) || n === 0
       ? null
       : pair(head(str), () => stream_take_max(stream_tail(str), n - 1));
   }`,
-  validTestcases: validGrader
+  validTestcases: validGrader,
 }
 
 test('stream grader OK, student OK, correct', async () => {
-  const results = await runAll(makeAwsEvent({
-    prependProgram: grader.validPrepend,
-    studentProgram: student.valid.correct,
-    postpendProgram: grader.validPostpend,
-    testcases: grader.validTestcases
-  }))
+  const results = await runAll(
+    makeAwsEvent({
+      prependProgram: grader.validPrepend,
+      studentProgram: student.valid.correct,
+      postpendProgram: grader.validPostpend,
+      testcases: grader.validTestcases,
+    }),
+  )
   expect(results).toEqual({
-    "totalScore": 3, // 4,
-    "maxScore": 3,
-    "results": [
+    totalScore: 3, // 4,
+    maxScore: 3,
+    results: [
       {
-        "resultType": "pass",
-        "score": 1
+        resultType: 'pass',
+        score: 1,
       },
       {
-        "resultType": "pass",
-        "score": 1
+        resultType: 'pass',
+        score: 1,
       },
       {
-        "resultType": "pass",
-        "score": 1
+        resultType: 'pass',
+        score: 1,
       },
       // {
       //   "resultType": "pass",
       //   "score": 1
       // }
-    ]
+    ],
   })
 })
 
 test('stream grader OK, student OK, wrong', async () => {
-  const results = await runAll(makeAwsEvent({
-    prependProgram: grader.validPrepend,
-    studentProgram: student.valid.wrong,
-    postpendProgram: grader.validPostpend,
-    testcases: grader.validTestcases
-  }))
+  const results = await runAll(
+    makeAwsEvent({
+      prependProgram: grader.validPrepend,
+      studentProgram: student.valid.wrong,
+      postpendProgram: grader.validPostpend,
+      testcases: grader.validTestcases,
+    }),
+  )
   expect(results).toEqual({
-    "totalScore": 1, // 2,
-    "maxScore": 3,
-    "results": [
+    totalScore: 1, // 2,
+    maxScore: 3,
+    results: [
       {
-        "resultType": "fail",
-        "expected": "true",
-        "actual": "false"
+        resultType: 'fail',
+        expected: 'true',
+        actual: 'false',
       },
       {
-        "resultType": "fail",
-        "expected": "true",
-        "actual": "false"
+        resultType: 'fail',
+        expected: 'true',
+        actual: 'false',
       },
       {
-        "resultType": "pass",
-        "score": 1
+        resultType: 'pass',
+        score: 1,
       },
       // {
       //   "resultType": "pass",
       //   "score": 1
       // }
-    ]
+    ],
   })
 })
 
 test('stream grader OK, student OK, partial', async () => {
-  const results = await runAll(makeAwsEvent({
-    prependProgram: grader.validPrepend,
-    studentProgram: student.valid.partial!,
-    postpendProgram: grader.validPostpend,
-    testcases: grader.validTestcases
-  }))
+  const results = await runAll(
+    makeAwsEvent({
+      prependProgram: grader.validPrepend,
+      studentProgram: student.valid.partial!,
+      postpendProgram: grader.validPostpend,
+      testcases: grader.validTestcases,
+    }),
+  )
   expect(results).toEqual({
-    "totalScore": 2, // 3,
-    "maxScore": 3,
-    "results": [
+    totalScore: 2, // 3,
+    maxScore: 3,
+    results: [
       {
-        "resultType": "pass",
-        "score": 1
+        resultType: 'pass',
+        score: 1,
       },
       {
-        "resultType": "fail",
-        "expected": "true",
-        "actual": "false"
+        resultType: 'fail',
+        expected: 'true',
+        actual: 'false',
       },
       {
-        "resultType": "pass",
-        "score": 1
+        resultType: 'pass',
+        score: 1,
       },
       // {
       //   "resultType": "pass",
       //   "score": 1
       // }
-    ]
+    ],
   })
 })
 
 test('stream grader OK, student runtimeError', async () => {
-  const results = await runAll(makeAwsEvent({
-    prependProgram: grader.validPrepend,
-    studentProgram: student.invalid.runtime,
-    postpendProgram: grader.validPostpend,
-    testcases: grader.validTestcases
-  }))
+  const results = await runAll(
+    makeAwsEvent({
+      prependProgram: grader.validPrepend,
+      studentProgram: student.invalid.runtime,
+      postpendProgram: grader.validPostpend,
+      testcases: grader.validTestcases,
+    }),
+  )
   expect(results).toEqual({
-    "totalScore": 3,
-    "maxScore": 3,
-    "results": [
+    totalScore: 3,
+    maxScore: 3,
+    results: [
       {
-        "resultType": "pass",
-        "score": 1
+        resultType: 'pass',
+        score: 1,
       },
       {
-        "resultType": "pass",
-        "score": 1
+        resultType: 'pass',
+        score: 1,
       },
       {
-        "resultType": "pass",
-        "score": 1
+        resultType: 'pass',
+        score: 1,
       },
       // {
       //   "resultType": "error",
@@ -258,6 +262,6 @@ test('stream grader OK, student runtimeError', async () => {
       //     }
       //   ]
       // }
-    ]
+    ],
   })
 })

@@ -1,16 +1,23 @@
 name: Build layer
-on: workflow_dispatch
+on:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
   xvfb:
     name: Build Xvfb
     runs-on: ubuntu-latest
-    container: amazon/aws-lambda-nodejs:22
+    container: amazon/aws-lambda-nodejs:24-x86_64
     steps:
-      - uses: actions/checkout@v4
+      - name: install git and tar
+        run: dnf install -y git tar bzip2 zip
+      - name: Checkout code
+        uses: actions/checkout@v7
       - name: Build Xvfb
         run: scripts/build-lambda-xvfb.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v7
         with:
           name: xvfbzip
           path: /opt/xvfb.zip

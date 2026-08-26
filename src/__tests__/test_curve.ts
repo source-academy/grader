@@ -5,14 +5,9 @@ const makeAwsEvent = awsEventFactory({
   chapter: 2,
   external: {
     name: 'CURVES',
-    symbols: [
-      'draw_connected_full_view_proportional',
-      'unit_circle',
-      'unit_line',
-      'picture_mse'
-    ]
+    symbols: ['draw_connected_full_view_proportional', 'unit_circle', 'unit_line', 'picture_mse'],
   },
-  globals: []
+  globals: [],
 })
 
 test('curve correct', async () => {
@@ -25,15 +20,15 @@ test('curve correct', async () => {
         {
           program: `picture_mse(draw_connected_full_view_proportional(200)(unit_circle), draw_connected_full_view_proportional(200)(unit_circle)) < 0.0001;`,
           answer: 'true',
-          score: 1
+          score: 1,
         },
         {
           program: `picture_mse(draw_connected_full_view_proportional(200)(unit_circle), draw_connected_full_view_proportional(200)(unit_line)) < 0.0001;`,
           answer: 'false',
-          score: 1
-        }
-      ]
-    })
+          score: 1,
+        },
+      ],
+    }),
   )
   expect(results).toMatchInlineSnapshot(`
     Object {

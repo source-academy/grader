@@ -1,14 +1,14 @@
 import { awsEventFactory } from './helpers'
 import { runAll } from '../index'
-import { Grader, Student } from './types';
+import { Grader, Student } from './types'
 
 const makeAwsEvent = awsEventFactory({
   chapter: 2,
   external: {
     name: 'NONE',
-    symbols: []
+    symbols: [],
   },
-  globals: []
+  globals: [],
 })
 
 /*
@@ -23,38 +23,31 @@ const makeAwsEvent = awsEventFactory({
     Testcase program: correct.
 */
 
-const validPrependCorrect =
-  `
+const validPrependCorrect = `
 const ist = list(1, 2, 3);
 `
 
-const invalidPrependRuntime =
-  `
+const invalidPrependRuntime = `
 const ist = ist;
 `
 
-const invalidPrependSyntax =
-  `
+const invalidPrependSyntax = `
 const ist = list(1, 2, 3)
 `
 
-const validPostpendCorrect =
-  `
+const validPostpendCorrect = `
 const __checkEquality = (l1, l2) => equal(l1, l2);
 `
 
-const invalidPostpendRuntime =
-  `
+const invalidPostpendRuntime = `
 const __checkEquality = __checkEquality;
 `
 
-const invalidPostpendSyntax =
-  `
+const invalidPostpendSyntax = `
 const __checkEquality = (l1, l2) => equal(l1, l2)
 `
 
-const validStudentCorrect =
-  `
+const validStudentCorrect = `
 function my_map(xs, f) {
   if (is_null(xs)) {
     return null;
@@ -64,15 +57,13 @@ function my_map(xs, f) {
 }
 `
 
-const validStudentWrong =
-  `
+const validStudentWrong = `
 function my_map(xs, f) {
   return pair(xs, xs);
 }
 `
 
-const invalidStudentRuntime =
-  `
+const invalidStudentRuntime = `
 function my_map(xs, f) {
   return pair(xs, my_map(tail(xs), f));
 }
@@ -81,22 +72,21 @@ function my_map(xs, f) {
 export const student: Student = {
   invalid: {
     runtime: invalidStudentRuntime,
-    syntax: "a",
+    syntax: 'a',
   },
   valid: {
     correct: validStudentCorrect,
-    wrong: validStudentWrong
-  }
+    wrong: validStudentWrong,
+  },
 }
 
 const validGrader = [
   {
-    program:
-      `
+    program: `
 my_map(ist, x => x + 1);
 `,
-    answer: "[2, [3, [4, null]]]",
-    score: 1
+    answer: '[2, [3, [4, null]]]',
+    score: 1,
   },
   {
     program: `
@@ -104,9 +94,9 @@ const ist2 = my_map(ist, x => x);
 
 __checkEquality(ist, ist2);
   `,
-    answer: "true",
-    score: 1
-  }
+    answer: 'true',
+    score: 1,
+  },
 ]
 
 export const grader: Grader = {
@@ -115,212 +105,226 @@ export const grader: Grader = {
   validTestcases: validGrader,
   invalidPrepend: {
     syntax: invalidPrependSyntax,
-    runtime: invalidPrependRuntime
+    runtime: invalidPrependRuntime,
   },
   invalidPostpend: {
     syntax: invalidPostpendSyntax,
-    runtime: invalidPostpendRuntime
-  }
+    runtime: invalidPostpendRuntime,
+  },
 }
 
 test('chap2 grader OK, student OK, correct', async () => {
-  const results = await runAll(makeAwsEvent({
-    prependProgram: grader.validPrepend,
-    studentProgram: student.valid.correct,
-    postpendProgram: grader.validPostpend,
-    testcases: grader.validTestcases
-  }))
+  const results = await runAll(
+    makeAwsEvent({
+      prependProgram: grader.validPrepend,
+      studentProgram: student.valid.correct,
+      postpendProgram: grader.validPostpend,
+      testcases: grader.validTestcases,
+    }),
+  )
   expect(results).toEqual({
-    "totalScore": 2,
-    "maxScore": 2,
-    "results": [
+    totalScore: 2,
+    maxScore: 2,
+    results: [
       {
-        "resultType": "pass",
-        "score": 1
+        resultType: 'pass',
+        score: 1,
       },
       {
-        "resultType": "pass",
-        "score": 1
-      }
-    ]
+        resultType: 'pass',
+        score: 1,
+      },
+    ],
   })
 })
 
 test('chap2 grader OK, student OK, wrong', async () => {
-  const results = await runAll(makeAwsEvent({
-    prependProgram: grader.validPrepend,
-    studentProgram: student.valid.wrong,
-    postpendProgram: grader.validPostpend,
-    testcases: grader.validTestcases
-  }))
+  const results = await runAll(
+    makeAwsEvent({
+      prependProgram: grader.validPrepend,
+      studentProgram: student.valid.wrong,
+      postpendProgram: grader.validPostpend,
+      testcases: grader.validTestcases,
+    }),
+  )
   expect(results).toEqual({
-    "totalScore": 0,
-    "maxScore": 2,
-    "results": [
+    totalScore: 0,
+    maxScore: 2,
+    results: [
       {
-        "resultType": "fail",
-        "expected": "[2, [3, [4, null]]]",
-        "actual": "[[1, [2, [3, null]]], [1, [2, [3, null]]]]"
+        resultType: 'fail',
+        expected: '[2, [3, [4, null]]]',
+        actual: '[[1, [2, [3, null]]], [1, [2, [3, null]]]]',
       },
       {
-        "resultType": "fail",
-        "expected": "true",
-        "actual": "false"
-      }
-    ]
+        resultType: 'fail',
+        expected: 'true',
+        actual: 'false',
+      },
+    ],
   })
 })
 
 test('chap2 grader OK, student OK, prepend runtime', async () => {
-  const results = await runAll(makeAwsEvent({
-    prependProgram: grader.invalidPrepend!.runtime,
-    studentProgram: student.valid.correct,
-    postpendProgram: grader.validPostpend,
-    testcases: grader.validTestcases
-  }))
+  const results = await runAll(
+    makeAwsEvent({
+      prependProgram: grader.invalidPrepend!.runtime,
+      studentProgram: student.valid.correct,
+      postpendProgram: grader.validPostpend,
+      testcases: grader.validTestcases,
+    }),
+  )
   expect(results).toEqual({
-    "totalScore": 0,
-    "maxScore": 2,
-    "results": [
+    totalScore: 0,
+    maxScore: 2,
+    results: [
       {
-        "resultType": "error",
-        "errors": [
+        resultType: 'error',
+        errors: [
           {
-            "errorType": "runtime",
-            "line": 2,
-            "location": "prepend",
-            "errorExplanation": "ReferenceError: Cannot access 'ist' before initialization",
-            "errorLine": "const ist = ist;",
-          }
-        ]
+            errorType: 'runtime',
+            line: 2,
+            location: 'prepend',
+            errorExplanation: "ReferenceError: Cannot access 'ist' before initialization",
+            errorLine: 'const ist = ist;',
+          },
+        ],
       },
       {
-        "resultType": "error",
-        "errors": [
+        resultType: 'error',
+        errors: [
           {
-            "errorType": "runtime",
-            "line": 2,
-            "location": "prepend",
-            "errorExplanation": "ReferenceError: Cannot access 'ist' before initialization",
-            "errorLine": "const ist = ist;",
-          }
-        ]
-      }
-    ]
+            errorType: 'runtime',
+            line: 2,
+            location: 'prepend',
+            errorExplanation: "ReferenceError: Cannot access 'ist' before initialization",
+            errorLine: 'const ist = ist;',
+          },
+        ],
+      },
+    ],
   })
 })
 
 test('chap2 grader OK, student OK, prepend syntax', async () => {
-  const results = await runAll(makeAwsEvent({
-    prependProgram: grader.invalidPrepend!.syntax,
-    studentProgram: student.valid.correct,
-    postpendProgram: grader.validPostpend,
-    testcases: grader.validTestcases
-  }))
+  const results = await runAll(
+    makeAwsEvent({
+      prependProgram: grader.invalidPrepend!.syntax,
+      studentProgram: student.valid.correct,
+      postpendProgram: grader.validPostpend,
+      testcases: grader.validTestcases,
+    }),
+  )
   expect(results).toEqual({
-    "totalScore": 0,
-    "maxScore": 2,
-    "results": [
+    totalScore: 0,
+    maxScore: 2,
+    results: [
       {
-        "resultType": "error",
-        "errors": [
+        resultType: 'error',
+        errors: [
           {
-            "errorExplanation": "Missing semicolon at the end of statement",
-            "errorLine": "const ist = list(1, 2, 3)",
-            "errorType": "syntax",
-            "line": 2,
-            "location": "prepend",
-          }
-        ]
+            errorExplanation: 'Missing semicolon at the end of statement',
+            errorLine: 'const ist = list(1, 2, 3)',
+            errorType: 'syntax',
+            line: 2,
+            location: 'prepend',
+          },
+        ],
       },
       {
-        "resultType": "error",
-        "errors": [
+        resultType: 'error',
+        errors: [
           {
-            "errorExplanation": "Missing semicolon at the end of statement",
-            "errorLine": "const ist = list(1, 2, 3)",
-            "errorType": "syntax",
-            "line": 2,
-            "location": "prepend",
-          }
-        ]
-      }
-    ]
+            errorExplanation: 'Missing semicolon at the end of statement',
+            errorLine: 'const ist = list(1, 2, 3)',
+            errorType: 'syntax',
+            line: 2,
+            location: 'prepend',
+          },
+        ],
+      },
+    ],
   })
 })
 test('chap2 grader OK, student OK, postpend runtime', async () => {
-  const results = await runAll(makeAwsEvent({
-    prependProgram: grader.validPrepend,
-    studentProgram: student.valid.correct,
-    postpendProgram: grader.invalidPostpend!.runtime,
-    testcases: grader.validTestcases
-  }))
+  const results = await runAll(
+    makeAwsEvent({
+      prependProgram: grader.validPrepend,
+      studentProgram: student.valid.correct,
+      postpendProgram: grader.invalidPostpend!.runtime,
+      testcases: grader.validTestcases,
+    }),
+  )
   expect(results).toEqual({
-    "totalScore": 0,
-    "maxScore": 2,
-    "results": [
+    totalScore: 0,
+    maxScore: 2,
+    results: [
       {
-        "resultType": "error",
-        "errors": [
+        resultType: 'error',
+        errors: [
           {
-            "errorType": "runtime",
-            "line": 2,
-            "location": "postpend",
-            "errorExplanation": "ReferenceError: Cannot access '__checkEquality' before initialization",
-            "errorLine": "const __checkEquality = __checkEquality;",
-          }
-        ]
+            errorType: 'runtime',
+            line: 2,
+            location: 'postpend',
+            errorExplanation:
+              "ReferenceError: Cannot access '__checkEquality' before initialization",
+            errorLine: 'const __checkEquality = __checkEquality;',
+          },
+        ],
       },
       {
-        "resultType": "error",
-        "errors": [
+        resultType: 'error',
+        errors: [
           {
-            "errorType": "runtime",
-            "line": 2,
-            "location": "postpend",
-            "errorExplanation": "ReferenceError: Cannot access '__checkEquality' before initialization",
-            "errorLine": "const __checkEquality = __checkEquality;",
-          }
-        ]
-      }
-    ]
+            errorType: 'runtime',
+            line: 2,
+            location: 'postpend',
+            errorExplanation:
+              "ReferenceError: Cannot access '__checkEquality' before initialization",
+            errorLine: 'const __checkEquality = __checkEquality;',
+          },
+        ],
+      },
+    ],
   })
 })
 test('chap2 grader OK, student OK, postpend syntax', async () => {
-  const results = await runAll(makeAwsEvent({
-    prependProgram: grader.validPrepend,
-    studentProgram: student.valid.correct,
-    postpendProgram: grader.invalidPostpend!.syntax,
-    testcases: grader.validTestcases
-  }))
+  const results = await runAll(
+    makeAwsEvent({
+      prependProgram: grader.validPrepend,
+      studentProgram: student.valid.correct,
+      postpendProgram: grader.invalidPostpend!.syntax,
+      testcases: grader.validTestcases,
+    }),
+  )
   expect(results).toEqual({
-    "totalScore": 0,
-    "maxScore": 2,
-    "results": [
+    totalScore: 0,
+    maxScore: 2,
+    results: [
       {
-        "resultType": "error",
-        "errors": [
+        resultType: 'error',
+        errors: [
           {
-            "errorExplanation": "Missing semicolon at the end of statement",
-            "errorLine": "const __checkEquality = (l1, l2) => equal(l1, l2)",
-            "errorType": "syntax",
-            "line": 2,
-            "location": "postpend",
-          }
-        ]
+            errorExplanation: 'Missing semicolon at the end of statement',
+            errorLine: 'const __checkEquality = (l1, l2) => equal(l1, l2)',
+            errorType: 'syntax',
+            line: 2,
+            location: 'postpend',
+          },
+        ],
       },
       {
-        "resultType": "error",
-        "errors": [
+        resultType: 'error',
+        errors: [
           {
-            "errorExplanation": "Missing semicolon at the end of statement",
-            "errorLine": "const __checkEquality = (l1, l2) => equal(l1, l2)",
-            "errorType": "syntax",
-            "line": 2,
-            "location": "postpend",
-          }
-        ]
-      }
-    ]
+            errorExplanation: 'Missing semicolon at the end of statement',
+            errorLine: 'const __checkEquality = (l1, l2) => equal(l1, l2)',
+            errorType: 'syntax',
+            line: 2,
+            location: 'postpend',
+          },
+        ],
+      },
+    ],
   })
 })

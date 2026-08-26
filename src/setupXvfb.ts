@@ -24,11 +24,11 @@ export async function setupLambdaXvfb() {
 
   await Promise.all([
     copyBinary('/opt/bin/xkbcomp', '/tmp/xkbcomp'),
-    copyBinary('/opt/bin/Xvfb', '/tmp/Xvfb')
+    copyBinary('/opt/bin/Xvfb', '/tmp/Xvfb'),
   ])
 
   const xvfb = spawn('/tmp/Xvfb', [`:${DISPLAY_NUMBER}`, '-screen', '0', '1024x768x24', '-ac'], {
-    stdio: 'ignore'
+    stdio: 'ignore',
   })
   while (!(await x11Alive())) {
     await sleep(100)
