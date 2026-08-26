@@ -7,6 +7,8 @@ sudo apt-get install -y build-essential libxi-dev libglu1-mesa-dev libglew-dev p
 rm -rf build grader.zip node_modules
 JOBS=$(nproc) yarn install --immutable
 yarn run tsc
+# remove dev dependencies
+yarn workspaces focus --production
 rm -rf build/__tests__
 cp -r node_modules/ build
 
