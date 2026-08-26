@@ -25,9 +25,9 @@ function event(overrides: Partial<AwsEvent> = {}): AwsEvent {
 describe('assemblePythonProgram', () => {
   it('joins prepend, student, __program__ binding, postpend, testcase in order', () => {
     const tc: Testcase = { program: 'print(a + b)', answer: '3', score: 1 }
-    expect(assemblePythonProgram(event({ prependProgram: 'a = 1', studentProgram: 'b = 2' }), tc)).toBe(
-      'a = 1\nb = 2\n__program__ = "b = 2"\nprint(a + b)',
-    )
+    expect(
+      assemblePythonProgram(event({ prependProgram: 'a = 1', studentProgram: 'b = 2' }), tc),
+    ).toBe('a = 1\nb = 2\n__program__ = "b = 2"\nprint(a + b)')
   })
 
   it('drops empty parts but always binds __program__ (even for empty student code)', () => {
@@ -73,7 +73,11 @@ describe('gradePythonRun', () => {
   it('reports the error kind when the run errored', () => {
     expect(
       gradePythonRun(
-        { lines: [], error: { errorType: 'runtime', message: 'ZeroDivisionError: x' }, timedOut: false },
+        {
+          lines: [],
+          error: { errorType: 'runtime', message: 'ZeroDivisionError: x' },
+          timedOut: false,
+        },
         tc,
       ),
     ).toEqual({

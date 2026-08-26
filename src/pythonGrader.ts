@@ -143,8 +143,9 @@ export function resolveBundlePath(): string {
 
 // Grades a Python event and returns the Summary the backend expects.
 export const runAll = async (event: AwsEvent, deps: PythonDeps = {}): Promise<Summary> => {
-  const runProgram = (deps.createRunner ??
-    (() => workerRunner(resolveBundlePath(), event.library.chapter)))()
+  const runProgram = (
+    deps.createRunner ?? (() => workerRunner(resolveBundlePath(), event.library.chapter))
+  )()
 
   // Sequential: one evaluator worker resident at a time.
   const results: Output[] = []

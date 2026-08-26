@@ -5,7 +5,7 @@ export type Language = 'Source' | 'Python'
 
 export type Library = {
   chapter: number
-  // `external` and `globals` are source-only. RUNES/CURVES/etc. are js-slang graphics modules 
+  // `external` and `globals` are source-only. RUNES/CURVES/etc. are js-slang graphics modules
   // graded by rendering to headless WebGL and comparing pixels (picture_mse) - there is
   // no Python equivalent for now, so the Python grader ignores this.
   external: {

@@ -2,7 +2,7 @@ import { createContext, runInContext, Result as SourceResult } from 'js-slang'
 import {
   defineSymbol,
   ensureGlobalEnvironmentExist,
-  importBuiltins
+  importBuiltins,
 } from 'js-slang/dist/createContext'
 import type { SourceError } from 'js-slang/dist/errors/base'
 import { Variant } from 'js-slang/dist/langs'
@@ -21,7 +21,7 @@ import {
   OutputFail,
   OutputPass,
   Summary,
-  Testcase
+  Testcase,
 } from './types'
 
 const externals: any = {}
@@ -72,24 +72,24 @@ export const runAll = async (event: AwsEvent): Promise<Summary> => {
       prependProgram: event.prependProgram || '',
       studentProgram: event.studentProgram,
       postpendProgram: event.postpendProgram || '',
-      testcase: testcase
-    })
+      testcase: testcase,
+    }),
   )
   const results = await Promise.all(promises)
   const totalScore = results.reduce<number>(
     (total: number, result) => (result.resultType === 'pass' ? total + result.score : total),
-    0
+    0,
   )
 
   const maxScore = event.testcases.reduce<number>(
     (max: number, testcase) => testcase.score + max,
-    0
+    0,
   )
 
   return {
     totalScore: totalScore,
     maxScore: maxScore,
-    results: results
+    results: results,
   }
 }
 
@@ -105,9 +105,9 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
     catchTimeouts(
       runInContext(unitTest.prependProgram, context, {
         executionMethod: 'native',
-        originalMaxExecTime: TIMEOUT_DURATION
-      })
-    )
+        originalMaxExecTime: TIMEOUT_DURATION,
+      }),
+    ),
   )
   if (prependResult.status !== 'finished') {
     return handleResult(prependResult, context, unitTest.prependProgram, 'prepend')
@@ -117,8 +117,8 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
   const studentResult = await catchTimeouts(
     runInContext(unitTest.studentProgram, context, {
       executionMethod: 'native',
-      originalMaxExecTime: TIMEOUT_DURATION
-    })
+      originalMaxExecTime: TIMEOUT_DURATION,
+    }),
   )
   if (studentResult.status !== 'finished') {
     return handleResult(studentResult, context, unitTest.studentProgram, 'student')
@@ -131,10 +131,10 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
       catchTimeouts(
         runInContext(unitTest.postpendProgram, context, {
           executionMethod: 'native',
-          originalMaxExecTime: TIMEOUT_DURATION
-        })
+          originalMaxExecTime: TIMEOUT_DURATION,
+        }),
       ),
-    elevatedBase
+    elevatedBase,
   )
   if (postpendResult.status !== 'finished') {
     return handleResult(postpendResult, context, unitTest.postpendProgram, 'postpend')
@@ -146,10 +146,10 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
       catchTimeouts(
         runInContext(unitTest.testcase.program, context, {
           executionMethod: 'native',
-          originalMaxExecTime: TIMEOUT_DURATION
-        })
+          originalMaxExecTime: TIMEOUT_DURATION,
+        }),
       ),
-    elevatedBase
+    elevatedBase,
   )
   if (testcaseResult.status !== 'finished') {
     return handleResult(testcaseResult, context, unitTest.testcase.program, 'testcase')
@@ -159,12 +159,12 @@ export const run = async (unitTest: UnitTest): Promise<Output> => {
   return resultValue === unitTest.testcase.answer
     ? ({
         resultType: 'pass',
-        score: unitTest.testcase.score
+        score: unitTest.testcase.score,
       } as OutputPass)
     : ({
         resultType: 'fail',
         expected: unitTest.testcase.answer,
-        actual: resultValue
+        actual: resultValue,
       } as OutputFail)
 }
 
@@ -185,12 +185,12 @@ const slangDisplay = (value: Value, str: string) => {
 async function runInElevatedContext<T>(
   context: Context,
   fn: () => Promise<T>,
-  base?: any
+  base?: any,
 ): Promise<[T, Frame]>
 async function runInElevatedContext<T>(
   context: Context,
   fn: () => T,
-  base?: any
+  base?: any,
 ): Promise<[T, Frame]> {
   ensureGlobalEnvironmentExist(context)
   const originalChapter = context.chapter
@@ -208,7 +208,7 @@ async function runInElevatedContext<T>(
       alert: slangDisplay,
       visualiseList: (v: Value) => {
         throw new Error('List visualizer is not enabled')
-      }
+      },
     })
     for (const [name, value] of Object.entries(externals)) {
       if (!Object.prototype.hasOwnProperty.call(overrideFrame, name)) {
@@ -236,7 +236,7 @@ const handleResult = (
   result: Result,
   context: Context,
   program: string,
-  location: ErrorFromSource['location']
+  location: ErrorFromSource['location'],
 ): OutputError => {
   switch (result.status) {
     case 'error': {
@@ -246,7 +246,7 @@ const handleResult = (
           case 'PotentialInfiniteRecursionError':
           case 'InfiniteLoopError':
             return {
-              errorType: 'timeout' as const
+              errorType: 'timeout' as const,
             }
         }
 
@@ -257,7 +257,7 @@ const handleResult = (
             line: 0,
             location: 'unknown',
             errorLine: '',
-            errorExplanation: err.explain()
+            errorExplanation: err.explain(),
           }
         }
 
@@ -268,19 +268,19 @@ const handleResult = (
           line,
           location,
           errorLine,
-          errorExplanation: err.explain()
+          errorExplanation: err.explain(),
         }
       })
       return {
         resultType: 'error',
-        errors: errors
+        errors: errors,
       }
     }
 
     case 'timeout':
       return {
         resultType: 'error',
-        errors: [{ errorType: 'timeout' }]
+        errors: [{ errorType: 'timeout' }],
       }
 
     default:
@@ -292,9 +292,9 @@ const handleResult = (
             line: 0,
             location: 'unknown',
             errorLine: '',
-            errorExplanation: `Unexpected result status ${result.status}`
-          }
-        ]
+            errorExplanation: `Unexpected result status ${result.status}`,
+          },
+        ],
       }
   }
 }
