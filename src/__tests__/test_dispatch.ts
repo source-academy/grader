@@ -21,13 +21,13 @@ beforeEach(() => jest.clearAllMocks())
 
 describe('runAll dispatch', () => {
   it('routes Python events to the Python grader', async () => {
-    await runAll(event('Python'))
+    await runAll(event('python'))
     expect(runPython).toHaveBeenCalledTimes(1)
     expect(runSource).not.toHaveBeenCalled()
   })
 
   it('routes Source events to the Source grader', async () => {
-    await runAll(event('Source'))
+    await runAll(event('source'))
     expect(runSource).toHaveBeenCalledTimes(1)
     expect(runPython).not.toHaveBeenCalled()
   })
