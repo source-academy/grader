@@ -7,4 +7,4 @@ export * from './types'
 // Entry point: dispatch to the grader for the event's language. Events without
 // a `language` field default to Source, preserving the original behaviour.
 export const runAll = (event: AwsEvent): Promise<Summary> =>
-  event.language === 'Python' ? runPython(event) : runSource(event)
+  event.language === 'python' ? runPython(event) : runSource(event)

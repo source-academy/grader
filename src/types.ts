@@ -1,7 +1,7 @@
 // Language-agnostic types shared across the dispatcher and both graders, whereas language-specific types live in the respective grader module.
 
 // Absent language => 'Source', preserving the original js-slang behaviour.
-export type Language = 'Source' | 'Python'
+export type Language = 'source' | 'python'
 
 export type Library = {
   chapter: number
