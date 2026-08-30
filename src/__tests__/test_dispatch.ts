@@ -26,15 +26,15 @@ describe('runAll dispatch', () => {
     expect(runSource).not.toHaveBeenCalled()
   })
 
-  it('routes Source events to the Source grader', async () => {
-    await runAll(event('source'))
+  it('routes JavaScript events to the Source grader', async () => {
+    await runAll(event('javascript'))
     expect(runSource).toHaveBeenCalledTimes(1)
     expect(runPython).not.toHaveBeenCalled()
   })
 
-  it('defaults to the Source grader when no language is given', async () => {
+  it('defaults to the Python grader when no language is given', async () => {
     await runAll(event())
-    expect(runSource).toHaveBeenCalledTimes(1)
-    expect(runPython).not.toHaveBeenCalled()
+    expect(runPython).toHaveBeenCalledTimes(1)
+    expect(runSource).not.toHaveBeenCalled()
   })
 })

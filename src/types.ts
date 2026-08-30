@@ -1,11 +1,11 @@
 // Language-agnostic types shared across the dispatcher and both graders, whereas language-specific types live in the respective grader module.
 
-// Absent language => 'source', preserving the original js-slang behaviour.
-export type Language = 'source' | 'python'
+// Absent language => 'python'.
+export type Language = 'javascript' | 'python'
 
 export type Library = {
   chapter: number
-  // `external` and `globals` are source-only. RUNES/CURVES/etc. are js-slang graphics modules
+  // `external` and `globals` are javascript-only. RUNES/CURVES/etc. are js-slang graphics modules
   // graded by rendering to headless WebGL and comparing pixels (picture_mse) - there is
   // no Python equivalent for now, so the Python grader ignores this.
   external: {
@@ -21,7 +21,7 @@ export type Testcase = {
   score: number
 }
 
-// An event from the backend. `language` defaults to Source when omitted.
+// An event from the backend. `language` defaults to Python when omitted.
 export type AwsEvent = {
   language?: Language
   library: Library
