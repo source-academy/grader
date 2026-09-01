@@ -14,14 +14,11 @@
   },
   "packageManager": "yarn@4.12.0+sha512.f45ab632439a67f8bc759bf32ead036a1f413287b9042726b7cc4818b7b49e14e9423ba49b18f9e06ea4941c1ad062385b1d8760a8d5091a1a31e5f6219afca8",
   "dependencies": {
-    "fast-levenshtein": "^3.0.0",
     "js-slang": "^1.0.88",
     "lodash": "4.18.1",
     "node-canvas-webgl": "^0.3.0"
   },
   "devDependencies": {
-    "@sourceacademy/conductor": "^0.8.0",
-    "@sourceacademy/runner-module-loader": "^0.1.0",
     "@types/jest": "^28.1.6",
     "@types/node": "^26.2.0",
     "coveralls": "^3.1.1",
@@ -29,9 +26,6 @@
     "cross-zip-cli": "^1.0.0",
     "esbuild": "^0.25.0",
     "jest": "^28.1.3",
-    "mathjs": "^15.2.0",
-    "moo": "^0.5.2",
-    "nearley": "^2.20.1",
     "prettier": "^3.7.4",
     "ts-jest": "^28.0.7",
     "typescript": "^6.0.3"
