@@ -11,5 +11,6 @@ yarn run tsc
 yarn workspaces focus --production
 rm -rf build/__tests__
 cp -r node_modules/ build
+cp -r vendor build
 
 tar jcf build.tar.bz2 build

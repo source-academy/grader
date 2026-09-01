@@ -9,6 +9,7 @@ type PartialAwsEvent = {
 
 export function awsEventFactory(library: Library) {
   return (awsEvent: PartialAwsEvent): AwsEvent => ({
+    language: 'javascript',
     library: library,
     prependProgram: awsEvent.prependProgram,
     studentProgram: awsEvent.studentProgram,

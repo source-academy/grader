@@ -176,3 +176,29 @@ The grader's corresponding `Summary` format will look like this:
 ```
 
 Other errors include timeout errors and runtime errors.
+
+## Building the Python runtime
+
+Python programs are graded by [py-slang](https://github.com/source-academy/py-slang)'s `py2js` engine, which is vendored into this repo as `vendor/py2js-bundle.cjs` and loaded by the grader at runtime. To build or rebuild it:
+
+```bash
+yarn build:py2js
+```
+
+By default the script clones py-slang and bundles it with esbuild. The build is configurable through environment variables:
+
+| Variable        | Default                                      | Purpose                                                             |
+| --------------- | -------------------------------------------- | ------------------------------------------------------------------- |
+| `PY_SLANG_DIR`  | _(unset)_                                    | Bundle from an existing local py-slang checkout instead of cloning. |
+| `PY_SLANG_REPO` | `https://github.com/source-academy/py-slang` | Repository to clone when `PY_SLANG_DIR` is unset.                   |
+| `PY_SLANG_REF`  | `main`                                       | Branch or tag to clone.                                             |
+
+```bash
+# Build from a local checkout (e.g. when developing py-slang alongside the grader)
+PY_SLANG_DIR=../source-academy-py-slang yarn build:py2js
+
+# Build from a specific py-slang branch
+PY_SLANG_REF=some-branch yarn build:py2js
+```
+
+The clone is placed in a temporary directory and removed afterwards. The output runtime is saved at `vendor/py2js-bundle.cjs`, which should be committed. Pointing `PY_SLANG_DIR` at a checkout without a `node_modules` will run `yarn install` inside that checkout.
