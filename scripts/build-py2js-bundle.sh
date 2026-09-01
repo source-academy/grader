@@ -44,8 +44,13 @@ py_slang_ref="$(git -C "$py_slang_dir" rev-parse HEAD 2>/dev/null || echo unknow
 
 mkdir -p "$(dirname "$outfile")"
 
-# Resolve py-slang's bare imports from its own node_modules.
-NODE_PATH="$py_slang_dir/node_modules" "$repo_root/node_modules/.bin/esbuild" "$entry" \
+esbuild_bin="$py_slang_dir/node_modules/.bin/esbuild"
+if [ ! -x "$esbuild_bin" ]; then
+  echo "esbuild not found at $esbuild_bin (expected from py-slang's dependencies)." >&2
+  exit 1
+fi
+
+"$esbuild_bin" "$entry" \
   --bundle \
   --platform=node \
   --format=cjs \
