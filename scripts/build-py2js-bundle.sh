@@ -5,10 +5,6 @@
 #
 # By default this clones py-slang ($PY_SLANG_REPO at $PY_SLANG_REF). Set
 # $PY_SLANG_DIR to bundle from an existing local checkout instead.
-#
-# The chosen checkout's own dependencies are installed with yarn so esbuild
-# resolves py-slang's imports from its node_modules - the grader's package.json
-# does not need to carry them.
 
 set -euo pipefail
 
