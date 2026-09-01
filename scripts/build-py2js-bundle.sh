@@ -1,27 +1,55 @@
 #!/bin/bash
 
 # Bundles py-slang's py2js engine into vendor/py2js-bundle.cjs, which the Python
-# grader loads at runtime. Point PY_SLANG_DIR at a py-slang checkout to override
-# the default sibling directory.
+# grader loads at runtime.
+#
+# By default this clones py-slang ($PY_SLANG_REPO at $PY_SLANG_REF). Set
+# $PY_SLANG_DIR to bundle from an existing local checkout instead.
+#
+# The chosen checkout's own dependencies are installed with yarn so esbuild
+# resolves py-slang's imports from its node_modules - the grader's package.json
+# does not need to carry them.
 
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-py_slang_dir="$(cd "${PY_SLANG_DIR:-$repo_root/../source-academy-py-slang}" 2>/dev/null && pwd || true)"
-entry="$py_slang_dir/src/engines/py2js/index.ts"
 outfile="$repo_root/vendor/py2js-bundle.cjs"
 
+PY_SLANG_REPO="${PY_SLANG_REPO:-https://github.com/source-academy/py-slang}"
+PY_SLANG_REF="${PY_SLANG_REF:-main}"
+
+# Clone into a temp dir unless a local checkout is provided; clean it up on exit.
+cloned_dir=""
+cleanup() { [ -n "$cloned_dir" ] && rm -rf "$cloned_dir"; }
+trap cleanup EXIT
+
+if [ -n "${PY_SLANG_DIR:-}" ]; then
+  py_slang_dir="$(cd "$PY_SLANG_DIR" && pwd)"
+else
+  cloned_dir="$(mktemp -d)"
+  echo "Cloning $PY_SLANG_REPO @ $PY_SLANG_REF ..."
+  git clone --depth 1 --branch "$PY_SLANG_REF" "$PY_SLANG_REPO" "$cloned_dir"
+  py_slang_dir="$cloned_dir"
+fi
+
+entry="$py_slang_dir/src/engines/py2js/index.ts"
 if [ ! -f "$entry" ]; then
-  echo "py-slang engine entry not found at ${entry:-$py_slang_dir/src/engines/py2js/index.ts} (set PY_SLANG_DIR)." >&2
+  echo "py-slang engine entry not found at $entry (set PY_SLANG_DIR or PY_SLANG_REF)." >&2
   exit 1
+fi
+
+# Install py-slang's own dependencies so esbuild can resolve its imports.
+if [ ! -d "$py_slang_dir/node_modules" ]; then
+  echo "Installing py-slang dependencies in $py_slang_dir ..."
+  (cd "$py_slang_dir" && corepack yarn install --immutable)
 fi
 
 py_slang_ref="$(git -C "$py_slang_dir" rev-parse HEAD 2>/dev/null || echo unknown)"
 
 mkdir -p "$(dirname "$outfile")"
 
-# py-slang's source tree has no node_modules; resolve its bare imports from ours.
-NODE_PATH="$repo_root/node_modules" "$repo_root/node_modules/.bin/esbuild" "$entry" \
+# Resolve py-slang's bare imports from its own node_modules.
+NODE_PATH="$py_slang_dir/node_modules" "$repo_root/node_modules/.bin/esbuild" "$entry" \
   --bundle \
   --platform=node \
   --format=cjs \
