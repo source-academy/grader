@@ -179,7 +179,7 @@ Other errors include timeout errors and runtime errors.
 
 ## Building the Python runtime
 
-Python programs are graded by [py-slang](https://github.com/source-academy/py-slang)'s `py2js` engine, which is vendored into this repo as `vendor/py2js-bundle.cjs` and loaded by the grader at runtime. To build or rebuild it:
+Python programs are graded by [py-slang](https://github.com/source-academy/py-slang)'s `py2js` engine, which is vendored into this repo as `vendor/py2js-bundle.cjs` and loaded by the grader at runtime. Chapter 5 is Python §4 Typed: each testcase's program is type-checked first (by py-slang's pyright-based checker, vendored as `vendor/TypedPy4Checker.js`; a program with type errors is not run and scores nothing), then runs as Python §4 with its types erased. To build or rebuild it:
 
 ```bash
 yarn build:py2js
@@ -201,4 +201,4 @@ PY_SLANG_DIR=../source-academy-py-slang yarn build:py2js
 PY_SLANG_REF=some-branch yarn build:py2js
 ```
 
-The clone is placed in a temporary directory and removed afterwards. The output runtime is saved at `vendor/py2js-bundle.cjs`, which should be committed. Pointing `PY_SLANG_DIR` at a checkout without a `node_modules` will run `yarn install` inside that checkout.
+The clone is placed in a temporary directory and removed afterwards. The output runtime is saved at `vendor/py2js-bundle.cjs` and the checker's worker at `vendor/TypedPy4Checker.js`, which should be committed. Pointing `PY_SLANG_DIR` at a checkout without a `node_modules` will run `yarn install` inside that checkout.
