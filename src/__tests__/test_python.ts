@@ -236,6 +236,69 @@ describe('Python §4 Typed', () => {
     expect(checker.dispose).toHaveBeenCalledTimes(1)
   })
 
+  it('reports a timeout when the checker does not answer, and does not use it again', async () => {
+    const errors = jest.fn(() => new Promise<never>(() => {}))
+    const checker: PythonTypeChecker = { errors, dispose: jest.fn() }
+    const ran = jest.fn()
+    const summary = await runAll(
+      event({
+        library: typedLibrary,
+        testcases: [
+          { program: 'print(1)', answer: '1', score: 1 },
+          { program: 'print(2)', answer: '2', score: 1 },
+        ],
+      }),
+      {
+        createChecker: () => Promise.resolve(checker),
+        createRunner: () => ran,
+        checkTimeoutMs: 50,
+      },
+    )
+    expect(summary.totalScore).toBe(0)
+    expect(summary.results).toEqual([
+      { resultType: 'error', errors: [{ errorType: 'timeout' }] },
+      { resultType: 'error', errors: [{ errorType: 'timeout' }] },
+    ])
+    expect(errors).toHaveBeenCalledTimes(1)
+    expect(ran).not.toHaveBeenCalled()
+    expect(checker.dispose).toHaveBeenCalledTimes(1)
+  })
+
+  it('reports a checker that fails, without stopping the event', async () => {
+    const checker: PythonTypeChecker = {
+      errors: () => Promise.reject(new Error('worker died')),
+      dispose: jest.fn(),
+    }
+    const summary = await runAll(
+      event({
+        library: typedLibrary,
+        testcases: [{ program: 'print(1)', answer: '1', score: 1 }],
+      }),
+      { createChecker: () => Promise.resolve(checker), createRunner: () => jest.fn() },
+    )
+    expect(summary.results[0]).toMatchObject({
+      resultType: 'error',
+      errors: [{ errorType: 'runtime', errorExplanation: 'The type checker failed: worker died' }],
+    })
+  })
+
+  it('reports a checker that cannot be started, without stopping the event', async () => {
+    const summary = await runAll(
+      event({
+        library: typedLibrary,
+        testcases: [{ program: 'print(1)', answer: '1', score: 1 }],
+      }),
+      {
+        createChecker: () => Promise.reject(new Error('no worker')),
+        createRunner: () => jest.fn(),
+      },
+    )
+    expect(summary.results[0]).toMatchObject({
+      resultType: 'error',
+      errors: [{ errorExplanation: 'The type checker failed: no worker' }],
+    })
+  })
+
   it('starts no checker for an untyped chapter', async () => {
     const createChecker = jest.fn()
     await runAll(event({ testcases: [{ program: 'print(1)', answer: '1', score: 1 }] }), {

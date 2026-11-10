@@ -6,6 +6,12 @@ import { AwsEvent, ErrorFromSource, Output, Summary, Testcase } from './types'
 
 const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT, 10) : 3000
 
+// The type checker has its own limit: the first check also starts it, and a submission can be large. A
+// check that takes longer is a timeout, not a crash of the whole event.
+const CHECK_TIMEOUT_DURATION = process.env.CHECK_TIMEOUT
+  ? parseInt(process.env.CHECK_TIMEOUT, 10)
+  : 15000
+
 const DEFAULT_PYTHON_VARIANT = 4
 
 // The chapter of a library is the position of its language in the language directory (see the
@@ -49,6 +55,7 @@ export type PythonDeps = {
   createRunner?: () => PythonProgramRunner
   // Starts the checker for a Python §4 Typed event: once, for all its testcases.
   createChecker?: () => Promise<PythonTypeChecker>
+  checkTimeoutMs?: number
 }
 
 // The single file runTestCaseConductor runs per testcase: prepend, student, a
@@ -219,6 +226,36 @@ export async function startTypeChecker(
   }
 }
 
+class CheckTimeout extends Error {}
+
+// What `checker.errors` gives, or a rejection after `ms`. The checker keeps working on its own, so it
+// is not used again after a timeout (see runAll).
+function withinTime<T>(promise: Promise<T>, ms: number): Promise<T> {
+  let timer: NodeJS.Timeout
+  const expired = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new CheckTimeout()), ms)
+  })
+  return Promise.race([promise, expired]).finally(() => clearTimeout(timer))
+}
+
+// The result of a testcase whose program could not be checked: a timeout, or a checker that failed.
+export function checkFailureOutput(error: unknown): Output {
+  if (error instanceof CheckTimeout)
+    return { resultType: 'error', errors: [{ errorType: 'timeout' }] }
+  return {
+    resultType: 'error',
+    errors: [
+      {
+        errorType: 'runtime',
+        line: 0,
+        location: 'unknown',
+        errorLine: '',
+        errorExplanation: `The type checker failed: ${error instanceof Error ? error.message : String(error)}`,
+      },
+    ],
+  }
+}
+
 // The type errors of a program, as the result of a testcase that is not run.
 export function typeErrorOutput(
   event: AwsEvent,
@@ -250,22 +287,41 @@ export const runAll = async (event: AwsEvent, deps: PythonDeps = {}): Promise<Su
   )()
 
   // The checker is started once, for all the testcases, and only when there is something to check.
-  const checker =
-    typed && event.testcases.length > 0
-      ? await (deps.createChecker ?? (() => startTypeChecker()))()
-      : undefined
+  // A checker that cannot be started is a failure of every testcase, not of the event.
+  let checker: PythonTypeChecker | undefined
+  let checkFailure: Output | undefined
+  if (typed && event.testcases.length > 0) {
+    try {
+      checker = await (deps.createChecker ?? (() => startTypeChecker()))()
+    } catch (error) {
+      checkFailure = checkFailureOutput(error)
+    }
+  }
 
   // Sequential: one evaluator worker resident at a time.
   const results: Output[] = []
+  // Once a check has timed out or failed the checker is not used again (it may still be busy with that
+  // program, or gone): the testcases after it get the same result, at once.
   try {
     for (const testcase of event.testcases) {
       const program = assemblePythonProgram(event, testcase)
+      let errors: PythonTypeError[] = []
+      if (checker && !checkFailure) {
+        try {
+          errors = await withinTime(
+            checker.errors(program),
+            deps.checkTimeoutMs ?? CHECK_TIMEOUT_DURATION,
+          )
+        } catch (error) {
+          checkFailure = checkFailureOutput(error)
+        }
+      }
       // A program with type errors is not run: the testcase scores nothing.
-      const errors = checker ? await checker.errors(program) : []
       results.push(
-        errors.length > 0
-          ? typeErrorOutput(event, testcase, errors)
-          : gradePythonRun(await runProgram(program, TIMEOUT_DURATION), testcase),
+        checkFailure ??
+          (errors.length > 0
+            ? typeErrorOutput(event, testcase, errors)
+            : gradePythonRun(await runProgram(program, TIMEOUT_DURATION), testcase)),
       )
     }
   } finally {
