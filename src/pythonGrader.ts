@@ -67,6 +67,18 @@ export function assemblePythonProgram(event: AwsEvent, testcase: Testcase): stri
     .join('\n')
 }
 
+/**
+ * The part of `assemblePythonProgram` that the student is responsible for: prepend and student
+ * code. Python §4 Typed checks this once per event; test cases are trusted, instructor-authored
+ * harness code and are not type-checked. Because this is a prefix of the assembled program, line
+ * numbers from checking it line up with the assembled program that `locate`/`typeErrorOutput` use.
+ */
+export function assemblePythonStudentProgram(event: AwsEvent): string {
+  return [event.prependProgram, event.studentProgram]
+    .filter(part => typeof part === 'string' && part.trim().length > 0)
+    .join('\n')
+}
+
 type ProgramPart = { text: string; location: ErrorFromSource['location'] }
 
 function assemblePythonParts(event: AwsEvent, testcase: Testcase): ProgramPart[] {
@@ -290,9 +302,22 @@ export const runAll = async (event: AwsEvent, deps: PythonDeps = {}): Promise<Su
   // A checker that cannot be started is a failure of every testcase, not of the event.
   let checker: PythonTypeChecker | undefined
   let checkFailure: Output | undefined
+  let studentTypeErrors: PythonTypeError[] = []
   if (typed && event.testcases.length > 0) {
     try {
       checker = await (deps.createChecker ?? (() => startTypeChecker()))()
+      try {
+        // Check the student's part only, once. Test cases are trusted, instructor-authored
+        // harness code: checking the assembled program again for every test case repeated the
+        // same student-code check N times and made a Typed event's cost grow with its number of
+        // test cases, not with the amount of student code.
+        studentTypeErrors = await withinTime(
+          checker.errors(assemblePythonStudentProgram(event)),
+          deps.checkTimeoutMs ?? CHECK_TIMEOUT_DURATION,
+        )
+      } catch (error) {
+        checkFailure = checkFailureOutput(error)
+      }
     } catch (error) {
       checkFailure = checkFailureOutput(error)
     }
@@ -300,29 +325,21 @@ export const runAll = async (event: AwsEvent, deps: PythonDeps = {}): Promise<Su
 
   // Sequential: one evaluator worker resident at a time.
   const results: Output[] = []
-  // Once a check has timed out or failed the checker is not used again (it may still be busy with that
-  // program, or gone): the testcases after it get the same result, at once.
   try {
     for (const testcase of event.testcases) {
-      const program = assemblePythonProgram(event, testcase)
-      let errors: PythonTypeError[] = []
-      if (checker && !checkFailure) {
-        try {
-          errors = await withinTime(
-            checker.errors(program),
-            deps.checkTimeoutMs ?? CHECK_TIMEOUT_DURATION,
-          )
-        } catch (error) {
-          checkFailure = checkFailureOutput(error)
-        }
+      // A check that failed (startup, crash, or timeout) or found type errors makes every test
+      // case fail without running it. The type errors are the same for every test case: the
+      // test case's own trusted code is not part of what was checked.
+      if (checkFailure) {
+        results.push(checkFailure)
+        continue
       }
-      // A program with type errors is not run: the testcase scores nothing.
-      results.push(
-        checkFailure ??
-          (errors.length > 0
-            ? typeErrorOutput(event, testcase, errors)
-            : gradePythonRun(await runProgram(program, TIMEOUT_DURATION), testcase)),
-      )
+      if (studentTypeErrors.length > 0) {
+        results.push(typeErrorOutput(event, testcase, studentTypeErrors))
+        continue
+      }
+      const program = assemblePythonProgram(event, testcase)
+      results.push(gradePythonRun(await runProgram(program, TIMEOUT_DURATION), testcase))
     }
   } finally {
     checker?.dispose()

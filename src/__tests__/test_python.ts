@@ -1,6 +1,7 @@
 import { AwsEvent, Library, Testcase } from '../types'
 import {
   assemblePythonProgram,
+  assemblePythonStudentProgram,
   isTypedChapter,
   locate,
   pythonVariant,
@@ -37,6 +38,19 @@ describe('assemblePythonProgram', () => {
   it('drops empty parts but always binds __program__ (even for empty student code)', () => {
     const tc: Testcase = { program: 'print(1)', answer: '1', score: 1 }
     expect(assemblePythonProgram(event(), tc)).toBe('__program__ = ""\nprint(1)')
+  })
+
+  it('assembles only prepend and student code for the type check', () => {
+    expect(
+      assemblePythonStudentProgram(
+        event({
+          prependProgram: 'a = 1',
+          studentProgram: 'b = 2',
+          postpendProgram: 'c = 3',
+        }),
+      ),
+    ).toBe('a = 1\nb = 2')
+    expect(assemblePythonStudentProgram(event({ postpendProgram: 'c = 3' }))).toBe('')
   })
 })
 
@@ -195,20 +209,19 @@ describe('Python §4 Typed', () => {
     expect(locate(e, tc, 5)).toEqual({ location: 'testcase', line: 1 })
   })
 
-  it('does not run a program with type errors, and reports them', async () => {
+  it('checks the student code once and gives its type errors to every test case', async () => {
     const ran: string[] = []
-    const checker: PythonTypeChecker = {
-      errors: program =>
-        Promise.resolve(program.includes('bad') ? [{ line: 1, message: 'wrong type' }] : []),
-      dispose: jest.fn(),
-    }
+    const errors = jest.fn((program: string) =>
+      Promise.resolve(program.includes('bad') ? [{ line: 2, message: 'wrong type' }] : []),
+    )
+    const checker: PythonTypeChecker = { errors, dispose: jest.fn() }
     const summary = await runAll(
       event({
         library: typedLibrary,
-        studentProgram: 'x = 1',
+        studentProgram: 'x = 1\nbad',
         testcases: [
           { program: 'print(1)', answer: '1', score: 1 },
-          { program: 'bad', answer: '1', score: 1 },
+          { program: 'print(2)', answer: '2', score: 1 },
         ],
       }),
       {
@@ -219,21 +232,70 @@ describe('Python §4 Typed', () => {
         },
       },
     )
-    expect(summary.totalScore).toBe(1)
-    expect(summary.results[0]).toEqual({ resultType: 'pass', score: 1 })
-    expect(summary.results[1]).toMatchObject({
-      resultType: 'error',
-      errors: [
-        {
-          errorType: 'syntax',
-          line: 1,
-          location: 'student',
-          errorExplanation: 'Type error: wrong type',
-        },
-      ],
-    })
-    expect(ran).toHaveLength(1)
+    expect(summary.totalScore).toBe(0)
+    expect(summary.results).toEqual([
+      {
+        resultType: 'error',
+        errors: [
+          {
+            errorType: 'syntax',
+            line: 2,
+            location: 'student',
+            errorLine: 'bad',
+            errorExplanation: 'Type error: wrong type',
+          },
+        ],
+      },
+      {
+        resultType: 'error',
+        errors: [
+          {
+            errorType: 'syntax',
+            line: 2,
+            location: 'student',
+            errorLine: 'bad',
+            errorExplanation: 'Type error: wrong type',
+          },
+        ],
+      },
+    ])
+    expect(errors).toHaveBeenCalledTimes(1)
+    expect(errors).toHaveBeenCalledWith('x = 1\nbad')
+    expect(ran).toHaveLength(0)
     expect(checker.dispose).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not type-check trusted test case code', async () => {
+    const errors = jest.fn(() => Promise.resolve([]))
+    const checker: PythonTypeChecker = { errors, dispose: jest.fn() }
+    const ran: string[] = []
+    const summary = await runAll(
+      event({
+        library: typedLibrary,
+        studentProgram: 'x = 1',
+        testcases: [
+          { program: 'print(1)', answer: '1', score: 1 },
+          { program: 'print(2)', answer: '2', score: 1 },
+        ],
+      }),
+      {
+        createChecker: () => Promise.resolve(checker),
+        createRunner: () => program => {
+          ran.push(program)
+          return Promise.resolve({
+            lines: [program.includes('print(2)') ? '2' : '1'],
+            timedOut: false,
+          })
+        },
+      },
+    )
+    expect(errors).toHaveBeenCalledTimes(1)
+    expect(errors).toHaveBeenCalledWith('x = 1')
+    expect(ran).toHaveLength(2)
+    expect(summary.results).toEqual([
+      { resultType: 'pass', score: 1 },
+      { resultType: 'pass', score: 1 },
+    ])
   })
 
   it('reports a timeout when the checker does not answer, and does not use it again', async () => {
@@ -326,7 +388,9 @@ describe('Python §4 Typed', () => {
     expect(summary.results[1]).toEqual({ resultType: 'fail', expected: '99', actual: '1' })
     expect(summary.results[2]).toMatchObject({
       resultType: 'error',
-      errors: [{ errorType: 'syntax', location: 'testcase', line: 1 }],
+      // The test case's own code is trusted and no longer type-checked: this call reaches the
+      // evaluator and fails at run time instead of being reported as a static type error.
+      errors: [{ errorType: 'runtime', location: 'unknown' }],
     })
   }, 60_000)
 
