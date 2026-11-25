@@ -814,6 +814,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sourceacademy/conductor@npm:^0.8.3":
+  version: 0.8.3
+  resolution: "@sourceacademy/conductor@npm:0.8.3"
+  checksum: 10c0/25a35004fd92abc3f9342c1928a6be884388d3a8465cdc26491ccf56566121dd7a68a0c305defe668dfe7b96eebe61e93059631f80a92e0d9a4dc2775090f3e5
+  languageName: node
+  linkType: hard
+
 "@ts-morph/bootstrap@npm:^0.18.0":
   version: 0.18.0
   resolution: "@ts-morph/bootstrap@npm:0.18.0"
@@ -2145,6 +2152,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "grader@workspace:."
   dependencies:
+    "@sourceacademy/conductor": "npm:^0.8.3"
     "@types/jest": "npm:^28.1.6"
     "@types/node": "npm:^26.2.0"
     coveralls: "npm:^3.1.1"

@@ -202,3 +202,15 @@ PY_SLANG_REF=some-branch yarn build:py2js
 ```
 
 The clone is placed in a temporary directory and removed afterwards. The output runtime is saved at `vendor/py2js-bundle.cjs` and the checker's worker at `vendor/TypedPy4Checker.js`, which should be committed. Pointing `PY_SLANG_DIR` at a checkout without a `node_modules` will run `yarn install` inside that checkout.
+
+## Conductor evaluators (any language)
+
+An event whose `library.evaluator` is the id (in the [language directory](https://github.com/source-academy/language-directory)) of an evaluator listed in `vendor/evaluators/manifest.json` is graded by that evaluator, whatever its language: `src/conductorGrader.ts` runs each testcase's program (prepend, student code, postpend and testcase, joined by newlines) in a worker thread under a [conductor](https://github.com/source-academy/conductor) host (`src/conductorHost.ts`), and compares the last line that the program prints with the answer. Other events go to the Source and Python graders as before.
+
+The evaluators are vendored, so that grading does not depend on the network. To add or update one:
+
+```sh
+scripts/vendor-evaluator.sh ocaml https://source-academy.github.io/ocaml-slang OCamlEvaluator.js ocaml-toplevel.js
+```
+
+then add its entry to the manifest (`script`, `fileName`, `env`, and `fileEnv` for the files it loads). `TIMEOUT` (ms per testcase), `EVALUATOR_STARTUP_ALLOWANCE` (extra ms for every testcase, which starts a fresh worker that loads the evaluator) and `EVALUATOR_MAX_HEAP_MB` set the limits.

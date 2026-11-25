@@ -1,0 +1,9 @@
+{
+  "ocamlJsOfOCaml": {
+    "script": "ocaml/OCamlEvaluator.js",
+    "fileName": "/main.ml",
+    "env": {},
+    "fileEnv": { "OCAML_SLANG_TOPLEVEL_URL": "ocaml/ocaml-toplevel.js" },
+    "source": "https://source-academy.github.io/ocaml-slang/"
+  }
+}

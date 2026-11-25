@@ -1,0 +1,112 @@
+// A host for conductor evaluators (https://github.com/source-academy/conductor): runs an evaluator's
+// script in a worker thread, gives it one program as a file over the conductor protocol, and
+// collects what it outputs and the errors it reports. It knows nothing of any language.
+//
+// An evaluator is stopped only by terminating its thread, so each program runs in a throwaway worker
+// under a wall-clock watchdog, as py2js programs do (see pythonGrader.ts).
+
+import { Worker } from 'worker_threads'
+
+export type EvaluatorProcess = {
+  // Absolute path of the evaluator's script.
+  script: string
+  // The environment of the worker, on top of the grader's.
+  env: Record<string, string>
+}
+
+export type EvaluatorRun = {
+  // What the program sent to the output (a line each), in order.
+  outputs: string[]
+  // The errors the evaluator reported, as their messages.
+  errors: string[]
+  timedOut: boolean
+  // The worker failed (the script is missing or throws): not the program's error.
+  failure?: string
+}
+
+export type EvaluatorRunner = (
+  evaluator: EvaluatorProcess,
+  fileName: string,
+  program: string,
+  timeoutMs: number,
+) => Promise<EvaluatorRun>
+
+// The conductor is a package of ES modules, and this one is compiled to CommonJS: it is imported
+// when the first program runs.
+async function loadConductor() {
+  const [conduit, host, types] = await Promise.all([
+    import('@sourceacademy/conductor/conduit'),
+    import('@sourceacademy/conductor/host'),
+    import('@sourceacademy/conductor/types'),
+  ])
+  return {
+    Conduit: conduit.Conduit,
+    BasicHostPlugin: host.BasicHostPlugin,
+    RunnerStatus: types.RunnerStatus,
+  }
+}
+
+const MAX_HEAP_MB = process.env.EVALUATOR_MAX_HEAP_MB
+  ? parseInt(process.env.EVALUATOR_MAX_HEAP_MB, 10)
+  : 512
+
+export const runInEvaluator: EvaluatorRunner = async (evaluator, fileName, program, timeoutMs) => {
+  const { Conduit, BasicHostPlugin, RunnerStatus } = await loadConductor()
+
+  return new Promise<EvaluatorRun>(resolve => {
+    const outputs: string[] = []
+    const errors: string[] = []
+    const worker = new Worker(evaluator.script, {
+      // Only what the manifest gives: the grader's own environment (credentials) is not for a program
+      // that a student wrote, which can read it (OCaml's Sys.getenv does).
+      env: { ...evaluator.env },
+      resourceLimits: { maxOldGenerationSizeMb: MAX_HEAP_MB },
+    })
+
+    let settled = false
+    const finish = (rest: Partial<EvaluatorRun>) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timer)
+      void worker.terminate()
+      resolve({ outputs, errors, timedOut: false, ...rest })
+    }
+    const timer = setTimeout(() => finish({ timedOut: true }), timeoutMs)
+    worker.on('error', (error: Error) => finish({ failure: error?.message ?? String(error) }))
+    worker.on('exit', code => finish({ failure: `The evaluator exited (code ${code})` }))
+
+    // A Node worker has no addEventListener, and the conduit transfers message ports.
+    const link = {
+      postMessage: (message: unknown, transfer: never) => worker.postMessage(message, transfer),
+      addEventListener: (_: string, listener: (event: { data: unknown }) => void) => {
+        worker.on('message', data => listener({ data }))
+      },
+    }
+
+    // (methods, not class fields: the base class binds requestFile in its constructor)
+    class Host extends BasicHostPlugin {
+      requestFile(name: string) {
+        return Promise.resolve(name === fileName ? program : undefined)
+      }
+      async requestLoadPlugin() {}
+      queryPluginResolutions() {
+        return {}
+      }
+      receiveOutput(message: string) {
+        outputs.push(message)
+      }
+      receiveError(error: { message: string }) {
+        errors.push(error.message)
+      }
+      // The evaluator is ready again when it has run the file.
+      receiveStatusUpdate(status: number, isActive: boolean) {
+        if (status === RunnerStatus.EVAL_READY && isActive) finish({})
+      }
+    }
+    const conduit = new Conduit(link as never, true)
+    const host = conduit.registerPlugin(Host as never) as unknown as {
+      startEvaluator(f: string): void
+    }
+    host.startEvaluator(fileName)
+  })
+}
