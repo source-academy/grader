@@ -1,6 +1,7 @@
 import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os'
 import * as path from 'path'
+import { Worker } from 'worker_threads'
 
 import {
   assembleProgram,
@@ -12,7 +13,7 @@ import {
   readManifest,
   runAll,
 } from '../conductorGrader'
-import { EvaluatorRun } from '../conductorHost'
+import { EvaluatorRun, WORKER_SOURCE } from '../conductorHost'
 import { AwsEvent } from '../types'
 
 const manifestPath = path.join(__dirname, '..', '..', 'vendor', 'evaluators', 'manifest.json')
@@ -253,5 +254,41 @@ describeOcaml('the vendored OCaml evaluator', () => {
       { resultType: 'error', errors: [{ errorType: 'timeout' }] },
       { resultType: 'pass', score: 1 },
     ])
+  })
+})
+
+describe('the worker of the host', () => {
+  it('gives a script built for a browser worker its globals: self, postMessage, addEventListener', async () => {
+    const script = path.join(__dirname, 'fixtures', 'browser-worker.js')
+    const worker = new Worker(WORKER_SOURCE, { eval: true, workerData: { script } })
+    try {
+      const reply = new Promise(resolve => worker.once('message', resolve))
+      worker.postMessage('ping')
+      expect(await reply).toEqual({ echo: 'ping', selfIsGlobal: true })
+    } finally {
+      await worker.terminate()
+    }
+  })
+
+  it('loads an evaluator that is an ES module with top-level await', async () => {
+    const script = path.join(__dirname, 'fixtures', 'browser-worker-esm.mjs')
+    const worker = new Worker(WORKER_SOURCE, { eval: true, workerData: { script } })
+    try {
+      const reply = new Promise(resolve => worker.once('message', resolve))
+      // sent at once, before the module has loaded: the port holds it until the module listens
+      worker.postMessage('ping')
+      expect(await reply).toEqual({ echo: 'ping', waited: true })
+    } finally {
+      await worker.terminate()
+    }
+  })
+
+  it('reports a script that cannot be loaded as an error of the worker', async () => {
+    const worker = new Worker(WORKER_SOURCE, {
+      eval: true,
+      workerData: { script: path.join(__dirname, 'fixtures', 'does-not-exist.js') },
+    })
+    await expect(new Promise((_, reject) => worker.once('error', reject))).rejects.toThrow()
+    await worker.terminate()
   })
 })
