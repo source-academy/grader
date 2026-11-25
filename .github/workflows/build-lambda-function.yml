@@ -19,34 +19,10 @@ jobs:
         with:
           node-version: 24
           cache: yarn
-      - name: Compile TypeScript
+      - name: Build the Lambda zip
         run: scripts/build-lambda-grader.sh
-      - uses: actions/upload-artifact@v7
-        with:
-          name: build-lambda
-          path: build.tar.bz2
-          if-no-files-found: error
-  native:
-    name: Build native modules
-    needs: tsc
-    runs-on: ubuntu-latest
-    container: amazon/aws-lambda-nodejs:24-x86_64
-    steps:
-      - name: install git and tar
-        run: dnf install -y git tar bzip2 zip
-      - name: Checkout code
-        uses: actions/checkout@v7
-      - uses: actions/download-artifact@v7
-        with:
-          name: build-lambda
-      - name: Rebuild native modules
-        run: scripts/build-lambda-grader-in-docker.sh
       - uses: actions/upload-artifact@v7
         with:
           name: graderzip
           path: grader.zip
           if-no-files-found: error
-      - uses: geekyeggo/delete-artifact@v6
-        with:
-          failOnError: false
-          name: build-lambda

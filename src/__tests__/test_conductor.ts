@@ -20,9 +20,6 @@ const manifestPath = path.join(__dirname, '..', '..', 'vendor', 'evaluators', 'm
 
 const event = (over: Partial<AwsEvent> = {}, evaluator = 'ocamlJsOfOCaml'): AwsEvent => ({
   library: {
-    chapter: 1,
-    external: { name: 'NONE', symbols: [] },
-    globals: [],
     language: 'ocaml',
     evaluator,
   },
@@ -174,8 +171,43 @@ describe('grading an event', () => {
     expect(timeouts[1] - timeouts[0]).toBe(15000 - 2000)
   })
 
-  it('refuses an evaluator it does not have', async () => {
+  it('caps a testcase at what the Lambda has left, less the margin, and times out the rest after it', async () => {
+    const limits: number[] = []
+    const summary = await runAll(event(), {
+      manifest: { ocamlJsOfOCaml: { script: 'e.js', fileName: '/main.ml' } },
+      manifestPath: '/v/manifest.json',
+      // 4 s left, less the 2 s margin: below TIMEOUT plus the startup allowance (5 s)
+      getRemainingTimeInMillis: () => 4000,
+      runEvaluator: async (_evaluator, _fileName, _program, timeoutMs) => {
+        limits.push(timeoutMs)
+        return run({ timedOut: true })
+      },
+    })
+    expect(limits[0]).toBeLessThanOrEqual(2000)
+    expect(limits[0]).toBeGreaterThan(1000)
+    expect(summary.results.every(r => r.resultType === 'error')).toBe(true)
+  })
+
+  it('does not run a testcase after the event deadline', async () => {
+    const programs: string[] = []
+    const summary = await runAll(event(), {
+      manifest: { ocamlJsOfOCaml: { script: 'e.js', fileName: '/main.ml' } },
+      manifestPath: '/v/manifest.json',
+      getRemainingTimeInMillis: () => 1000, // less than the margin
+      runEvaluator: async (_evaluator, _fileName, program) => {
+        programs.push(program)
+        return run({ outputs: ['120'] })
+      },
+    })
+    expect(programs).toEqual([])
+    expect(summary.results.every(r => r.resultType === 'error')).toBe(true)
+  })
+
+  it('refuses an evaluator it does not have, and an event that names none', async () => {
     await expect(runAll(event({}, 'nope'), { manifest: {} })).rejects.toThrow(/nope/)
+    await expect(
+      runAll(event({ library: { language: 'python' } }), { manifest: {} }),
+    ).rejects.toThrow(/undefined/)
   })
 })
 
