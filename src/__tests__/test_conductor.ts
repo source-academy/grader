@@ -1,4 +1,5 @@
-import { existsSync } from 'fs'
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'fs'
+import { tmpdir } from 'os'
 import * as path from 'path'
 
 import {
@@ -202,6 +203,39 @@ describeOcaml('the vendored OCaml evaluator', () => {
       expect(summary.results).toEqual([{ resultType: 'pass', score: 1 }])
     } finally {
       delete process.env.GRADER_SECRET_FOR_TEST
+    }
+  })
+
+  it('does not let the program reach the machine: no shell commands, no real files', async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'grader-sandbox-'))
+    const secret = path.join(dir, 'secret.txt')
+    const touched = path.join(dir, 'touched')
+    const written = path.join(dir, 'written.txt')
+    writeFileSync(secret, 'hunter2')
+    try {
+      const summary = await runAll(
+        event({
+          studentProgram: '',
+          testcases: [
+            { program: `;; Sys.command "touch ${touched}"`, answer: '127', score: 1 },
+            {
+              program: `;; In_channel.with_open_text "${secret}" In_channel.input_all`,
+              answer: '"hunter2"',
+              score: 1,
+            },
+            {
+              program: `let () = Out_channel.with_open_text "${written}" (fun oc -> output_string oc "x")\n;; 1`,
+              answer: '1',
+              score: 1,
+            },
+          ],
+        }),
+      )
+      expect(summary.results.map(r => r.resultType)).toEqual(['pass', 'error', 'pass'])
+      expect(existsSync(touched)).toBe(false)
+      expect(existsSync(written)).toBe(false)
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
     }
   })
 
