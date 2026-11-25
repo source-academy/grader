@@ -13,7 +13,7 @@ import {
   readManifest,
   runAll,
 } from '../conductorGrader'
-import { EvaluatorRun, WORKER_BOOTSTRAP } from '../conductorHost'
+import { EvaluatorRun, runInEvaluator, WORKER_BOOTSTRAP } from '../conductorHost'
 import { AwsEvent } from '../types'
 
 const manifestPath = path.join(__dirname, '..', '..', 'vendor', 'evaluators', 'manifest.json')
@@ -35,6 +35,7 @@ const event = (over: Partial<AwsEvent> = {}, evaluator = 'ocamlJsOfOCaml'): AwsE
 
 const run = (over: Partial<EvaluatorRun> = {}): EvaluatorRun => ({
   outputs: [],
+  results: [],
   errors: [],
   timedOut: false,
   ...over,
@@ -319,5 +320,17 @@ describe('the worker of the host', () => {
     })
     await expect(new Promise((_, reject) => worker.once('error', reject))).rejects.toThrow()
     await worker.terminate()
+  })
+})
+
+describe('the host', () => {
+  it('waits for everything the evaluator sent, not for its status update alone', async () => {
+    const script = path.join(__dirname, 'fixtures', 'chatty-evaluator.mjs')
+    const run = await runInEvaluator({ script, env: {} }, '/main.x', 'ignored', 20000)
+    expect(run.failure).toBeUndefined()
+    expect(run.outputs).toHaveLength(300)
+    expect(run.outputs[299]).toBe('line 299')
+    expect(run.results).toEqual([42])
+    expect(run.errors).toEqual(['boom'])
   })
 })

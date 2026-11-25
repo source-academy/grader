@@ -20,6 +20,9 @@ export type EvaluatorProcess = {
 export type EvaluatorRun = {
   // What the program sent to the output (a line each), in order.
   outputs: string[]
+  // The values the evaluator sent as the result of the program (the value of its last expression,
+  // for a language that has one), as they arrived: plain data.
+  results: unknown[]
   // The errors the evaluator reported, as their messages (the conductor sends nothing else).
   errors: string[]
   timedOut: boolean
@@ -63,6 +66,7 @@ export const runInEvaluator: EvaluatorRunner = async (evaluator, fileName, progr
 
   return new Promise<EvaluatorRun>(resolve => {
     const outputs: string[] = []
+    const results: unknown[] = []
     const errors: string[] = []
     const worker = new Worker(WORKER_BOOTSTRAP, {
       workerData: { script: evaluator.script, files: evaluator.files ?? {} },
@@ -78,7 +82,7 @@ export const runInEvaluator: EvaluatorRunner = async (evaluator, fileName, progr
       settled = true
       clearTimeout(timer)
       void worker.terminate()
-      resolve({ outputs, errors, timedOut: false, ...rest })
+      resolve({ outputs, results, errors, timedOut: false, ...rest })
     }
     const timer = setTimeout(() => finish({ timedOut: true }), timeoutMs)
     worker.on('error', (error: Error) => finish({ failure: error?.message ?? String(error) }))
@@ -92,6 +96,13 @@ export const runInEvaluator: EvaluatorRunner = async (evaluator, fileName, progr
       },
     }
 
+    let ready = false
+    let sent = 0
+    let received = 0
+    const done = () => {
+      if (ready && received >= sent) finish({})
+    }
+
     // (methods, not class fields: the base class binds requestFile in its constructor)
     class Host extends BasicHostPlugin {
       requestFile(name: string) {
@@ -103,13 +114,28 @@ export const runInEvaluator: EvaluatorRunner = async (evaluator, fileName, progr
       }
       receiveOutput(message: string) {
         outputs.push(message)
+        received++
+        done()
+      }
+      receiveResult(result: unknown) {
+        results.push(result)
+        received++
+        done()
       }
       receiveError(error: { message: string }) {
         errors.push(error.message)
+        received++
+        done()
       }
-      // The evaluator is ready again when it has run the file.
-      receiveStatusUpdate(status: number, isActive: boolean) {
-        if (status === RunnerStatus.EVAL_READY && isActive) finish({})
+      // The evaluator is ready again when it has run the file. Output, result and error ride their own
+      // channels, which are not ordered against the status: the status says how many of them the
+      // evaluator sent (`sentCount`), and the run is over when that many have arrived.
+      receiveStatusUpdate(status: number, isActive: boolean, sentCount?: number) {
+        if (status === RunnerStatus.EVAL_READY && isActive) {
+          ready = true
+          sent = sentCount ?? 0
+          done()
+        }
       }
     }
     const conduit = new Conduit(link as never, true)
