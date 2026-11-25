@@ -94,6 +94,18 @@ describe('grading a Source question', () => {
     expect(loop.results[0]).toMatchObject({ resultType: 'error' })
   }, 60_000)
 
+  it('lets a program run longer than a second: the evaluator has no limit, the grader’s watchdog does', async () => {
+    // fib(32) takes about 1.2 s, which js-slang's evaluators used to refuse.
+    const fib = 'function fib(n) { return n <= 1 ? n : fib(n - 1) + fib(n - 2); }'
+    const summary = await runAll(
+      event({ prependProgram: fib, testcases: [testcase('fib(32);', '2178309')] }),
+    )
+    expect(summary.results[0]).toEqual({ resultType: 'pass', score: 1 })
+    // An endless loop is stopped by the grader's own watchdog.
+    const loop = await runAll(event({ testcases: [testcase('while (true) {}', '')] }))
+    expect(loop.results[0]).toEqual({ resultType: 'error', errors: [{ errorType: 'timeout' }] })
+  }, 60_000)
+
   it('runs the evaluator that the event names: Source §1 has no loops, §3 has', async () => {
     const run = (n: number) =>
       runAll(
