@@ -20,6 +20,14 @@ const STARTUP_ALLOWANCE = process.env.EVALUATOR_STARTUP_ALLOWANCE
   ? parseInt(process.env.EVALUATOR_STARTUP_ALLOWANCE, 10)
   : 2000
 
+// The event has a deadline too: the time the Lambda has left (`getRemainingTimeInMillis` of its
+// context, which AWS passes as the second argument of the handler) less this margin, which is for
+// returning the Summary. It caps every run, so that a slow event returns the results it has instead
+// of being killed with none: the testcases that the deadline cuts off are `timeout` errors.
+const DEADLINE_MARGIN_MS = process.env.DEADLINE_MARGIN_MS
+  ? parseInt(process.env.DEADLINE_MARGIN_MS, 10)
+  : 2000
+
 // An entry of vendor/evaluators/manifest.json, keyed by the evaluator's id in the language directory.
 export type ManifestEntry = {
   // The evaluator's script, relative to the manifest.
@@ -140,6 +148,8 @@ export function gradeRun(
 }
 
 export type ConductorDeps = {
+  // The milliseconds that the Lambda has left: its context has this method. Absent: no event deadline.
+  getRemainingTimeInMillis?: () => number
   manifest?: Manifest
   manifestPath?: string
   runEvaluator?: EvaluatorRunner
@@ -157,22 +167,25 @@ export const runAll = async (event: AwsEvent, deps: ConductorDeps = {}): Promise
   }
   const evaluator = processOf(entry, manifestPath)
   const run = deps.runEvaluator ?? runInEvaluator
+  const deadline = deps.getRemainingTimeInMillis
+    ? Date.now() + deps.getRemainingTimeInMillis() - DEADLINE_MARGIN_MS
+    : Infinity
 
   // Sequential: one evaluator worker resident at a time.
   const results: Output[] = []
   for (const testcase of event.testcases) {
+    const remaining = deadline - Date.now()
+    if (remaining <= 0) {
+      results.push({ resultType: 'error', errors: [{ errorType: 'timeout' }] })
+      continue
+    }
     const program = assembleProgram(event, testcase, entry.studentSourceBinding)
+    const limit = Math.min(
+      TIMEOUT_DURATION + (entry.startupAllowanceMs ?? STARTUP_ALLOWANCE),
+      remaining,
+    )
     results.push(
-      gradeRun(
-        await run(
-          evaluator,
-          entry.fileName,
-          program,
-          TIMEOUT_DURATION + (entry.startupAllowanceMs ?? STARTUP_ALLOWANCE),
-        ),
-        testcase,
-        entry.answerFrom,
-      ),
+      gradeRun(await run(evaluator, entry.fileName, program, limit), testcase, entry.answerFrom),
     )
   }
 
