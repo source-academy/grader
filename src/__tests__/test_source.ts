@@ -95,10 +95,15 @@ describe('grading a Source question', () => {
   }, 60_000)
 
   it('lets a program run longer than a second: the evaluator has no limit, the grader’s watchdog does', async () => {
-    // fib(32) takes about 1.2 s, which js-slang's evaluators used to refuse.
-    const fib = 'function fib(n) { return n <= 1 ? n : fib(n - 1) + fib(n - 2); }'
+    // Waits 1.3 s of wall-clock time, longer than js-slang's evaluators used to allow (1 s) and
+    // shorter than the test's TIMEOUT (2 s). A busy-wait takes the same time on any machine; a
+    // computation such as fib(32) does not, and timed out on a slow CI runner.
     const summary = await runAll(
-      event({ prependProgram: fib, testcases: [testcase('fib(32);', '2178309')] }),
+      event({
+        testcases: [
+          testcase('const start = get_time();\nwhile (get_time() - start < 1300) {}\n42;', '42'),
+        ],
+      }),
     )
     expect(summary.results[0]).toEqual({ resultType: 'pass', score: 1 })
     // An endless loop is stopped by the grader's own watchdog.
