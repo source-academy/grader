@@ -46,6 +46,20 @@ async function loadConductor() {
   }
 }
 
+// The evaluators that a language directory lists are built for a browser worker: they use `self`,
+// `postMessage` and `addEventListener`. A Node worker has `parentPort` instead, so the worker starts
+// with those globals defined over it, and then runs the evaluator's script as it is.
+export const WORKER_SOURCE = `
+  const { parentPort, workerData } = require('worker_threads')
+  globalThis.self = globalThis
+  globalThis.postMessage = (message, transfer) => parentPort.postMessage(message, transfer)
+  globalThis.addEventListener = (type, listener) => {
+    if (type === 'message') parentPort.on('message', data => listener({ data }))
+  }
+  globalThis.removeEventListener = () => {}
+  require(workerData.script)
+`
+
 const MAX_HEAP_MB = process.env.EVALUATOR_MAX_HEAP_MB
   ? parseInt(process.env.EVALUATOR_MAX_HEAP_MB, 10)
   : 512
@@ -56,7 +70,9 @@ export const runInEvaluator: EvaluatorRunner = async (evaluator, fileName, progr
   return new Promise<EvaluatorRun>(resolve => {
     const outputs: string[] = []
     const errors: string[] = []
-    const worker = new Worker(evaluator.script, {
+    const worker = new Worker(WORKER_SOURCE, {
+      eval: true,
+      workerData: { script: evaluator.script },
       env: { ...process.env, ...evaluator.env },
       resourceLimits: { maxOldGenerationSizeMb: MAX_HEAP_MB },
     })

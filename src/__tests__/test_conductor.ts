@@ -1,5 +1,6 @@
 import { existsSync } from 'fs'
 import * as path from 'path'
+import { Worker } from 'worker_threads'
 
 import {
   assembleProgram,
@@ -11,7 +12,7 @@ import {
   readManifest,
   runAll,
 } from '../conductorGrader'
-import { EvaluatorRun } from '../conductorHost'
+import { EvaluatorRun, WORKER_SOURCE } from '../conductorHost'
 import { AwsEvent } from '../types'
 
 const manifestPath = path.join(__dirname, '..', '..', 'vendor', 'evaluators', 'manifest.json')
@@ -202,5 +203,19 @@ describeOcaml('the vendored OCaml evaluator', () => {
       { resultType: 'error', errors: [{ errorType: 'timeout' }] },
       { resultType: 'pass', score: 1 },
     ])
+  })
+})
+
+describe('the worker of the host', () => {
+  it('gives a script built for a browser worker its globals: self, postMessage, addEventListener', async () => {
+    const script = path.join(__dirname, 'fixtures', 'browser-worker.js')
+    const worker = new Worker(WORKER_SOURCE, { eval: true, workerData: { script } })
+    try {
+      const reply = new Promise(resolve => worker.once('message', resolve))
+      worker.postMessage('ping')
+      expect(await reply).toEqual({ echo: 'ping', selfIsGlobal: true })
+    } finally {
+      await worker.terminate()
+    }
   })
 })
