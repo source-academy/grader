@@ -20,9 +20,6 @@ const manifestPath = path.join(__dirname, '..', '..', 'vendor', 'evaluators', 'm
 
 const event = (over: Partial<AwsEvent> = {}, evaluator = 'ocamlJsOfOCaml'): AwsEvent => ({
   library: {
-    chapter: 1,
-    external: { name: 'NONE', symbols: [] },
-    globals: [],
     language: 'ocaml',
     evaluator,
   },
@@ -174,8 +171,11 @@ describe('grading an event', () => {
     expect(timeouts[1] - timeouts[0]).toBe(15000 - 2000)
   })
 
-  it('refuses an evaluator it does not have', async () => {
+  it('refuses an evaluator it does not have, and an event that names none', async () => {
     await expect(runAll(event({}, 'nope'), { manifest: {} })).rejects.toThrow(/nope/)
+    await expect(
+      runAll(event({ library: { language: 'python' } }), { manifest: {} }),
+    ).rejects.toThrow(/undefined/)
   })
 })
 

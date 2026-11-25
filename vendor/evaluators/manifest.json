@@ -41,5 +41,29 @@
     },
     "source": "https://source-academy.github.io/py-slang/",
     "startupAllowanceMs": 15000
+  },
+  "source1Default": {
+    "script": "source/SourceEvaluator1.js",
+    "fileName": "/main.js",
+    "answerFrom": "result",
+    "source": "https://source-academy.github.io/js-slang/"
+  },
+  "source2Default": {
+    "script": "source/SourceEvaluator2.js",
+    "fileName": "/main.js",
+    "answerFrom": "result",
+    "source": "https://source-academy.github.io/js-slang/"
+  },
+  "source3Default": {
+    "script": "source/SourceEvaluator3.js",
+    "fileName": "/main.js",
+    "answerFrom": "result",
+    "source": "https://source-academy.github.io/js-slang/"
+  },
+  "source4Default": {
+    "script": "source/SourceEvaluator4.js",
+    "fileName": "/main.js",
+    "answerFrom": "result",
+    "source": "https://source-academy.github.io/js-slang/"
   }
 }

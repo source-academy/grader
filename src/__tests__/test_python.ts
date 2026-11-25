@@ -1,21 +1,14 @@
 import { assembleProgram, readManifest, runAll } from '../conductorGrader'
 import { AwsEvent, Library, Testcase } from '../types'
 
-// Python is graded by py-slang's conductor evaluators, vendored in vendor/evaluators (see the manifest).
-// The events here are as the backend sent them before it sent evaluator ids: the chapter names the
-// evaluator (legacyEvents.ts).
+// Python is graded by py-slang's conductor evaluators, vendored in vendor/evaluators (see the manifest);
+// an event names the one that grades it.
 
-const library = (chapter: number, evaluator?: string): Library => ({
-  chapter,
-  external: { name: 'NONE', symbols: [] },
-  globals: [],
-  evaluator,
-})
+const library = (evaluator: string): Library => ({ language: 'python', evaluator })
 
 function event(overrides: Partial<AwsEvent> = {}): AwsEvent {
   return {
-    language: 'python',
-    library: library(4),
+    library: library('python4Py2js'),
     prependProgram: '',
     studentProgram: '',
     postpendProgram: '',
@@ -108,11 +101,11 @@ describe('grading a Python question', () => {
     expect(summary.results[0]).toEqual({ resultType: 'pass', score: 1 })
   }, 60_000)
 
-  it('runs the evaluator of the chapter: Python §1 has no list literals, §4 does', async () => {
+  it('runs the evaluator that the event names: Python §1 has no list literals, §4 does', async () => {
     const run = (chapter: number) =>
       runAll(
         event({
-          library: library(chapter),
+          library: library(`python${chapter}Py2js`),
           testcases: [testcase('x = [1, 2]\nprint(x)', '[1, 2]')],
         }),
       )
@@ -123,7 +116,7 @@ describe('grading a Python question', () => {
   it('runs the evaluator that the event names', async () => {
     const summary = await runAll(
       event({
-        library: library(1, 'python3Py2js'),
+        library: library('python3Py2js'),
         testcases: [testcase('x = [1, 2]\nprint(x)', '[1, 2]')],
       }),
     )
@@ -131,7 +124,7 @@ describe('grading a Python question', () => {
   }, 60_000)
 
   it('refuses an evaluator it has not vendored', async () => {
-    await expect(runAll(event({ library: library(4, 'python4Stepper') }))).rejects.toThrow(
+    await expect(runAll(event({ library: library('python4Stepper') }))).rejects.toThrow(
       /python4Stepper/,
     )
   })
@@ -143,7 +136,7 @@ describe('Python §4 Typed', () => {
     expect(entry.startupAllowanceMs).toBeGreaterThanOrEqual(15000)
   })
 
-  const typed = library(5)
+  const typed = library('python4TypedPy2js')
 
   it('grades a typed question: pass, wrong answer, and a type error', async () => {
     const summary = await runAll(
