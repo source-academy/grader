@@ -269,4 +269,26 @@ describe('the worker of the host', () => {
       await worker.terminate()
     }
   })
+
+  it('loads an evaluator that is an ES module with top-level await', async () => {
+    const script = path.join(__dirname, 'fixtures', 'browser-worker-esm.mjs')
+    const worker = new Worker(WORKER_SOURCE, { eval: true, workerData: { script } })
+    try {
+      const reply = new Promise(resolve => worker.once('message', resolve))
+      // sent at once, before the module has loaded: the port holds it until the module listens
+      worker.postMessage('ping')
+      expect(await reply).toEqual({ echo: 'ping', waited: true })
+    } finally {
+      await worker.terminate()
+    }
+  })
+
+  it('reports a script that cannot be loaded as an error of the worker', async () => {
+    const worker = new Worker(WORKER_SOURCE, {
+      eval: true,
+      workerData: { script: path.join(__dirname, 'fixtures', 'does-not-exist.js') },
+    })
+    await expect(new Promise((_, reject) => worker.once('error', reject))).rejects.toThrow()
+    await worker.terminate()
+  })
 })
