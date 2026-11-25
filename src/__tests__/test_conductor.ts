@@ -328,9 +328,12 @@ describe('the host', () => {
     const script = path.join(__dirname, 'fixtures', 'chatty-evaluator.mjs')
     const run = await runInEvaluator({ script, env: {} }, '/main.x', 'ignored', 20000)
     expect(run.failure).toBeUndefined()
+    // finished because everything had arrived, not because the watchdog went off
+    expect(run.timedOut).toBe(false)
     expect(run.outputs).toHaveLength(300)
     expect(run.outputs[299]).toBe('line 299')
-    expect(run.results).toEqual([42])
+    // the evaluator's own result (42), and the void result that BasicEvaluator sends for the file
+    expect(run.results).toStrictEqual([42, undefined])
     expect(run.errors).toEqual(['boom'])
   })
 })
