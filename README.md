@@ -213,4 +213,4 @@ The evaluators are vendored, so that grading does not depend on the network. To 
 scripts/vendor-evaluator.sh ocaml https://source-academy.github.io/ocaml-slang OCamlEvaluator.js ocaml-toplevel.js
 ```
 
-then add its entry to the manifest (`script`, `fileName`, `env`, and `fileEnv` for the files it loads). `TIMEOUT` (ms per testcase), `EVALUATOR_STARTUP_ALLOWANCE` (extra ms for the first testcase, which loads the evaluator) and `EVALUATOR_MAX_HEAP_MB` set the limits.
+then add its entry to the manifest (`script`, `fileName`, `env`, and `fileEnv` for the files it loads). `TIMEOUT` (ms per testcase), `EVALUATOR_STARTUP_ALLOWANCE` (extra ms for every testcase, which starts a fresh worker that loads the evaluator) and `EVALUATOR_MAX_HEAP_MB` set the limits.

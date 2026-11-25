@@ -57,7 +57,9 @@ export const runInEvaluator: EvaluatorRunner = async (evaluator, fileName, progr
     const outputs: string[] = []
     const errors: string[] = []
     const worker = new Worker(evaluator.script, {
-      env: { ...process.env, ...evaluator.env },
+      // Only what the manifest gives: the grader's own environment (credentials) is not for a program
+      // that a student wrote, which can read it (OCaml's Sys.getenv does).
+      env: { ...evaluator.env },
       resourceLimits: { maxOldGenerationSizeMb: MAX_HEAP_MB },
     })
 

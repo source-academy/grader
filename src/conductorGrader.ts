@@ -11,11 +11,12 @@ import { AwsEvent, Output, Summary, Testcase } from './types'
 
 const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT, 10) : 3000
 
-// An evaluator's first program also loads the evaluator itself (the OCaml toplevel is several MB),
-// which a testcase's own limit should not have to cover.
+// Each testcase starts a fresh worker, which loads the evaluator itself (the OCaml toplevel is several
+// MB, about 0.3 s): the watchdog allows for that on top of `TIMEOUT`. The host cannot see when
+// evaluation starts, so the allowance is added to every run.
 const STARTUP_ALLOWANCE = process.env.EVALUATOR_STARTUP_ALLOWANCE
   ? parseInt(process.env.EVALUATOR_STARTUP_ALLOWANCE, 10)
-  : 10000
+  : 2000
 
 // An entry of vendor/evaluators/manifest.json, keyed by the evaluator's id in the language directory.
 export type ManifestEntry = {
@@ -111,14 +112,11 @@ export const runAll = async (event: AwsEvent, deps: ConductorDeps = {}): Promise
 
   // Sequential: one evaluator worker resident at a time.
   const results: Output[] = []
-  let first = true
   for (const testcase of event.testcases) {
     const program = assembleProgram(event, testcase)
-    const allowance = first ? STARTUP_ALLOWANCE : 0
-    first = false
     results.push(
       gradeRun(
-        await run(evaluator, entry.fileName, program, TIMEOUT_DURATION + allowance),
+        await run(evaluator, entry.fileName, program, TIMEOUT_DURATION + STARTUP_ALLOWANCE),
         testcase,
       ),
     )

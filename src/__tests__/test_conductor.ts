@@ -188,6 +188,23 @@ describeOcaml('the vendored OCaml evaluator', () => {
     expect(summary.results).toEqual([{ resultType: 'pass', score: 1 }])
   })
 
+  it('does not give the program the grader’s environment', async () => {
+    process.env.GRADER_SECRET_FOR_TEST = 'hunter2'
+    try {
+      const summary = await runAll(
+        event({
+          studentProgram: '',
+          testcases: [
+            { program: ';; Sys.getenv_opt "GRADER_SECRET_FOR_TEST"', answer: 'None', score: 1 },
+          ],
+        }),
+      )
+      expect(summary.results).toEqual([{ resultType: 'pass', score: 1 }])
+    } finally {
+      delete process.env.GRADER_SECRET_FOR_TEST
+    }
+  })
+
   it('stops a runaway loop and carries on with the next testcase', async () => {
     const summary = await runAll(
       event({
