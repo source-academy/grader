@@ -13,7 +13,7 @@ import {
   readManifest,
   runAll,
 } from '../conductorGrader'
-import { EvaluatorRun, WORKER_SOURCE } from '../conductorHost'
+import { EvaluatorRun, WORKER_BOOTSTRAP } from '../conductorHost'
 import { AwsEvent } from '../types'
 
 const manifestPath = path.join(__dirname, '..', '..', 'vendor', 'evaluators', 'manifest.json')
@@ -74,8 +74,20 @@ describe('the result of a testcase', () => {
 
   it('is an error with the evaluator’s message when it reports one', () => {
     const result = gradeRun(run({ errors: ['Type error'], outputs: ['120'] }), testcase)
-    expect(result).toMatchObject({ resultType: 'error' })
-    expect(JSON.stringify(result)).toContain('Type error')
+    expect(result).toMatchObject({
+      resultType: 'error',
+      errors: [{ errorType: 'runtime', errorExplanation: 'Type error' }],
+    })
+  })
+
+  it('has every error the evaluator reported, as a runtime error', () => {
+    expect(gradeRun(run({ errors: ['a', 'b'] }), testcase)).toMatchObject({
+      resultType: 'error',
+      errors: [
+        { errorType: 'runtime', errorExplanation: 'a' },
+        { errorType: 'runtime', errorExplanation: 'b' },
+      ],
+    })
   })
 
   it('is a timeout when the program ran out of time', () => {
@@ -108,6 +120,7 @@ describe('the evaluators the grader has', () => {
     expect(processOf(manifest.known, '/v/m.json')).toEqual({
       script: '/v/k.js',
       env: { FILE: '/v/f.bin' },
+      files: {},
     })
   })
 
@@ -141,6 +154,23 @@ describe('grading an event', () => {
     expect(summary.totalScore).toBe(2)
     expect(summary.maxScore).toBe(5)
     expect(summary.results.map(r => r.resultType)).toEqual(['pass', 'fail'])
+  })
+
+  it('allows an evaluator the startup time that its manifest entry says, instead of the default', async () => {
+    const timeouts: number[] = []
+    const grade = (entry: Manifest[string]) =>
+      runAll(event(), {
+        manifest: { ocamlJsOfOCaml: entry },
+        manifestPath: '/v/manifest.json',
+        runEvaluator: async (_evaluator, _fileName, _program, timeoutMs) => {
+          timeouts.push(timeoutMs)
+          return run({ outputs: ['120'] })
+        },
+      })
+    await grade({ script: 'e.js', fileName: '/main.ml' })
+    await grade({ script: 'e.js', fileName: '/main.ml', startupAllowanceMs: 15000 })
+    // the default allowance is 2 s (EVALUATOR_STARTUP_ALLOWANCE unset)
+    expect(timeouts[1] - timeouts[0]).toBe(15000 - 2000)
   })
 
   it('refuses an evaluator it does not have', async () => {
@@ -260,7 +290,7 @@ describeOcaml('the vendored OCaml evaluator', () => {
 describe('the worker of the host', () => {
   it('gives a script built for a browser worker its globals: self, postMessage, addEventListener', async () => {
     const script = path.join(__dirname, 'fixtures', 'browser-worker.js')
-    const worker = new Worker(WORKER_SOURCE, { eval: true, workerData: { script } })
+    const worker = new Worker(WORKER_BOOTSTRAP, { workerData: { script } })
     try {
       const reply = new Promise(resolve => worker.once('message', resolve))
       worker.postMessage('ping')
@@ -272,7 +302,7 @@ describe('the worker of the host', () => {
 
   it('loads an evaluator that is an ES module with top-level await', async () => {
     const script = path.join(__dirname, 'fixtures', 'browser-worker-esm.mjs')
-    const worker = new Worker(WORKER_SOURCE, { eval: true, workerData: { script } })
+    const worker = new Worker(WORKER_BOOTSTRAP, { workerData: { script } })
     try {
       const reply = new Promise(resolve => worker.once('message', resolve))
       // sent at once, before the module has loaded: the port holds it until the module listens
@@ -284,8 +314,7 @@ describe('the worker of the host', () => {
   })
 
   it('reports a script that cannot be loaded as an error of the worker', async () => {
-    const worker = new Worker(WORKER_SOURCE, {
-      eval: true,
+    const worker = new Worker(WORKER_BOOTSTRAP, {
       workerData: { script: path.join(__dirname, 'fixtures', 'does-not-exist.js') },
     })
     await expect(new Promise((_, reject) => worker.once('error', reject))).rejects.toThrow()

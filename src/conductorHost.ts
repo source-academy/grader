@@ -3,8 +3,9 @@
 // collects what it outputs and the errors it reports. It knows nothing of any language.
 //
 // An evaluator is stopped only by terminating its thread, so each program runs in a throwaway worker
-// under a wall-clock watchdog, as py2js programs do (see pythonGrader.ts).
+// under a wall-clock watchdog.
 
+import * as path from 'path'
 import { Worker } from 'worker_threads'
 
 export type EvaluatorProcess = {
@@ -12,12 +13,14 @@ export type EvaluatorProcess = {
   script: string
   // The environment of the worker, on top of the grader's.
   env: Record<string, string>
+  // URL -> absolute path of a file: what the evaluator fetches from such a URL comes from the file.
+  files?: Record<string, string>
 }
 
 export type EvaluatorRun = {
   // What the program sent to the output (a line each), in order.
   outputs: string[]
-  // The errors the evaluator reported, as their messages.
+  // The errors the evaluator reported, as their messages (the conductor sends nothing else).
   errors: string[]
   timedOut: boolean
   // The worker failed (the script is missing or throws): not the program's error.
@@ -46,22 +49,10 @@ async function loadConductor() {
   }
 }
 
-// The evaluators that a language directory lists are built for a browser worker: they use `self`,
-// `postMessage` and `addEventListener`. A Node worker has `parentPort` instead, so the worker starts
-// with those globals defined over it, and then loads the evaluator's script as it is (as an ES module or a CommonJS one).
-export const WORKER_SOURCE = `
-  const { parentPort, workerData } = require('worker_threads')
-  globalThis.self = globalThis
-  globalThis.postMessage = (message, transfer) => parentPort.postMessage(message, transfer)
-  globalThis.addEventListener = (type, listener) => {
-    if (type === 'message') parentPort.on('message', data => listener({ data }))
-  }
-  globalThis.removeEventListener = () => {}
-  // import(), not require(): an evaluator may be an ES module, even one with top-level await.
-  import(require('url').pathToFileURL(workerData.script).href).catch(error => {
-    setImmediate(() => { throw error })
-  })
-`
+// The first script of the worker: it gives a Node worker the globals of a browser worker (`self`,
+// `postMessage`, `addEventListener`, `fetch` from vendored files, `Worker`) and loads the evaluator's
+// script as it is. See workerBootstrap.js.
+export const WORKER_BOOTSTRAP = path.join(__dirname, 'workerBootstrap.js')
 
 const MAX_HEAP_MB = process.env.EVALUATOR_MAX_HEAP_MB
   ? parseInt(process.env.EVALUATOR_MAX_HEAP_MB, 10)
@@ -73,9 +64,8 @@ export const runInEvaluator: EvaluatorRunner = async (evaluator, fileName, progr
   return new Promise<EvaluatorRun>(resolve => {
     const outputs: string[] = []
     const errors: string[] = []
-    const worker = new Worker(WORKER_SOURCE, {
-      eval: true,
-      workerData: { script: evaluator.script },
+    const worker = new Worker(WORKER_BOOTSTRAP, {
+      workerData: { script: evaluator.script, files: evaluator.files ?? {} },
       // Only what the manifest gives: the grader's own environment (credentials) is not for a program
       // that a student wrote, which can read it (OCaml's Sys.getenv does).
       env: { ...evaluator.env },

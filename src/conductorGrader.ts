@@ -7,7 +7,8 @@ import { existsSync, readFileSync } from 'fs'
 import * as path from 'path'
 
 import { EvaluatorProcess, EvaluatorRunner, EvaluatorRun, runInEvaluator } from './conductorHost'
-import { AwsEvent, Output, Summary, Testcase } from './types'
+import { legacyEvaluatorId } from './legacyEvents'
+import { AwsEvent, Output, OutputError, Summary, Testcase } from './types'
 
 const TIMEOUT_DURATION = process.env.TIMEOUT ? parseInt(process.env.TIMEOUT, 10) : 3000
 
@@ -29,6 +30,17 @@ export type ManifestEntry = {
   // Environment variables that are paths of files, relative to the manifest (the evaluator is given
   // them as absolute paths): the files it loads.
   fileEnv?: Record<string, string>
+  // URL -> file, relative to the manifest: what the evaluator downloads from such a URL (a worker
+  // script of its own, say) is read from the file, so that grading needs no network.
+  files?: Record<string, string>
+  // Milliseconds that a run may take on top of `TIMEOUT` for the evaluator to start, which the
+  // default (`EVALUATOR_STARTUP_ALLOWANCE`) may not cover: py-slang's Typed evaluator starts a type
+  // checker first (the grader used to allow that 15 s). Absent: the default.
+  startupAllowanceMs?: number
+  // A line of the program that binds the student's source code, for a postpend grader that parses
+  // it: the line with `%s` replaced by the source as a JSON string (a string literal in most
+  // languages). Placed after the student's code. Absent: no such line.
+  studentSourceBinding?: string
 }
 
 export type Manifest = Record<string, ManifestEntry>
@@ -46,9 +58,10 @@ export function readManifest(manifestPath: string = resolveManifestPath()): Mani
   return existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : {}
 }
 
-// The evaluator an event names, by `library.evaluator`; undefined if it is not one the grader has.
+// The evaluator an event names, by `library.evaluator` (or, for an event that predates evaluator ids,
+// the one that its chapter stands for); undefined if it is not one the grader has.
 export function evaluatorOf(event: AwsEvent, manifest: Manifest): ManifestEntry | undefined {
-  const id = event.library?.evaluator
+  const id = event.library?.evaluator ?? legacyEvaluatorId(event)
   return id && Object.prototype.hasOwnProperty.call(manifest, id) ? manifest[id] : undefined
 }
 
@@ -56,13 +69,30 @@ export function processOf(entry: ManifestEntry, manifestPath: string): Evaluator
   const dir = path.dirname(manifestPath)
   const env: Record<string, string> = { ...(entry.env ?? {}) }
   for (const [name, file] of Object.entries(entry.fileEnv ?? {})) env[name] = path.join(dir, file)
-  return { script: path.join(dir, entry.script), env }
+  const files: Record<string, string> = {}
+  for (const [url, file] of Object.entries(entry.files ?? {})) files[url] = path.join(dir, file)
+  return { script: path.join(dir, entry.script), env, files }
 }
 
-// The one file that runs per testcase, as the frontend (runTestCase.ts) and the other graders
-// build it: prepend, the student's code, postpend and the testcase, joined by newlines.
-export function assembleProgram(event: AwsEvent, testcase: Testcase): string {
-  return [event.prependProgram, event.studentProgram, event.postpendProgram, testcase.program]
+// The one file that runs per testcase, as the frontend (runTestCase.ts) builds it: prepend, the
+// student's code, the binding of its source (if the evaluator has one), postpend and the testcase,
+// joined by newlines.
+export function assembleProgram(
+  event: AwsEvent,
+  testcase: Testcase,
+  studentSourceBinding?: string,
+): string {
+  const binding =
+    studentSourceBinding === undefined
+      ? undefined
+      : studentSourceBinding.replace('%s', () => JSON.stringify(event.studentProgram ?? ''))
+  return [
+    event.prependProgram,
+    event.studentProgram,
+    binding,
+    event.postpendProgram,
+    testcase.program,
+  ]
     .filter(part => typeof part === 'string' && part.trim().length > 0)
     .join('\n')
 }
@@ -72,23 +102,22 @@ export function lastOutput(outputs: string[]): string {
   return outputs.length > 0 ? outputs[outputs.length - 1].trim() : ''
 }
 
+// What the conductor sends of an error is its message: no kind (syntax, type, runtime) and no
+// location, so every error is a `runtime` error at no line.
+function errorOutput(message: string): OutputError['errors'][number] {
+  return {
+    errorType: 'runtime',
+    line: 0,
+    location: 'unknown',
+    errorLine: '',
+    errorExplanation: message,
+  }
+}
+
 export function gradeRun(run: EvaluatorRun, testcase: Testcase): Output {
   if (run.timedOut) return { resultType: 'error', errors: [{ errorType: 'timeout' }] }
-  const message = run.failure ?? run.errors[0]
-  if (message !== undefined) {
-    return {
-      resultType: 'error',
-      errors: [
-        {
-          errorType: 'runtime',
-          line: 0,
-          location: 'unknown',
-          errorLine: '',
-          errorExplanation: message,
-        },
-      ],
-    }
-  }
+  if (run.failure !== undefined) return { resultType: 'error', errors: [errorOutput(run.failure)] }
+  if (run.errors.length > 0) return { resultType: 'error', errors: run.errors.map(errorOutput) }
   const actual = lastOutput(run.outputs)
   return actual === testcase.answer
     ? { resultType: 'pass', score: testcase.score }
@@ -113,10 +142,15 @@ export const runAll = async (event: AwsEvent, deps: ConductorDeps = {}): Promise
   // Sequential: one evaluator worker resident at a time.
   const results: Output[] = []
   for (const testcase of event.testcases) {
-    const program = assembleProgram(event, testcase)
+    const program = assembleProgram(event, testcase, entry.studentSourceBinding)
     results.push(
       gradeRun(
-        await run(evaluator, entry.fileName, program, TIMEOUT_DURATION + STARTUP_ALLOWANCE),
+        await run(
+          evaluator,
+          entry.fileName,
+          program,
+          TIMEOUT_DURATION + (entry.startupAllowanceMs ?? STARTUP_ALLOWANCE),
+        ),
         testcase,
       ),
     )
