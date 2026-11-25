@@ -5,6 +5,11 @@ export type Language = 'javascript' | 'python'
 
 export type Library = {
   chapter: number
+  // The ids, in the language directory, of the language and the evaluator that grade the question
+  // (what the backend sends since source-academy/backend#1387). An evaluator that the grader has
+  // vendored (vendor/evaluators/manifest.json) is run by the conductor grader, whatever `language` says.
+  language?: string
+  evaluator?: string
   // `external` and `globals` are javascript-only. RUNES/CURVES/etc. are js-slang graphics modules
   // graded by rendering to headless WebGL and comparing pixels (picture_mse) - there is
   // no Python equivalent for now, so the Python grader ignores this.
