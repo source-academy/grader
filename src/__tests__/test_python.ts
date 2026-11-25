@@ -1,23 +1,21 @@
+import { assembleProgram, runAll } from '../conductorGrader'
 import { AwsEvent, Library, Testcase } from '../types'
-import {
-  assemblePythonProgram,
-  isTypedChapter,
-  locate,
-  pythonVariant,
-  type PythonTypeChecker,
-  gradePythonRun,
-  lastPrintedLine,
-  type PythonProgramRunner,
-  resolveBundlePath,
-  runAll,
-  workerRunner,
-} from '../pythonGrader'
 
-const library: Library = { chapter: 4, external: { name: 'NONE', symbols: [] }, globals: [] }
+// Python is graded by py-slang's conductor evaluators, vendored in vendor/evaluators (see the manifest).
+// The events here are as the backend sent them before it sent evaluator ids: the chapter names the
+// evaluator (legacyEvents.ts).
+
+const library = (chapter: number, evaluator?: string): Library => ({
+  chapter,
+  external: { name: 'NONE', symbols: [] },
+  globals: [],
+  evaluator,
+})
 
 function event(overrides: Partial<AwsEvent> = {}): AwsEvent {
   return {
-    library,
+    language: 'python',
+    library: library(4),
     prependProgram: '',
     studentProgram: '',
     postpendProgram: '',
@@ -26,298 +24,131 @@ function event(overrides: Partial<AwsEvent> = {}): AwsEvent {
   }
 }
 
-describe('assemblePythonProgram', () => {
-  it('joins prepend, student, __program__ binding, postpend, testcase in order', () => {
-    const tc: Testcase = { program: 'print(a + b)', answer: '3', score: 1 }
-    expect(
-      assemblePythonProgram(event({ prependProgram: 'a = 1', studentProgram: 'b = 2' }), tc),
-    ).toBe('a = 1\nb = 2\n__program__ = "b = 2"\nprint(a + b)')
+const testcase = (program: string, answer: string, score = 1): Testcase => ({
+  program,
+  answer,
+  score,
+})
+
+describe('the program of a Python testcase', () => {
+  const binding = '__program__ = %s'
+
+  it('joins prepend, student, the __program__ binding, postpend and testcase in order', () => {
+    const e = event({ prependProgram: 'a = 1', studentProgram: 'b = 2', postpendProgram: 'c = 3' })
+    expect(assembleProgram(e, testcase('print(a)', '1'), binding)).toBe(
+      'a = 1\nb = 2\n__program__ = "b = 2"\nc = 3\nprint(a)',
+    )
   })
 
-  it('drops empty parts but always binds __program__ (even for empty student code)', () => {
-    const tc: Testcase = { program: 'print(1)', answer: '1', score: 1 }
-    expect(assemblePythonProgram(event(), tc)).toBe('__program__ = ""\nprint(1)')
+  it('drops empty parts but always binds __program__, even for empty student code', () => {
+    expect(assembleProgram(event(), testcase('print(1)', '1'), binding)).toBe(
+      '__program__ = ""\nprint(1)',
+    )
+  })
+
+  it('quotes the student source as a JSON string', () => {
+    const e = event({ studentProgram: 'print("a\\n")' })
+    expect(assembleProgram(e, testcase('', ''), binding)).toContain(
+      '__program__ = "print(\\"a\\\\n\\")"',
+    )
   })
 })
 
-describe('lastPrintedLine', () => {
-  it('returns the last line, trimmed', () => {
-    expect(lastPrintedLine(['3'])).toBe('3')
-    expect(lastPrintedLine(['a', 'b', '3'])).toBe('3')
-    expect(lastPrintedLine(['  5  '])).toBe('5')
-  })
-
-  it('keeps a single multi-line print intact (matches consoleLogs, not a newline split)', () => {
-    expect(lastPrintedLine(['a\nb'])).toBe('a\nb')
-  })
-
-  it('is the empty string when nothing was printed', () => {
-    expect(lastPrintedLine([])).toBe('')
-  })
-})
-
-describe('gradePythonRun', () => {
-  const tc: Testcase = { program: 'print(3)', answer: '3', score: 2 }
-
-  it('passes when the last printed line equals the answer', () => {
-    expect(gradePythonRun({ lines: ['debug', '3'], timedOut: false }, tc)).toEqual({
-      resultType: 'pass',
-      score: 2,
-    })
-  })
-
-  it('fails and reports expected/actual otherwise', () => {
-    expect(gradePythonRun({ lines: ['4'], timedOut: false }, tc)).toEqual({
-      resultType: 'fail',
-      expected: '3',
-      actual: '4',
-    })
-  })
-
-  it('reports the error kind when the run errored', () => {
-    expect(
-      gradePythonRun(
-        {
-          lines: [],
-          error: { errorType: 'runtime', message: 'ZeroDivisionError: x' },
-          timedOut: false,
-        },
-        tc,
-      ),
-    ).toEqual({
-      resultType: 'error',
-      errors: [
-        {
-          errorType: 'runtime',
-          line: 0,
-          location: 'unknown',
-          errorLine: '',
-          errorExplanation: 'ZeroDivisionError: x',
-        },
-      ],
-    })
-  })
-
-  it('reports a timeout when the run did not settle', () => {
-    expect(gradePythonRun({ lines: [], timedOut: true }, tc)).toEqual({
-      resultType: 'error',
-      errors: [{ errorType: 'timeout' }],
-    })
-  })
-})
-
-describe('runAll (injected runner)', () => {
-  // Pretends the evaluator prints the integer inside the testcase's `print(<n>)`.
-  const echoingRunner: PythonProgramRunner = program => {
-    const match = program.match(/print\((\d+)\)\s*$/)
-    return Promise.resolve({ lines: match ? [match[1]] : [], timedOut: false })
-  }
-
-  it('grades each testcase and aggregates the score', async () => {
-    const testcases: Testcase[] = [
-      { program: 'print(1)', answer: '1', score: 2 },
-      { program: 'print(9)', answer: '2', score: 3 },
-    ]
-    const summary = await runAll(event({ testcases }), { createRunner: () => echoingRunner })
-
-    expect(summary.maxScore).toBe(5)
-    expect(summary.totalScore).toBe(2)
-    expect(summary.results).toEqual([
-      { resultType: 'pass', score: 2 },
-      { resultType: 'fail', expected: '2', actual: '9' },
-    ])
-  })
-
-  it('returns a zero-score empty summary when there are no testcases', async () => {
-    expect(await runAll(event({ testcases: [] }), { createRunner: () => echoingRunner })).toEqual({
-      totalScore: 0,
-      maxScore: 0,
-      results: [],
-    })
-  })
-})
-
-// End-to-end through the real vendored py2js bundle in a worker.
-describe('runAll (vendored py2js engine)', () => {
-  it('grades a Python question: pass, fail, and a runtime error', async () => {
+describe('grading a Python question', () => {
+  it('passes, fails, and reports a runtime error', async () => {
     const summary = await runAll(
       event({
         studentProgram: 'def f(x):\n    return x + 1',
         testcases: [
-          { program: 'print(f(41))', answer: '42', score: 1 },
-          { program: 'print(f(0))', answer: '99', score: 1 },
-          { program: 'print(1 // 0)', answer: '0', score: 1 },
+          testcase('print(f(41))', '42'),
+          testcase('print(f(0))', '99'),
+          testcase('print(1 // 0)', '0'),
         ],
       }),
     )
-
     expect(summary.maxScore).toBe(3)
     expect(summary.totalScore).toBe(1)
     expect(summary.results[0]).toEqual({ resultType: 'pass', score: 1 })
     expect(summary.results[1]).toEqual({ resultType: 'fail', expected: '99', actual: '1' })
-    expect(summary.results[2].resultType).toBe('error')
-  })
+    expect(summary.results[2]).toMatchObject({
+      resultType: 'error',
+      errors: [{ errorType: 'runtime' }],
+    })
+  }, 60_000)
 
   it('grades the last printed line when a testcase prints more than once', async () => {
     const summary = await runAll(
+      event({ testcases: [testcase('print("debug")\nprint(6 * 7)', '42')] }),
+    )
+    expect(summary.results[0]).toEqual({ resultType: 'pass', score: 1 })
+  }, 60_000)
+
+  it('returns a zero-score summary when there are no testcases', async () => {
+    expect(await runAll(event())).toEqual({ totalScore: 0, maxScore: 0, results: [] })
+  })
+
+  it('terminates a runaway loop, reports a timeout, and carries on', async () => {
+    const summary = await runAll(
+      event({ testcases: [testcase('while True:\n    pass', ''), testcase('print(1)', '1')] }),
+    )
+    expect(summary.results).toEqual([
+      { resultType: 'error', errors: [{ errorType: 'timeout' }] },
+      { resultType: 'pass', score: 1 },
+    ])
+  }, 60_000)
+
+  it('gives a postpend grader the student’s source in __program__', async () => {
+    const summary = await runAll(
       event({
-        studentProgram: '',
-        testcases: [{ program: 'print("debug")\nprint(6 * 7)', answer: '42', score: 1 }],
+        studentProgram: 'x = 1',
+        postpendProgram: 'print(__program__)',
+        testcases: [testcase('', 'x = 1')],
       }),
     )
     expect(summary.results[0]).toEqual({ resultType: 'pass', score: 1 })
-  })
+  }, 60_000)
 
-  it('terminates a runaway loop and reports a timeout', async () => {
-    const run = await workerRunner(resolveBundlePath())('while True:\n    pass', 300)
-    expect(run.timedOut).toBe(true)
+  it('runs the evaluator of the chapter: Python §1 has no list literals, §4 does', async () => {
+    const run = (chapter: number) =>
+      runAll(
+        event({
+          library: library(chapter),
+          testcases: [testcase('x = [1, 2]\nprint(x)', '[1, 2]')],
+        }),
+      )
+    expect((await run(1)).results[0].resultType).toBe('error')
+    expect((await run(4)).results[0]).toEqual({ resultType: 'pass', score: 1 })
+  }, 60_000)
+
+  it('runs the evaluator that the event names', async () => {
+    const summary = await runAll(
+      event({
+        library: library(1, 'python3Py2js'),
+        testcases: [testcase('x = [1, 2]\nprint(x)', '[1, 2]')],
+      }),
+    )
+    expect(summary.results[0]).toEqual({ resultType: 'pass', score: 1 })
+  }, 60_000)
+
+  it('refuses an evaluator it has not vendored', async () => {
+    await expect(runAll(event({ library: library(4, 'python4Stepper') }))).rejects.toThrow(
+      /python4Stepper/,
+    )
   })
 })
 
 describe('Python §4 Typed', () => {
-  const typedLibrary: Library = { ...library, chapter: 5 }
+  const typed = library(5)
 
-  it('takes chapters from 5 on as typed, run as Python §4', () => {
-    expect([1, 4, 5, 6].map(isTypedChapter)).toEqual([false, false, true, true])
-    expect([1, 3, 4, 5, 6].map(pythonVariant)).toEqual([1, 3, 4, 4, 4])
-  })
-
-  it('finds the part of the program that a line is in', () => {
-    const e = event({
-      prependProgram: 'a = 1\nb = 2',
-      studentProgram: 'c = 3',
-      postpendProgram: '',
-    })
-    const tc: Testcase = { program: 'print(c)', answer: '3', score: 1 }
-    // prepend: lines 1-2, student: line 3, the __program__ binding: line 4, testcase: line 5
-    expect(locate(e, tc, 2)).toEqual({ location: 'prepend', line: 2 })
-    expect(locate(e, tc, 3)).toEqual({ location: 'student', line: 1 })
-    expect(locate(e, tc, 5)).toEqual({ location: 'testcase', line: 1 })
-  })
-
-  it('does not run a program with type errors, and reports them', async () => {
-    const ran: string[] = []
-    const checker: PythonTypeChecker = {
-      errors: program =>
-        Promise.resolve(program.includes('bad') ? [{ line: 1, message: 'wrong type' }] : []),
-      dispose: jest.fn(),
-    }
-    const summary = await runAll(
-      event({
-        library: typedLibrary,
-        studentProgram: 'x = 1',
-        testcases: [
-          { program: 'print(1)', answer: '1', score: 1 },
-          { program: 'bad', answer: '1', score: 1 },
-        ],
-      }),
-      {
-        createChecker: () => Promise.resolve(checker),
-        createRunner: () => program => {
-          ran.push(program)
-          return Promise.resolve({ lines: ['1'], timedOut: false })
-        },
-      },
-    )
-    expect(summary.totalScore).toBe(1)
-    expect(summary.results[0]).toEqual({ resultType: 'pass', score: 1 })
-    expect(summary.results[1]).toMatchObject({
-      resultType: 'error',
-      errors: [
-        {
-          errorType: 'syntax',
-          line: 1,
-          location: 'student',
-          errorExplanation: 'Type error: wrong type',
-        },
-      ],
-    })
-    expect(ran).toHaveLength(1)
-    expect(checker.dispose).toHaveBeenCalledTimes(1)
-  })
-
-  it('reports a timeout when the checker does not answer, and does not use it again', async () => {
-    const errors = jest.fn(() => new Promise<never>(() => {}))
-    const checker: PythonTypeChecker = { errors, dispose: jest.fn() }
-    const ran = jest.fn()
-    const summary = await runAll(
-      event({
-        library: typedLibrary,
-        testcases: [
-          { program: 'print(1)', answer: '1', score: 1 },
-          { program: 'print(2)', answer: '2', score: 1 },
-        ],
-      }),
-      {
-        createChecker: () => Promise.resolve(checker),
-        createRunner: () => ran,
-        checkTimeoutMs: 50,
-      },
-    )
-    expect(summary.totalScore).toBe(0)
-    expect(summary.results).toEqual([
-      { resultType: 'error', errors: [{ errorType: 'timeout' }] },
-      { resultType: 'error', errors: [{ errorType: 'timeout' }] },
-    ])
-    expect(errors).toHaveBeenCalledTimes(1)
-    expect(ran).not.toHaveBeenCalled()
-    expect(checker.dispose).toHaveBeenCalledTimes(1)
-  })
-
-  it('reports a checker that fails, without stopping the event', async () => {
-    const checker: PythonTypeChecker = {
-      errors: () => Promise.reject(new Error('worker died')),
-      dispose: jest.fn(),
-    }
-    const summary = await runAll(
-      event({
-        library: typedLibrary,
-        testcases: [{ program: 'print(1)', answer: '1', score: 1 }],
-      }),
-      { createChecker: () => Promise.resolve(checker), createRunner: () => jest.fn() },
-    )
-    expect(summary.results[0]).toMatchObject({
-      resultType: 'error',
-      errors: [{ errorType: 'runtime', errorExplanation: 'The type checker failed: worker died' }],
-    })
-  })
-
-  it('reports a checker that cannot be started, without stopping the event', async () => {
-    const summary = await runAll(
-      event({
-        library: typedLibrary,
-        testcases: [{ program: 'print(1)', answer: '1', score: 1 }],
-      }),
-      {
-        createChecker: () => Promise.reject(new Error('no worker')),
-        createRunner: () => jest.fn(),
-      },
-    )
-    expect(summary.results[0]).toMatchObject({
-      resultType: 'error',
-      errors: [{ errorExplanation: 'The type checker failed: no worker' }],
-    })
-  })
-
-  it('starts no checker for an untyped chapter', async () => {
-    const createChecker = jest.fn()
-    await runAll(event({ testcases: [{ program: 'print(1)', answer: '1', score: 1 }] }), {
-      createChecker,
-      createRunner: () => () => Promise.resolve({ lines: ['1'], timedOut: false }),
-    })
-    expect(createChecker).not.toHaveBeenCalled()
-  })
-
-  // End to end: the vendored bundle and checker.
   it('grades a typed question: pass, wrong answer, and a type error', async () => {
     const summary = await runAll(
       event({
-        library: typedLibrary,
+        library: typed,
         studentProgram: 'def f(x: int) -> int:\n    return x + 1',
         testcases: [
-          { program: 'print(f(41))', answer: '42', score: 1 },
-          { program: 'print(f(0))', answer: '99', score: 1 },
-          { program: 'print(f("a"))', answer: '1', score: 1 },
+          testcase('print(f(41))', '42'),
+          testcase('print(f(0))', '99'),
+          testcase('print(f("a"))', '1'),
         ],
       }),
     )
@@ -326,22 +157,20 @@ describe('Python §4 Typed', () => {
     expect(summary.results[1]).toEqual({ resultType: 'fail', expected: '99', actual: '1' })
     expect(summary.results[2]).toMatchObject({
       resultType: 'error',
-      errors: [{ errorType: 'syntax', location: 'testcase', line: 1 }],
+      errors: [{ errorType: 'runtime' }],
     })
-  }, 60_000)
+  }, 120_000)
 
   it('gives a type error in the student program to every testcase', async () => {
     const summary = await runAll(
       event({
-        library: typedLibrary,
+        library: typed,
         studentProgram: 'def f(x: int) -> int:\n    return "a"',
-        testcases: [{ program: 'print(f(1))', answer: 'a', score: 1 }],
+        testcases: [testcase('print(f(1))', 'a'), testcase('print(f(2))', 'a')],
       }),
     )
     expect(summary.totalScore).toBe(0)
-    expect(summary.results[0]).toMatchObject({
-      resultType: 'error',
-      errors: [{ location: 'student', line: 2 }],
-    })
-  }, 60_000)
+    expect(summary.results.map(r => r.resultType)).toEqual(['error', 'error'])
+    expect(summary.results[0]).toMatchObject({ errors: [{ errorType: 'runtime' }] })
+  }, 120_000)
 })

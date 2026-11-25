@@ -177,40 +177,17 @@ The grader's corresponding `Summary` format will look like this:
 
 Other errors include timeout errors and runtime errors.
 
-## Building the Python runtime
-
-Python programs are graded by [py-slang](https://github.com/source-academy/py-slang)'s `py2js` engine, which is vendored into this repo as `vendor/py2js-bundle.cjs` and loaded by the grader at runtime. Chapter 5 is Python §4 Typed: each testcase's program is type-checked first (by py-slang's pyright-based checker, vendored as `vendor/TypedPy4Checker.js`; a program with type errors is not run and scores nothing), then runs as Python §4 with its types erased. To build or rebuild it:
-
-```bash
-yarn build:py2js
-```
-
-By default the script clones py-slang and bundles it with esbuild. The build is configurable through environment variables:
-
-| Variable        | Default                                      | Purpose                                                             |
-| --------------- | -------------------------------------------- | ------------------------------------------------------------------- |
-| `PY_SLANG_DIR`  | _(unset)_                                    | Bundle from an existing local py-slang checkout instead of cloning. |
-| `PY_SLANG_REPO` | `https://github.com/source-academy/py-slang` | Repository to clone when `PY_SLANG_DIR` is unset.                   |
-| `PY_SLANG_REF`  | `main`                                       | Branch or tag to clone.                                             |
-
-```bash
-# Build from a local checkout (e.g. when developing py-slang alongside the grader)
-PY_SLANG_DIR=../source-academy-py-slang yarn build:py2js
-
-# Build from a specific py-slang branch
-PY_SLANG_REF=some-branch yarn build:py2js
-```
-
-The clone is placed in a temporary directory and removed afterwards. The output runtime is saved at `vendor/py2js-bundle.cjs` and the checker's worker at `vendor/TypedPy4Checker.js`, which should be committed. Pointing `PY_SLANG_DIR` at a checkout without a `node_modules` will run `yarn install` inside that checkout.
-
 ## Conductor evaluators (any language)
 
-An event whose `library.evaluator` is the id (in the [language directory](https://github.com/source-academy/language-directory)) of an evaluator listed in `vendor/evaluators/manifest.json` is graded by that evaluator, whatever its language: `src/conductorGrader.ts` runs each testcase's program (prepend, student code, postpend and testcase, joined by newlines) in a worker thread under a [conductor](https://github.com/source-academy/conductor) host (`src/conductorHost.ts`), and compares the last line that the program prints with the answer. Other events go to the Source and Python graders as before.
+An event whose `library.evaluator` is the id (in the [language directory](https://github.com/source-academy/language-directory)) of an evaluator listed in `vendor/evaluators/manifest.json` is graded by that evaluator, whatever its language: `src/conductorGrader.ts` runs each testcase's program (prepend, student code, postpend and testcase, joined by newlines) in a worker thread under a [conductor](https://github.com/source-academy/conductor) host (`src/conductorHost.ts`), and compares the last line that the program prints with the answer. An event that names none (Python events from before the backend sent evaluator ids) gets the one its chapter stands for (`src/legacyEvents.ts`: Python §1 to §4 and §4 Typed). Source events that name no vendored evaluator still go to `src/sourceGrader.ts`, until Source too runs on the host.
+
+Python is graded this way, by [py-slang](https://github.com/source-academy/py-slang)'s evaluators (`python1Py2js` to `python4Py2js`, and `python4TypedPy2js`, which type-checks each program with its pyright-based checker before running it: a program with type errors is not run and scores nothing). The Typed evaluator downloads its checker; the manifest's `files` serves that URL from the vendored `TypedPy4Checker.js`, and the host gives the evaluator's worker a browser `Worker` for it (`src/workerBootstrap.js`).
 
 The evaluators are vendored, so that grading does not depend on the network. To add or update one:
 
 ```sh
 scripts/vendor-evaluator.sh ocaml https://source-academy.github.io/ocaml-slang OCamlEvaluator.js ocaml-toplevel.js
+scripts/vendor-evaluator.sh python https://source-academy.github.io/py-slang Py2JsEvaluator4.js TypedPy2JsEvaluator4.js TypedPy4Checker.js
 ```
 
-then add its entry to the manifest (`script`, `fileName`, `env`, and `fileEnv` for the files it loads). `TIMEOUT` (ms per testcase), `EVALUATOR_STARTUP_ALLOWANCE` (extra ms for every testcase, which starts a fresh worker that loads the evaluator) and `EVALUATOR_MAX_HEAP_MB` set the limits.
+then add its entry to the manifest (`script`, `fileName`, `env`, `fileEnv` for the files it loads, `files` for the URLs it downloads, and `studentSourceBinding` for a line that binds the student's source). `TIMEOUT` (ms per testcase), `EVALUATOR_STARTUP_ALLOWANCE` (extra ms for every testcase, which starts a fresh worker that loads the evaluator) and `EVALUATOR_MAX_HEAP_MB` set the limits.
