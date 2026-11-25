@@ -156,6 +156,23 @@ describe('grading an event', () => {
     expect(summary.results.map(r => r.resultType)).toEqual(['pass', 'fail'])
   })
 
+  it('allows an evaluator the startup time that its manifest entry says, instead of the default', async () => {
+    const timeouts: number[] = []
+    const grade = (entry: Manifest[string]) =>
+      runAll(event(), {
+        manifest: { ocamlJsOfOCaml: entry },
+        manifestPath: '/v/manifest.json',
+        runEvaluator: async (_evaluator, _fileName, _program, timeoutMs) => {
+          timeouts.push(timeoutMs)
+          return run({ outputs: ['120'] })
+        },
+      })
+    await grade({ script: 'e.js', fileName: '/main.ml' })
+    await grade({ script: 'e.js', fileName: '/main.ml', startupAllowanceMs: 15000 })
+    // the default allowance is 2 s (EVALUATOR_STARTUP_ALLOWANCE unset)
+    expect(timeouts[1] - timeouts[0]).toBe(15000 - 2000)
+  })
+
   it('refuses an evaluator it does not have', async () => {
     await expect(runAll(event({}, 'nope'), { manifest: {} })).rejects.toThrow(/nope/)
   })

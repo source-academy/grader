@@ -39,6 +39,7 @@
     "files": {
       "https://source-academy.github.io/py-slang/TypedPy4Checker.js": "python/TypedPy4Checker.js"
     },
-    "source": "https://source-academy.github.io/py-slang/"
+    "source": "https://source-academy.github.io/py-slang/",
+    "startupAllowanceMs": 15000
   }
 }

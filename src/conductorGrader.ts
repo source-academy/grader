@@ -33,6 +33,10 @@ export type ManifestEntry = {
   // URL -> file, relative to the manifest: what the evaluator downloads from such a URL (a worker
   // script of its own, say) is read from the file, so that grading needs no network.
   files?: Record<string, string>
+  // Milliseconds that a run may take on top of `TIMEOUT` for the evaluator to start, which the
+  // default (`EVALUATOR_STARTUP_ALLOWANCE`) may not cover: py-slang's Typed evaluator starts a type
+  // checker first (the grader used to allow that 15 s). Absent: the default.
+  startupAllowanceMs?: number
   // A line of the program that binds the student's source code, for a postpend grader that parses
   // it: the line with `%s` replaced by the source as a JSON string (a string literal in most
   // languages). Placed after the student's code. Absent: no such line.
@@ -141,7 +145,12 @@ export const runAll = async (event: AwsEvent, deps: ConductorDeps = {}): Promise
     const program = assembleProgram(event, testcase, entry.studentSourceBinding)
     results.push(
       gradeRun(
-        await run(evaluator, entry.fileName, program, TIMEOUT_DURATION + STARTUP_ALLOWANCE),
+        await run(
+          evaluator,
+          entry.fileName,
+          program,
+          TIMEOUT_DURATION + (entry.startupAllowanceMs ?? STARTUP_ALLOWANCE),
+        ),
         testcase,
       ),
     )

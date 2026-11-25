@@ -1,4 +1,4 @@
-import { assembleProgram, runAll } from '../conductorGrader'
+import { assembleProgram, readManifest, runAll } from '../conductorGrader'
 import { AwsEvent, Library, Testcase } from '../types'
 
 // Python is graded by py-slang's conductor evaluators, vendored in vendor/evaluators (see the manifest).
@@ -138,6 +138,11 @@ describe('grading a Python question', () => {
 })
 
 describe('Python §4 Typed', () => {
+  it('has time to start its type checker: the 15 s that the grader used to allow it', () => {
+    const entry = readManifest().python4TypedPy2js
+    expect(entry.startupAllowanceMs).toBeGreaterThanOrEqual(15000)
+  })
+
   const typed = library(5)
 
   it('grades a typed question: pass, wrong answer, and a type error', async () => {

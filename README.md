@@ -190,4 +190,4 @@ scripts/vendor-evaluator.sh ocaml https://source-academy.github.io/ocaml-slang O
 scripts/vendor-evaluator.sh python https://source-academy.github.io/py-slang Py2JsEvaluator4.js TypedPy2JsEvaluator4.js TypedPy4Checker.js
 ```
 
-then add its entry to the manifest (`script`, `fileName`, `env`, `fileEnv` for the files it loads, `files` for the URLs it downloads, and `studentSourceBinding` for a line that binds the student's source). `TIMEOUT` (ms per testcase), `EVALUATOR_STARTUP_ALLOWANCE` (extra ms for every testcase, which starts a fresh worker that loads the evaluator) and `EVALUATOR_MAX_HEAP_MB` set the limits.
+then add its entry to the manifest (`script`, `fileName`, `env`, `fileEnv` for the files it loads, `files` for the URLs it downloads, `startupAllowanceMs` for an evaluator that needs longer than the default to start, and `studentSourceBinding` for a line that binds the student's source). `TIMEOUT` (ms per testcase), `EVALUATOR_STARTUP_ALLOWANCE` (extra ms for every testcase, which starts a fresh worker that loads the evaluator) and `EVALUATOR_MAX_HEAP_MB` set the limits.
