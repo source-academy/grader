@@ -74,7 +74,14 @@ jobs:
         run: yarn install --immutable
 
       - name: Run tests
+        if: github.event_name != 'push' || github.ref != 'refs/heads/master'
         run: yarn test
+
+      # Coverage is measured, and sent to Coveralls, only for what is merged: instrumenting slows the
+      # tests, some of which have timing limits, so pull requests run them plain.
+      - name: Run tests with coverage
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: yarn test --coverage --coverageReporters=lcov
 
       - name: Upload coverage to Coveralls
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'

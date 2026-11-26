@@ -5,3 +5,6 @@ grader.zip
 
 # Yarn
 .yarn/install-state.gz
+
+# jest coverage report
+/coverage
