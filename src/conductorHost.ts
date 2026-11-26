@@ -3,8 +3,9 @@
 // collects what it outputs and the errors it reports. It knows nothing of any language.
 //
 // An evaluator is stopped only by terminating its thread, so each program runs in a throwaway worker
-// under a wall-clock watchdog, as py2js programs do (see pythonGrader.ts).
+// under a wall-clock watchdog.
 
+import * as path from 'path'
 import { Worker } from 'worker_threads'
 
 export type EvaluatorProcess = {
@@ -12,12 +13,17 @@ export type EvaluatorProcess = {
   script: string
   // The environment of the worker, on top of the grader's.
   env: Record<string, string>
+  // URL -> absolute path of a file: what the evaluator fetches from such a URL comes from the file.
+  files?: Record<string, string>
 }
 
 export type EvaluatorRun = {
   // What the program sent to the output (a line each), in order.
   outputs: string[]
-  // The errors the evaluator reported, as their messages.
+  // The values the evaluator sent as the result of the program (the value of its last expression,
+  // for a language that has one), as they arrived: plain data.
+  results: unknown[]
+  // The errors the evaluator reported, as their messages (the conductor sends nothing else).
   errors: string[]
   timedOut: boolean
   // The worker failed (the script is missing or throws): not the program's error.
@@ -46,6 +52,11 @@ async function loadConductor() {
   }
 }
 
+// The first script of the worker: it gives a Node worker the globals of a browser worker (`self`,
+// `postMessage`, `addEventListener`, `fetch` from vendored files, `Worker`) and loads the evaluator's
+// script as it is. See workerBootstrap.js.
+export const WORKER_BOOTSTRAP = path.join(__dirname, 'workerBootstrap.js')
+
 const MAX_HEAP_MB = process.env.EVALUATOR_MAX_HEAP_MB
   ? parseInt(process.env.EVALUATOR_MAX_HEAP_MB, 10)
   : 512
@@ -55,8 +66,10 @@ export const runInEvaluator: EvaluatorRunner = async (evaluator, fileName, progr
 
   return new Promise<EvaluatorRun>(resolve => {
     const outputs: string[] = []
+    const results: unknown[] = []
     const errors: string[] = []
-    const worker = new Worker(evaluator.script, {
+    const worker = new Worker(WORKER_BOOTSTRAP, {
+      workerData: { script: evaluator.script, files: evaluator.files ?? {} },
       // Only what the manifest gives: the grader's own environment (credentials) is not for a program
       // that a student wrote, which can read it (OCaml's Sys.getenv does).
       env: { ...evaluator.env },
@@ -69,7 +82,7 @@ export const runInEvaluator: EvaluatorRunner = async (evaluator, fileName, progr
       settled = true
       clearTimeout(timer)
       void worker.terminate()
-      resolve({ outputs, errors, timedOut: false, ...rest })
+      resolve({ outputs, results, errors, timedOut: false, ...rest })
     }
     const timer = setTimeout(() => finish({ timedOut: true }), timeoutMs)
     worker.on('error', (error: Error) => finish({ failure: error?.message ?? String(error) }))
@@ -83,6 +96,13 @@ export const runInEvaluator: EvaluatorRunner = async (evaluator, fileName, progr
       },
     }
 
+    let ready = false
+    let sent = 0
+    let received = 0
+    const done = () => {
+      if (ready && received >= sent) finish({})
+    }
+
     // (methods, not class fields: the base class binds requestFile in its constructor)
     class Host extends BasicHostPlugin {
       requestFile(name: string) {
@@ -94,13 +114,28 @@ export const runInEvaluator: EvaluatorRunner = async (evaluator, fileName, progr
       }
       receiveOutput(message: string) {
         outputs.push(message)
+        received++
+        done()
+      }
+      receiveResult(result: unknown) {
+        results.push(result)
+        received++
+        done()
       }
       receiveError(error: { message: string }) {
         errors.push(error.message)
+        received++
+        done()
       }
-      // The evaluator is ready again when it has run the file.
-      receiveStatusUpdate(status: number, isActive: boolean) {
-        if (status === RunnerStatus.EVAL_READY && isActive) finish({})
+      // The evaluator is ready again when it has run the file. Output, result and error ride their own
+      // channels, which are not ordered against the status: the status says how many of them the
+      // evaluator sent (`sentCount`), and the run is over when that many have arrived.
+      receiveStatusUpdate(status: number, isActive: boolean, sentCount?: number) {
+        if (status === RunnerStatus.EVAL_READY && isActive) {
+          ready = true
+          sent = sentCount ?? 0
+          done()
+        }
       }
     }
     const conduit = new Conduit(link as never, true)

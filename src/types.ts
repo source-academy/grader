@@ -1,23 +1,13 @@
-// Language-agnostic types shared across the dispatcher and both graders, whereas language-specific types live in the respective grader module.
-
-// Absent language => 'python'.
-export type Language = 'javascript' | 'python'
+// The types of the grader's input and output. The grader knows no language: an event names the evaluator
+// that grades it (`library.evaluator`, an id in the language directory), and the grader runs it.
 
 export type Library = {
-  chapter: number
-  // The ids, in the language directory, of the language and the evaluator that grade the question
-  // (what the backend sends since source-academy/backend#1387). An evaluator that the grader has
-  // vendored (vendor/evaluators/manifest.json) is run by the conductor grader, whatever `language` says.
-  language?: string
-  evaluator?: string
-  // `external` and `globals` are javascript-only. RUNES/CURVES/etc. are js-slang graphics modules
-  // graded by rendering to headless WebGL and comparing pixels (picture_mse) - there is
-  // no Python equivalent for now, so the Python grader ignores this.
-  external: {
-    name: 'NONE' | 'RUNES' | 'CURVES' | 'SOUNDS' | 'BINARYTREES' | 'PIXNFLIX'
-    symbols: string[]
-  }
-  globals: Array<string[]>
+  // The backend grader's language and evaluator, by their ids in the language directory
+  // (source-academy/backend#1387, #1391). The evaluator must be one the grader has vendored
+  // (vendor/evaluators/manifest.json). The event has more (`chapter`, `runtime`, `userLibrary`, ...):
+  // the grader does not read it.
+  language?: string | null
+  evaluator?: string | null
 }
 
 export type Testcase = {
@@ -26,9 +16,8 @@ export type Testcase = {
   score: number
 }
 
-// An event from the backend. `language` defaults to Python when omitted.
+// An event from the backend.
 export type AwsEvent = {
-  language?: Language
   library: Library
   prependProgram: string
   studentProgram: string

@@ -3,7 +3,67 @@
     "script": "ocaml/OCamlEvaluator.js",
     "fileName": "/main.ml",
     "env": {},
-    "fileEnv": { "OCAML_SLANG_TOPLEVEL_URL": "ocaml/ocaml-toplevel.js" },
+    "fileEnv": {
+      "OCAML_SLANG_TOPLEVEL_URL": "ocaml/ocaml-toplevel.js"
+    },
     "source": "https://source-academy.github.io/ocaml-slang/"
+  },
+  "python1Py2js": {
+    "script": "python/Py2JsEvaluator1.js",
+    "fileName": "/main.py",
+    "studentSourceBinding": "__program__ = %s",
+    "source": "https://source-academy.github.io/py-slang/"
+  },
+  "python2Py2js": {
+    "script": "python/Py2JsEvaluator2.js",
+    "fileName": "/main.py",
+    "studentSourceBinding": "__program__ = %s",
+    "source": "https://source-academy.github.io/py-slang/"
+  },
+  "python3Py2js": {
+    "script": "python/Py2JsEvaluator3.js",
+    "fileName": "/main.py",
+    "studentSourceBinding": "__program__ = %s",
+    "source": "https://source-academy.github.io/py-slang/"
+  },
+  "python4Py2js": {
+    "script": "python/Py2JsEvaluator4.js",
+    "fileName": "/main.py",
+    "studentSourceBinding": "__program__ = %s",
+    "source": "https://source-academy.github.io/py-slang/"
+  },
+  "python4TypedPy2js": {
+    "script": "python/TypedPy2JsEvaluator4.js",
+    "fileName": "/main.py",
+    "studentSourceBinding": "__program__ = %s",
+    "files": {
+      "https://source-academy.github.io/py-slang/TypedPy4Checker.js": "python/TypedPy4Checker.js"
+    },
+    "source": "https://source-academy.github.io/py-slang/",
+    "startupAllowanceMs": 15000
+  },
+  "source1Default": {
+    "script": "source/SourceEvaluator1.js",
+    "fileName": "/main.js",
+    "answerFrom": "result",
+    "source": "https://source-academy.github.io/js-slang/"
+  },
+  "source2Default": {
+    "script": "source/SourceEvaluator2.js",
+    "fileName": "/main.js",
+    "answerFrom": "result",
+    "source": "https://source-academy.github.io/js-slang/"
+  },
+  "source3Default": {
+    "script": "source/SourceEvaluator3.js",
+    "fileName": "/main.js",
+    "answerFrom": "result",
+    "source": "https://source-academy.github.io/js-slang/"
+  },
+  "source4Default": {
+    "script": "source/SourceEvaluator4.js",
+    "fileName": "/main.js",
+    "answerFrom": "result",
+    "source": "https://source-academy.github.io/js-slang/"
   }
 }

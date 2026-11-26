@@ -1,6 +1,7 @@
 import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os'
 import * as path from 'path'
+import { Worker } from 'worker_threads'
 
 import {
   assembleProgram,
@@ -12,16 +13,13 @@ import {
   readManifest,
   runAll,
 } from '../conductorGrader'
-import { EvaluatorRun } from '../conductorHost'
+import { EvaluatorRun, runInEvaluator, WORKER_BOOTSTRAP } from '../conductorHost'
 import { AwsEvent } from '../types'
 
 const manifestPath = path.join(__dirname, '..', '..', 'vendor', 'evaluators', 'manifest.json')
 
 const event = (over: Partial<AwsEvent> = {}, evaluator = 'ocamlJsOfOCaml'): AwsEvent => ({
   library: {
-    chapter: 1,
-    external: { name: 'NONE', symbols: [] },
-    globals: [],
     language: 'ocaml',
     evaluator,
   },
@@ -34,6 +32,7 @@ const event = (over: Partial<AwsEvent> = {}, evaluator = 'ocamlJsOfOCaml'): AwsE
 
 const run = (over: Partial<EvaluatorRun> = {}): EvaluatorRun => ({
   outputs: [],
+  results: [],
   errors: [],
   timedOut: false,
   ...over,
@@ -73,8 +72,20 @@ describe('the result of a testcase', () => {
 
   it('is an error with the evaluator’s message when it reports one', () => {
     const result = gradeRun(run({ errors: ['Type error'], outputs: ['120'] }), testcase)
-    expect(result).toMatchObject({ resultType: 'error' })
-    expect(JSON.stringify(result)).toContain('Type error')
+    expect(result).toMatchObject({
+      resultType: 'error',
+      errors: [{ errorType: 'runtime', errorExplanation: 'Type error' }],
+    })
+  })
+
+  it('has every error the evaluator reported, as a runtime error', () => {
+    expect(gradeRun(run({ errors: ['a', 'b'] }), testcase)).toMatchObject({
+      resultType: 'error',
+      errors: [
+        { errorType: 'runtime', errorExplanation: 'a' },
+        { errorType: 'runtime', errorExplanation: 'b' },
+      ],
+    })
   })
 
   it('is a timeout when the program ran out of time', () => {
@@ -107,6 +118,7 @@ describe('the evaluators the grader has', () => {
     expect(processOf(manifest.known, '/v/m.json')).toEqual({
       script: '/v/k.js',
       env: { FILE: '/v/f.bin' },
+      files: {},
     })
   })
 
@@ -142,8 +154,60 @@ describe('grading an event', () => {
     expect(summary.results.map(r => r.resultType)).toEqual(['pass', 'fail'])
   })
 
-  it('refuses an evaluator it does not have', async () => {
+  it('allows an evaluator the startup time that its manifest entry says, instead of the default', async () => {
+    const timeouts: number[] = []
+    const grade = (entry: Manifest[string]) =>
+      runAll(event(), {
+        manifest: { ocamlJsOfOCaml: entry },
+        manifestPath: '/v/manifest.json',
+        runEvaluator: async (_evaluator, _fileName, _program, timeoutMs) => {
+          timeouts.push(timeoutMs)
+          return run({ outputs: ['120'] })
+        },
+      })
+    await grade({ script: 'e.js', fileName: '/main.ml' })
+    await grade({ script: 'e.js', fileName: '/main.ml', startupAllowanceMs: 15000 })
+    // the default allowance is 2 s (EVALUATOR_STARTUP_ALLOWANCE unset)
+    expect(timeouts[1] - timeouts[0]).toBe(15000 - 2000)
+  })
+
+  it('caps a testcase at what the Lambda has left, less the margin, and times out the rest after it', async () => {
+    const limits: number[] = []
+    const summary = await runAll(event(), {
+      manifest: { ocamlJsOfOCaml: { script: 'e.js', fileName: '/main.ml' } },
+      manifestPath: '/v/manifest.json',
+      // 4 s left, less the 2 s margin: below TIMEOUT plus the startup allowance (5 s)
+      getRemainingTimeInMillis: () => 4000,
+      runEvaluator: async (_evaluator, _fileName, _program, timeoutMs) => {
+        limits.push(timeoutMs)
+        return run({ timedOut: true })
+      },
+    })
+    expect(limits[0]).toBeLessThanOrEqual(2000)
+    expect(limits[0]).toBeGreaterThan(1000)
+    expect(summary.results.every(r => r.resultType === 'error')).toBe(true)
+  })
+
+  it('does not run a testcase after the event deadline', async () => {
+    const programs: string[] = []
+    const summary = await runAll(event(), {
+      manifest: { ocamlJsOfOCaml: { script: 'e.js', fileName: '/main.ml' } },
+      manifestPath: '/v/manifest.json',
+      getRemainingTimeInMillis: () => 1000, // less than the margin
+      runEvaluator: async (_evaluator, _fileName, program) => {
+        programs.push(program)
+        return run({ outputs: ['120'] })
+      },
+    })
+    expect(programs).toEqual([])
+    expect(summary.results.every(r => r.resultType === 'error')).toBe(true)
+  })
+
+  it('refuses an evaluator it does not have, and an event that names none', async () => {
     await expect(runAll(event({}, 'nope'), { manifest: {} })).rejects.toThrow(/nope/)
+    await expect(
+      runAll(event({ library: { language: 'python' } }), { manifest: {} }),
+    ).rejects.toThrow(/undefined/)
   })
 })
 
@@ -253,5 +317,55 @@ describeOcaml('the vendored OCaml evaluator', () => {
       { resultType: 'error', errors: [{ errorType: 'timeout' }] },
       { resultType: 'pass', score: 1 },
     ])
+  })
+})
+
+describe('the worker of the host', () => {
+  it('gives a script built for a browser worker its globals: self, postMessage, addEventListener', async () => {
+    const script = path.join(__dirname, 'fixtures', 'browser-worker.js')
+    const worker = new Worker(WORKER_BOOTSTRAP, { workerData: { script } })
+    try {
+      const reply = new Promise(resolve => worker.once('message', resolve))
+      worker.postMessage('ping')
+      expect(await reply).toEqual({ echo: 'ping', selfIsGlobal: true })
+    } finally {
+      await worker.terminate()
+    }
+  })
+
+  it('loads an evaluator that is an ES module with top-level await', async () => {
+    const script = path.join(__dirname, 'fixtures', 'browser-worker-esm.mjs')
+    const worker = new Worker(WORKER_BOOTSTRAP, { workerData: { script } })
+    try {
+      const reply = new Promise(resolve => worker.once('message', resolve))
+      // sent at once, before the module has loaded: the port holds it until the module listens
+      worker.postMessage('ping')
+      expect(await reply).toEqual({ echo: 'ping', waited: true })
+    } finally {
+      await worker.terminate()
+    }
+  })
+
+  it('reports a script that cannot be loaded as an error of the worker', async () => {
+    const worker = new Worker(WORKER_BOOTSTRAP, {
+      workerData: { script: path.join(__dirname, 'fixtures', 'does-not-exist.js') },
+    })
+    await expect(new Promise((_, reject) => worker.once('error', reject))).rejects.toThrow()
+    await worker.terminate()
+  })
+})
+
+describe('the host', () => {
+  it('waits for everything the evaluator sent, not for its status update alone', async () => {
+    const script = path.join(__dirname, 'fixtures', 'chatty-evaluator.mjs')
+    const run = await runInEvaluator({ script, env: {} }, '/main.x', 'ignored', 20000)
+    expect(run.failure).toBeUndefined()
+    // finished because everything had arrived, not because the watchdog went off
+    expect(run.timedOut).toBe(false)
+    expect(run.outputs).toHaveLength(300)
+    expect(run.outputs[299]).toBe('line 299')
+    // the evaluator's own result (42), and the void result that BasicEvaluator sends for the file
+    expect(run.results).toStrictEqual([42, undefined])
+    expect(run.errors).toEqual(['boom'])
   })
 })
