@@ -3,171 +3,54 @@
 [![Build_status](https://travis-ci.org/source-academy/grader.svg?branch=master)](https://travis-ci.org/source-academy/grader)
 [![Coverage](https://coveralls.io/repos/github/source-academy/grader/badge.svg?branch=master)](https://coveralls.io/github/source-academy/grader?branch=master)
 
-The grader is a component of the [Cadet backend](https://github.com/source-academy/cadet). The grader,
+The grader is a component of the [Cadet backend](https://github.com/source-academy/cadet). It knows no language. The grader,
 
-1. Receives a JSON format from the backend,
-2. For each test case program,
-   1. Concatenate all the program strings into a single combined program
-   2. Evaluates the single combined program in the [js-slang](https://github.com/source-academy/js-slang) interpreter
+1. Receives a JSON event from the backend, which names the [conductor](https://github.com/source-academy/conductor) evaluator that grades the question (`library.evaluator`, an id in the [language directory](https://github.com/source-academy/language-directory)),
+2. For each testcase, concatenates the prepend, student, postpend and testcase programs into one program, and runs it in that evaluator, in a worker thread,
+3. Returns a `Summary` JSON with the result of each testcase.
 
-3. Returns a `Summary` JSON containing the results of the evaluation of the student code
+The evaluators (Source, Python, OCaml, ...) are vendored in `vendor/evaluators`, so that grading does not depend on the network: see [Conductor evaluators](#conductor-evaluators-any-language).
 
 ## Input JSON format
 
-The input format consists of library, prepend, student, postpend, and testcases fields.
-
-Example input:
-
 ```json
 {
-  "library": {
-    "chapter": 1,
-    "external": {
-      "name": "NONE",
-      "symbols": []
-    },
-    "globals": []
-  },
-  "prependProgram": "// This line will be ignored",
-  "studentProgram": "const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2);",
-  "postpendProgram": "// This line will also be ignored",
+  "library": { "language": "python4", "evaluator": "python4Py2js" },
+  "prependProgram": "# This line is part of every testcase's program",
+  "studentProgram": "def f(i):\n    return 0 if i == 0 else 1 if i < 3 else f(i - 1) + f(i - 2)",
+  "postpendProgram": "",
   "testcases": [
-    {
-      "program": "f(1);",
-      "answer": "1",
-      "score": 1
-    },
-    {
-      "program": "f(3);",
-      "answer": "2",
-      "score": 1
-    },
-    {
-      "program": "f(5);",
-      "answer": "5",
-      "score": 1
-    }
+    { "program": "print(f(1))", "answer": "1", "score": 1 },
+    { "program": "print(f(3))", "answer": "2", "score": 1 },
+    { "program": "print(f(5))", "answer": "5", "score": 1 }
   ]
 }
 ```
 
-The programs are programs written in [the source language](https://github.com/source-academy/js-slang).
+`library.evaluator` must be an evaluator in `vendor/evaluators/manifest.json`; the grader refuses an event whose evaluator it does not have. (The backend's event has more fields, such as `chapter`, `runtime` and `userLibrary`; the grader does not read them.)
 
-Each test case consists of the prepend, student, postpend and testcase program concatenated in that order.
-
-For example, testcase 1 will look like:
-
-```javascript
-// This line will be ignored
-const f = i => (i === 0 ? 0 : i < 3 ? 1 : f(i - 1) + f(i - 2))
-// This line will also be ignored
-f(1)
-```
+Each testcase's program is the prepend, student, postpend and testcase programs joined by newlines. A testcase's `answer` is compared with the last line that the program prints, or, for an evaluator whose manifest entry says `"answerFrom": "result"` (Source), with the value of the program's last expression, shown as in the frontend (`src/formatValue.ts`).
 
 ## Output `Summary` Format
 
-The grader will produce a `Summary` for every input. The `Summary` will be an array of `Result`, with each testcase producing one `Result`. The format of the `Result` are as follows:
-
-### Example: Correct Answer
-
-The student's code is correct.
-
-The grader's corresponding `Summary` format will look like this:
+The grader produces a `Summary` for every event, with one result per testcase: `pass`, `fail` (with the expected and the actual answer) or `error`.
 
 ```json
 {
-  "totalScore": 3,
+  "totalScore": 1,
+  "maxScore": 3,
   "results": [
-    {
-      "resultType": "pass",
-      "score": 1
-    },
-    {
-      "resultType": "pass",
-      "score": 1
-    },
-    {
-      "resultType": "pass",
-      "score": 1
-    }
-  ]
-}
-```
-
-Note that the `resultType` pass represents any successful evaluation, i.e. no errors raised.
-
-### Example: Wrong Answer
-
-The student's code is wrong.
-
-The grader's corresponding `Summary` format will look like this:
-
-```json
-{
-  "totalScore": 0,
-  "results": [
-    {
-      "resultType": "fail",
-      "expected": "1",
-      "actual": "2"
-    },
-    {
-      "resultType": "fail",
-      "expected": "2",
-      "actual": "3"
-    },
-    {
-      "resultType": "fail",
-      "expected": "5",
-      "actual": "8"
-    }
-  ]
-}
-```
-
-### Example: Error in the code
-
-The student's code has a syntax error.
-
-The grader's corresponding `Summary` format will look like this:
-
-```JSON
-{
-  "totalScore": 0,
-  "results": [
+    { "resultType": "pass", "score": 1 },
+    { "resultType": "fail", "expected": "2", "actual": "3" },
     {
       "resultType": "error",
       "errors": [
         {
-          "errorType": "syntax",
-          "line": 1,
-          "location": "student",
-          "errorLine": "const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2)",
-          "errorExplanation": "Missing semicolon at the end of statement"
-        }
-      ]
-    },
-    {
-      "resultType": "error",
-      "errors": [
-        {
-          "errorType": "syntax",
-          "line": 1,
-          "location": "student",
-          "errorLine": "const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2)",
-          "errorExplanation": "Missing semicolon at the end of statement"
-        }
-      ]
-    },
-    {
-      "resultType": "error",
-      "errors": [
-        {
-          "errorType": "syntax",
-          "line": 1,
-          "location": "student",
-          "errorLine": "const f = i => i === 0 ? 0 : i < 3 ? 1 : f(i-1) + f(i-2)",
-          "errorExplanation": "Missing semicolon at the end of statement"
+          "errorType": "runtime",
+          "line": 0,
+          "location": "unknown",
+          "errorLine": "",
+          "errorExplanation": "integer division or modulo by zero"
         }
       ]
     }
@@ -175,30 +58,20 @@ The grader's corresponding `Summary` format will look like this:
 }
 ```
 
-Other errors include timeout errors and runtime errors.
+An error is the message that the evaluator reported: the conductor sends nothing else, so every error is `runtime`, at no line. A program that runs out of time (`TIMEOUT`, and the evaluator's startup allowance) is `{ "errorType": "timeout" }`. So is a testcase that the event's deadline cuts off: the time the Lambda has left (`getRemainingTimeInMillis` of the context that AWS passes to the handler) less `DEADLINE_MARGIN_MS` (default 2000) caps every run, so that a slow event returns the results it has, instead of none when AWS stops it. Without a Lambda context there is no event deadline.
 
-## Building the Python runtime
+## Conductor evaluators (any language)
 
-Python programs are graded by [py-slang](https://github.com/source-academy/py-slang)'s `py2js` engine, which is vendored into this repo as `vendor/py2js-bundle.cjs` and loaded by the grader at runtime. To build or rebuild it:
+Every event names the evaluator that grades it, by `library.evaluator`: `src/conductorGrader.ts` runs each testcase's program in a worker thread under a [conductor](https://github.com/source-academy/conductor) host (`src/conductorHost.ts`), and compares the answer with what the program printed or returned (the manifest entry's `answerFrom`). The vendored evaluators are Source (`source1Default` to `source4Default`, from [js-slang](https://github.com/source-academy/js-slang)), Python (below) and OCaml (`ocamlJsOfOCaml`, from [ocaml-slang](https://github.com/source-academy/ocaml-slang)). The grader no longer grades Source's graphics modules (Runes, Curves): that needs headless versions of the modules (source-academy/modules#1011), and until then those questions are graded by hand.
 
-```bash
-yarn build:py2js
+Python is graded by [py-slang](https://github.com/source-academy/py-slang)'s evaluators (`python1Py2js` to `python4Py2js`, and `python4TypedPy2js`, which type-checks each program with its pyright-based checker before running it: a program with type errors is not run and scores nothing). The Typed evaluator downloads its checker; the manifest's `files` serves that URL from the vendored `TypedPy4Checker.js`, and the host gives the evaluator's worker a browser `Worker` for it (`src/workerBootstrap.js`).
+
+The evaluators are vendored, so that grading does not depend on the network. To add or update one:
+
+```sh
+scripts/vendor-evaluator.sh ocaml https://source-academy.github.io/ocaml-slang OCamlEvaluator.js ocaml-toplevel.js
+scripts/vendor-evaluator.sh python https://source-academy.github.io/py-slang Py2JsEvaluator4.js TypedPy2JsEvaluator4.js TypedPy4Checker.js
+scripts/vendor-evaluator.sh source https://source-academy.github.io/js-slang SourceEvaluator3.js
 ```
 
-By default the script clones py-slang and bundles it with esbuild. The build is configurable through environment variables:
-
-| Variable        | Default                                      | Purpose                                                             |
-| --------------- | -------------------------------------------- | ------------------------------------------------------------------- |
-| `PY_SLANG_DIR`  | _(unset)_                                    | Bundle from an existing local py-slang checkout instead of cloning. |
-| `PY_SLANG_REPO` | `https://github.com/source-academy/py-slang` | Repository to clone when `PY_SLANG_DIR` is unset.                   |
-| `PY_SLANG_REF`  | `main`                                       | Branch or tag to clone.                                             |
-
-```bash
-# Build from a local checkout (e.g. when developing py-slang alongside the grader)
-PY_SLANG_DIR=../source-academy-py-slang yarn build:py2js
-
-# Build from a specific py-slang branch
-PY_SLANG_REF=some-branch yarn build:py2js
-```
-
-The clone is placed in a temporary directory and removed afterwards. The output runtime is saved at `vendor/py2js-bundle.cjs`, which should be committed. Pointing `PY_SLANG_DIR` at a checkout without a `node_modules` will run `yarn install` inside that checkout.
+then add its entry to the manifest (`script`, `fileName`, `env`, `fileEnv` for the files it loads, `files` for the URLs it downloads, `startupAllowanceMs` for an evaluator that needs longer than the default to start, and `studentSourceBinding` for a line that binds the student's source, and `answerFrom` for what the answer is compared with: `output`, the default, or `result`). `TIMEOUT` (ms per testcase), `DEADLINE_MARGIN_MS` (ms kept back from the Lambda's remaining time), `EVALUATOR_STARTUP_ALLOWANCE` (extra ms for every testcase, which starts a fresh worker that loads the evaluator) and `EVALUATOR_MAX_HEAP_MB` set the limits.
