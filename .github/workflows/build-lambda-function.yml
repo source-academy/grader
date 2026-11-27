@@ -17,7 +17,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: .node-version
           cache: yarn
       - name: Build the Lambda zip
         run: scripts/build-lambda-grader.sh
