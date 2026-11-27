@@ -3,6 +3,8 @@
 [![Build_status](https://travis-ci.org/source-academy/grader.svg?branch=master)](https://travis-ci.org/source-academy/grader)
 [![Coverage](https://coveralls.io/repos/github/source-academy/grader/badge.svg?branch=master)](https://coveralls.io/github/source-academy/grader?branch=master)
 
+Needs Node 24 (the version in `.node-version`; see the [Node.js version](https://github.com/source-academy/documentation/blob/main/app/docs/developers/node-version.md) page). The Lambda that runs it follows the same page.
+
 The grader is a component of the [Cadet backend](https://github.com/source-academy/cadet). It knows no language. The grader,
 
 1. Receives a JSON event from the backend, which names the [conductor](https://github.com/source-academy/conductor) evaluator that grades the question (`library.evaluator`, an id in the [language directory](https://github.com/source-academy/language-directory)),
